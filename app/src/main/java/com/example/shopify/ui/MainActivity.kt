@@ -1,19 +1,22 @@
-@file:OptIn(ExperimentalLayoutApi::class)
-
-package com.example.shopify
+package com.example.shopify.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shopify.navigation.graph.ShopifyGraph
+import com.example.shopify.model.repository.ShopifyRepository
+import com.example.shopify.ui.navigation.graph.ShopifyGraph
 import com.example.shopify.ui.theme.ShopifyTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var repository: ShopifyRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -23,6 +26,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
 
 @Composable

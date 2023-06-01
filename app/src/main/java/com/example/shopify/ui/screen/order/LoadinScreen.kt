@@ -1,4 +1,4 @@
-package com.example.shopify.screen.order
+package com.example.shopify.ui.screen.order
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearOutSlowInEasing

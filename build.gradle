@@ -6,8 +6,8 @@ buildscript {
         hilt_navigation_version = '1.0.0'
         hilt_version = '2.46.1'
         preferences_datastore_version = '1.0.0'
-        apollo_version = '3.8.2'
         m3_version = '1.2.0-alpha02'
+        shopify_version = '16.0.0'
     }
 }
 

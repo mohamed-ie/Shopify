@@ -1,4 +1,4 @@
-package com.example.shopify
+package com.example.shopify.utils
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable

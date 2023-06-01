@@ -1,4 +1,4 @@
-package com.example.shopify.navigation
+package com.example.shopify.ui.navigation
 
 object Graph {
     const val ROOT = "ROOT_GRAPH"

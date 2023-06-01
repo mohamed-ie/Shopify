@@ -1,4 +1,4 @@
-package com.example.shopify.screen.home
+package com.example.shopify.ui.screen.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -22,8 +22,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.shopify.navigation.NavigationBarScreen
-import com.example.shopify.navigation.graph.HomeGraph
+import com.example.shopify.ui.navigation.NavigationBarScreen
+import com.example.shopify.ui.navigation.graph.HomeGraph
 
 private val items = listOf<NavigationBarScreen>(
     NavigationBarScreen.Home
