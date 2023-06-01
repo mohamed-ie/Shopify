@@ -1,11 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
-    id 'com.apollographql.apollo3' version "$apollo_version"
-
-
+    id 'kotlin-kapt'
 }
 
 android {
@@ -97,13 +94,8 @@ dependencies {
     //preferences datastore
     implementation "androidx.datastore:datastore-preferences:$preferences_datastore_version"
 
-    //apollo
-    implementation "com.apollographql.apollo3:apollo-runtime:$apollo_version"
-
-}
-
-apollo {
-    service("service") {
-        packageName.set("com.example.shopify")
+    //shopify
+    implementation ("com.shopify.mobilebuysdk:buy3:$shopify_version"){
+        exclude group: "com.shopify.graphql.support"
     }
 }
