@@ -2,7 +2,6 @@ package com.example.shopify.di.apollo
 
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.interceptor.ApolloInterceptor
-import com.example.shopify.feature.core.domain.interceptor.ShopifyApolloInterceptor
 import com.example.shopify.utils.Constants
 import dagger.Module
 import dagger.Provides
