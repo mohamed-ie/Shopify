@@ -8,4 +8,8 @@
     <string name="choose_quantity_opened">Choose quantity opened</string>
     <string name="remove">Remove</string>
     <string name="move_to_wishlist">Move to wishlist</string>
+    <string name="enter_coupon_code">Enter Coupon Code</string>
+    <string name="apply">Apply</string>
+    <string name="clear">Clear</string>
+    <string name="coupon_code_invalid">Oops! Coupon code invalid</string>
 </resources>
