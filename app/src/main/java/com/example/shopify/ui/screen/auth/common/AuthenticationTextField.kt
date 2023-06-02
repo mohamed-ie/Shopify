@@ -1,4 +1,4 @@
-package com.example.shopify.auth.common
+package com.example.shopify.ui.screen.auth.common
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +33,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shopify.R
 
 
 @Composable
@@ -43,6 +45,8 @@ fun AuthTextField(
     @StringRes textFieldHeader: Int,
     @StringRes placeHolder: Int,
     modifier: Modifier,
+    isError:Boolean,
+    @StringRes errorMessage:Int,
     onTextChanged: (String) -> Unit
 ) {
     Column(modifier = modifier) {
@@ -53,8 +57,11 @@ fun AuthTextField(
             color = Color.Gray
         )
         Spacer(modifier = Modifier.padding(vertical = 7.dp))
-        CustomTextFiled(text = text, placeHolder = placeHolder, onTextChanged = onTextChanged)
-        PasswordVisualTransformation()
+        CustomTextFiled(text = text, placeHolder = placeHolder, isError, onTextChanged = onTextChanged)
+        Spacer(modifier = Modifier.padding(vertical = 3.dp))
+        if (isError)
+            Text(text = stringResource(id = errorMessage),style = MaterialTheme.typography.labelMedium,
+                color = Color.Red)
     }
 }
 
@@ -64,6 +71,8 @@ fun AuthPasswordTextField(
     @StringRes textFieldHeader: Int,
     @StringRes placeHolder: Int,
     modifier: Modifier,
+    isError:Boolean,
+    @StringRes errorMessage:Int,
     onTextChanged: (String) -> Unit
 ) {
     Column(modifier = modifier) {
@@ -74,10 +83,17 @@ fun AuthPasswordTextField(
             color = Color.Gray
         )
         Spacer(modifier = Modifier.padding(vertical = 7.dp))
-        CustomPasswordTextFiled(text = text, placeHolder = placeHolder, onTextChanged = onTextChanged)
+        CustomPasswordTextFiled(text = text, placeHolder = placeHolder, isError, onTextChanged = onTextChanged)
+        Spacer(modifier = Modifier.padding(vertical = 3.dp))
+        if (isError)
+            Text(text = stringResource(id = errorMessage),style = MaterialTheme.typography.labelMedium,
+                color = Color.Red)
+
 
     }
 }
+
+
 
 
 
@@ -86,6 +102,7 @@ fun AuthPasswordTextField(
 private fun CustomTextFiled(
     text: String,
     @StringRes placeHolder: Int,
+    isError:Boolean,
     onTextChanged: (String) -> Unit,
 ) {
     BasicTextField(
@@ -99,7 +116,7 @@ private fun CustomTextFiled(
                 modifier = Modifier.drawWithContent {
                     drawContent()
                     drawLine(
-                        color = Color.LightGray,
+                        color = if (isError) Color.Red else Color.LightGray,
                         start = Offset(
                             x = 0f,
                             y = size.height - 1.dp.toPx(),
@@ -134,6 +151,7 @@ private fun CustomTextFiled(
 private fun CustomPasswordTextFiled(
     text: String,
     @StringRes placeHolder: Int,
+    isError:Boolean,
     onTextChanged: (String) -> Unit,
 ) {
     var passwordVisible by remember { mutableStateOf(true) }
@@ -148,7 +166,7 @@ private fun CustomPasswordTextFiled(
                 modifier = Modifier.drawWithContent {
                     drawContent()
                     drawLine(
-                        color = Color.LightGray,
+                        color = if (isError) Color.Red else Color.LightGray,
                         start = Offset(
                             x = 0f,
                             y = size.height - 1.dp.toPx(),

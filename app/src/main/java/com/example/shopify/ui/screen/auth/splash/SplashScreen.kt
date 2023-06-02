@@ -1,4 +1,4 @@
-package com.example.shopify.auth.splash
+package com.example.shopify.ui.screen.auth.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

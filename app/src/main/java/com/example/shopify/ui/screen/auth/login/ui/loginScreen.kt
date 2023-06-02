@@ -1,4 +1,4 @@
-package com.example.shopify.auth.login.ui
+package com.example.shopify.ui.screen.auth.login.ui
 
 
 import androidx.compose.foundation.layout.Column
@@ -25,9 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.auth.common.AuthHeader
-import com.example.shopify.auth.common.AuthPasswordTextField
-import com.example.shopify.auth.common.AuthTextField
+import com.example.shopify.ui.screen.auth.common.AuthHeader
+import com.example.shopify.ui.screen.auth.common.AuthPasswordTextField
+import com.example.shopify.ui.screen.auth.common.AuthTextField
 
 
 @Composable
@@ -64,6 +64,8 @@ fun LoginScreen() {
                 textFieldHeader = R.string.email,
                 placeHolder = R.string.email_place_holder,
                 modifier = Modifier.fillMaxWidth().padding(2.dp),
+                isError = false,
+                errorMessage = 0,
                 onTextChanged = { textEmailValue -> email = textEmailValue }
             )
 
@@ -74,6 +76,8 @@ fun LoginScreen() {
                 textFieldHeader = R.string.password,
                 placeHolder = R.string.password_place_holder,
                 modifier = Modifier.fillMaxWidth().padding(2.dp),
+                isError = false,
+                errorMessage = 0,
                 onTextChanged = {textPasswordValue ->
                     password = textPasswordValue
                 }

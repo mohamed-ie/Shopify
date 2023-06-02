@@ -1,4 +1,4 @@
-package com.example.shopify.auth.common
+package com.example.shopify.ui.screen.auth.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
