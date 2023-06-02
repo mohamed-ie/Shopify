@@ -15,6 +15,14 @@
     <string name="lastName_place_holder">Please enter your last name</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="phone_place_holder">Please enter your phone number</string>
+    <string name="email_not_formed_error">Oh no! Please enter a valid email.</string>
+    <string name="password_not_formed_error">Hold up, this field requires at least 8 characters.</string>
+    <string name="first_name_not_formed_error">Hold up, this field requires your first name.</string>
+    <string name="second_name_not_formed_error">Hold up, this field requires your second name.</string>
+    <string name="phone_not_formed_error">Hold up, it must be like (+201558653011)</string>
+    <string name="nothing">must be like (+201558653011)</string>
     <string name="phone">Phone</string>
+    <string name="home">home</string>
+    <string name="back">back</string>
 
 </resources>
