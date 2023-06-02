@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Shopify</string>
+    <string name="back">Back</string>
+    <string name="home">Home</string>
+    <string name="discount">%1$s OFF</string>
+    <string name="sold_by">Sold by</string>
+    <string name="choose_quantity_clossed">Choose quantity closed</string>
+    <string name="choose_quantity_opened">Choose quantity opened</string>
+    <string name="remove">Remove</string>
+    <string name="move_to_wishlist">Move to wishlist</string>
 </resources>
