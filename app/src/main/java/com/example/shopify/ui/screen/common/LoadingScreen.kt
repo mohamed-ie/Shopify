@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.order
+package com.example.shopify.ui.screen.common
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +28,7 @@ import androidx.compose.ui.unit.dp
 fun LoadingContent() {
     val infiniteTransition = rememberInfiniteTransition()
 
-    val size = infiniteTransition.animateValue(
+    val size by infiniteTransition.animateValue(
         initialValue = 10.dp,
         targetValue = 50.dp,
         typeConverter = Dp.VectorConverter,
@@ -41,7 +42,7 @@ fun LoadingContent() {
         )
     )
 
-    val color = infiniteTransition.animateColor(
+    val color by infiniteTransition.animateColor(
         initialValue = MaterialTheme.colorScheme.primary.copy(alpha = .6f),
         targetValue = MaterialTheme.colorScheme.primary.copy(alpha = .0f),
         animationSpec = infiniteRepeatable(
@@ -63,8 +64,8 @@ fun LoadingContent() {
         Box(
             modifier = Modifier
                 .clip(shape = CircleShape)
-                .background(color = color.value)
-                .size(size.value)
+                .background(color = color)
+                .size(size)
         )
     }
 }
