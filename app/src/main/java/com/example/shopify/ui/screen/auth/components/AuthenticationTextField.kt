@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.auth.common
+package com.example.shopify.ui.screen.auth.components
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement

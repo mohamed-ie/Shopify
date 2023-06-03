@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,12 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shopify.R
-import com.example.shopify.ui.screen.auth.common.AuthHeader
-import com.example.shopify.ui.screen.auth.common.AuthPasswordTextField
-import com.example.shopify.ui.screen.auth.common.AuthTextField
+import com.example.shopify.ui.screen.auth.components.AuthHeader
+import com.example.shopify.ui.screen.auth.components.AuthPasswordTextField
+import com.example.shopify.ui.screen.auth.components.AuthTextField
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
 import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
-import com.example.shopify.ui.screen.auth.common.ErrorCard
+import com.example.shopify.ui.screen.auth.components.ErrorCard
 import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.viewModel.RegistrationViewModel
 import com.example.shopify.utils.shopifyLoading

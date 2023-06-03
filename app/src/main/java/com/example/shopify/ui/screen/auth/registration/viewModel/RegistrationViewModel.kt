@@ -6,7 +6,7 @@ import com.example.shopify.R
 import com.example.shopify.helpers.Resource
 import com.example.shopify.model.repository.ShopifyRepository
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
-import com.example.shopify.ui.screen.auth.helper.UserInputValidator
+import com.example.shopify.helpers.UserInputValidator
 import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
 import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
@@ -96,6 +96,8 @@ class RegistrationViewModel @Inject constructor(
                     }
                 }
             }.launchIn(viewModelScope)
+        }else {
+            _uiLoadingState.value = false
         }
     }
     private fun updateFieldsErrors() {
