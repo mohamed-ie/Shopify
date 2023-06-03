@@ -5,7 +5,7 @@ import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.shopify.buy3.Storefront
 import javax.inject.Inject
 
-class ShopifyQueryGeneratorImpl @Inject constructor() :ShopifyQueryGenerator {
+class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateSingUpQuery(userInfo: SignUpUserInfo): Storefront.MutationQuery =
         Storefront.mutation { rootQuery ->
             rootQuery.customerCreate(createSingUpCustomerCreateInput(userInfo)) { payload ->
@@ -30,6 +30,23 @@ class ShopifyQueryGeneratorImpl @Inject constructor() :ShopifyQueryGenerator {
                         .expiresAt()
                 }.customerUserErrors { userErrorQuery ->
                     userErrorQuery.field().message()
+                }
+            }
+        }
+
+    override fun generateBrandQuery(): Storefront.QueryRootQuery? =
+        Storefront.query { rootQuery: Storefront.QueryRootQuery ->
+            rootQuery.collections({ arg -> arg.first(10) }
+            ) { collectionConnectionQuery ->
+                collectionConnectionQuery.edges { collectionEdgeQuery ->
+                    collectionEdgeQuery
+                        .node { collectionQuery ->
+                            collectionQuery
+                                .title()
+                                .image {
+                                    it.url()
+                                }
+                        }
                 }
             }
         }
