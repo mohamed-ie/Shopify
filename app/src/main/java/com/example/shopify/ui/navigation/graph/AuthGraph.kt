@@ -17,19 +17,18 @@ fun NavGraphBuilder.authGraph(navController:NavController) {
         startDestination = Auth.SIGN_IN
     ){
         composable(route = Auth.SIGN_IN){
-            LoginScreen(viewModel = hiltViewModel(), navigateToSignUp = {
-                navController.navigate(Auth.SIGN_UP)
-            }){
-                navController.navigate(Graph.HOME){
-                    popUpTo(Graph.ROOT)
-                }
-            }
+            LoginScreen(
+                viewModel = hiltViewModel(),
+                navigateToSignUp = { navController.navigate(Auth.SIGN_UP) },
+                navigateToHome = { navController.navigate(Graph.HOME){ popUpTo(Graph.ROOT) } }
+            )
         }
 
         composable(route = Auth.SIGN_UP){
-            SignUpScreen(viewModel = hiltViewModel()) {
-                navController.navigate(Auth.SIGN_IN)
-            }
+            SignUpScreen(
+                viewModel = hiltViewModel(),
+                navigateToSignIn = {navController.navigate(Auth.SIGN_IN)}
+            )
         }
     }
 }
