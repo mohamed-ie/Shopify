@@ -7,6 +7,7 @@ import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserResponseInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
+import com.example.shopify.ui.screen.home.model.Brand
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
@@ -36,15 +37,17 @@ class ShopifyRepositoryImpl @Inject constructor(
         return enqueueAuth(query).mapResource(mapper::mapToSignInResponse)
     }
 
+    override fun getBrands(): Flow<Resource<List<Brand>?>> {
+        val query = queryGenerator.generateBrandQuery()
+        return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
+    }
 
     private fun Storefront.QueryRootQuery.enqueue() = callbackFlow {
         val call = graphClient.queryGraph(this@enqueue).enqueue { result ->
             when (result) {
-                is GraphCallResult.Success ->
-                    trySend(Resource.Success(result.response))
+                is GraphCallResult.Success -> trySend(Resource.Success(result.response))
 
-                is GraphCallResult.Failure ->
-                    trySend(Resource.Error(result.error))
+                is GraphCallResult.Failure -> trySend(Resource.Error(result.error))
 
             }
         }
