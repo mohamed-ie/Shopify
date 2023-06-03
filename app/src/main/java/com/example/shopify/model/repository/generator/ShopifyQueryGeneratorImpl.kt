@@ -3,6 +3,7 @@ package com.example.shopify.model.repository.generator
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 import javax.inject.Inject
 
 class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
@@ -47,6 +48,60 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                     it.url()
                                 }
                         }
+                }
+            }
+        }
+
+    //8312397005107
+    override fun generateProductDetailsQuery(id:String) : Storefront.QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.node(ID(id)){ nodeQuery ->
+                nodeQuery.id()
+                nodeQuery.onProduct {productQuery ->
+                    productQuery
+                        .title()
+                        .description()
+                        .productType()
+                        .createdAt()
+                        .vendor()
+                        .isGiftCard
+                        .availableForSale()
+                        .tags()
+                        .onlineStoreUrl()
+                        .requiresSellingPlan()
+                        .media {mediaConnectionQuery ->
+                            mediaConnectionQuery.nodes {mediaQuery ->
+                                mediaQuery
+                                    .mediaContentType()
+                            }
+                        }
+                        .images {imageConnectionQuery ->
+                            imageConnectionQuery.nodes {imageQuery ->
+                                imageQuery
+                                    .id()
+                                    .url()
+                            }
+                        }
+                        .variants {variantConnectionQuery ->
+                            variantConnectionQuery.nodes {productVariantQuery ->
+                                productVariantQuery
+                                    .title()
+                                    .price {moneyQuery ->
+                                        moneyQuery.amount()
+                                    }
+                            }
+                        }
+                        .priceRange {productPriceRangeQuery ->
+                            productPriceRangeQuery
+                                .maxVariantPrice {moneyQuery ->
+                                    moneyQuery.amount()
+                                }
+                                .minVariantPrice { moneyQuery ->
+                                    moneyQuery.amount()
+                                }
+                        }
+
+
                 }
             }
         }
