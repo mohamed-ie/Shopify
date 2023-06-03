@@ -15,17 +15,14 @@ fun ShopifyGraph(navController: NavHostController) {
         route = Graph.ROOT,
         startDestination = Graph.LANDING
     ) {
+        authGraph(navController)
 
         composable(route = Graph.LANDING){
-            navController.navigate(Graph.HOME)
+            navController.navigate(Graph.AUTH)
         }
 
         composable(route = Graph.HOME){
             HomeScreen()
-        }
-
-        composable(route = Graph.AUTH){
-            navController.navigate(Graph.HOME)
         }
 
     }

@@ -37,6 +37,9 @@ class RegistrationViewModel @Inject constructor(
     private val _uiErrorState = MutableStateFlow(ErrorAuthUiState())
     val uiErrorState = _uiErrorState.asStateFlow()
 
+    private val _uiLoadingState = MutableStateFlow(false)
+    val uiLoadingState = _uiLoadingState.asStateFlow()
+
 
     fun sendFirstNameValue(value:String){
         _uiState.update {registrationUiState ->
@@ -67,6 +70,7 @@ class RegistrationViewModel @Inject constructor(
 
     fun signUp(){
         _uiErrorState.value = ErrorAuthUiState()
+        _uiLoadingState.value = true
         updateFieldsErrors()
         if (isDataValid()) {
             repository.signUp(
@@ -78,6 +82,7 @@ class RegistrationViewModel @Inject constructor(
                     _uiState.value.password.value
                 )
             ).onEach { response ->
+                _uiLoadingState.value = false
                 when (response) {
                     is Resource.Error -> {
                         _uiErrorState.value = ErrorAuthUiState(response.throwable.message ?: "",true)

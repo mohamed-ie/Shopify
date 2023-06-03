@@ -35,11 +35,16 @@ class LoginViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<AuthUIEvent<SignInUserResponseInfo>>()
     val uiEvent = _uiEvent.asSharedFlow()
 
+    private val _uiLoadingState = MutableStateFlow(false)
+    val uiLoadingState = _uiLoadingState.asStateFlow()
+
     fun signIn(){
         _uiErrorState.value = ErrorAuthUiState()
+        _uiLoadingState.value = true
         repository.signIn(
             SignInUserInfo(_uiState.value.email.value,_uiState.value.password.value)
         ).onEach { response ->
+            _uiLoadingState.value = false
             when (response) {
                 is Resource.Error -> {
                     _uiErrorState.value = ErrorAuthUiState(response.throwable.message ?: "",true)

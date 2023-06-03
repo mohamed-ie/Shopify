@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,12 +18,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,23 +41,27 @@ import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
 import com.example.shopify.ui.screen.auth.common.ErrorCard
 import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.viewModel.RegistrationViewModel
+import com.example.shopify.utils.shopifyLoading
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 
 @Composable
 fun SignUpScreen(
-    viewModel: RegistrationViewModel
+    viewModel: RegistrationViewModel,
+    navigateToSignIn:()->Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val errorUiState by viewModel.uiErrorState.collectAsState()
+    val loadingUiState by viewModel.uiLoadingState.collectAsState()
 
     LaunchedEffect(key1 = Unit){
         viewModel.uiEvent
             .onEach {authUIEvent ->
                 when(authUIEvent){
-                    is AuthUIEvent.Loading -> {}
-                    is AuthUIEvent.NavigateToHome -> {}
+                    is AuthUIEvent.NavigateToHome -> {
+                        navigateToSignIn()
+                    }
                 }
             }
             .launchIn(this)
@@ -62,6 +69,8 @@ fun SignUpScreen(
     SignUpScreenContent(
         uiState = uiState,
         errorUiState = errorUiState,
+        loadingUiState = loadingUiState,
+        navigateToSignIn = navigateToSignIn,
         onFirstNameTextChange = viewModel::sendFirstNameValue,
         onSecondNameTextChange = viewModel::sendSecondNameValue,
         onEmailTextChange = viewModel::sendEmailValue,
@@ -75,6 +84,8 @@ fun SignUpScreen(
 private fun SignUpScreenContent(
     uiState: RegistrationUiState,
     errorUiState: ErrorAuthUiState,
+    loadingUiState: Boolean,
+    navigateToSignIn: () -> Unit,
     onFirstNameTextChange:(String) -> Unit,
     onSecondNameTextChange:(String) -> Unit,
     onEmailTextChange:(String) -> Unit,
@@ -91,10 +102,14 @@ private fun SignUpScreenContent(
             ErrorCard(error = errorUiState.error)
         }
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 40.dp)
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 40.dp)
         ) {
             Spacer(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
             )
 
             AuthHeader()
@@ -193,7 +208,11 @@ private fun SignUpScreenContent(
                     onClick = {
                         onSignUp()
                     },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp).height(50.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp)
+                        .height(50.dp)
+                        .shopifyLoading(loadingUiState),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
                     shape = RoundedCornerShape(5.dp)
                 ) {
@@ -213,7 +232,8 @@ private fun SignUpScreenContent(
                     Text(
                         text = stringResource(R.string.signin),
                         style = MaterialTheme.typography.labelLarge,
-                        color = Color.Black, modifier = Modifier.padding(start = 2.dp)
+                        color = Color.Black,
+                        modifier = Modifier.clip(MaterialTheme.shapes.extraSmall).clickable { navigateToSignIn() }.padding(start = 2.dp)
                     )
                 }
             }
@@ -225,5 +245,5 @@ private fun SignUpScreenContent(
 @Preview
 @Composable
 private fun PreviewSignUpScreen() {
-    SignUpScreen(hiltViewModel())
+    SignUpScreen(hiltViewModel()){}
 }
