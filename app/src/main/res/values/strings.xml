@@ -1,5 +1,25 @@
 <resources>
     <string name="app_name">Shopify</string>
+    <string name="discount">%1$s OFF</string>
+    <string name="sold_by">Sold by</string>
+    <string name="choose_quantity_clossed">Choose quantity closed</string>
+    <string name="choose_quantity_opened">Choose quantity opened</string>
+    <string name="remove">Remove</string>
+    <string name="move_to_wishlist">Move to wishlist</string>
+    <string name="enter_coupon_code">Enter Coupon Code</string>
+    <string name="apply">Apply</string>
+    <string name="clear">Clear</string>
+    <string name="coupon_code_invalid">Oops! Coupon code invalid</string>
+    <string name="one_item">1 Item</string>
+    <string name="number_of_items">%1$s Items</string>
+    <string name="checkout">Checkout</string>
+    <string name="cart">Cart</string>
+    <string name="wishlist">Wishlist</string>
+    <string name="deliver_to">Deliver to</string>
+    <string name="shipping_fee">Shipping Fee</string>
+    <string name="taxes">Taxes</string>
+    <string name="total">Total</string>
+    <string name="subtotal">Subtotal</string>
     <string name="login_welcome_expression">"Hala! Welcome back!"</string>
     <string name="email">"Email"</string>
     <string name="password">"Password"</string>
@@ -26,6 +46,12 @@
     <string name="category">Category</string>
     <string name="favourite">Favourite</string>
     <string name="me">Me</string>
-    <string name="cart">Cart</string>
     <string name="back">Back</string>
+    <string name="cash">Cash</string>
+    <string name="your_cart_is_empty">Your cart is empty</string>
+    <string name="be_sure_to_fill_your_cart_with_somthing_you_like">Be sure to fill your cart with somthing you like</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Oops! Something went wrong</string>
+    <string name="this_doesnt_seem_right_let_us_try_to_sort_it_out">This doesn\'t seem right! Let us try to sort it out</string>
+
 </resources>
