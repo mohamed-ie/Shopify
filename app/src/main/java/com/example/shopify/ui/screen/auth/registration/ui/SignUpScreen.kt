@@ -1,6 +1,9 @@
-package com.example.shopify.ui.screen.auth.registration
+package com.example.shopify.ui.screen.auth.registration.ui
 
-import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +16,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -30,64 +34,67 @@ import com.example.shopify.ui.screen.auth.common.AuthHeader
 import com.example.shopify.ui.screen.auth.common.AuthPasswordTextField
 import com.example.shopify.ui.screen.auth.common.AuthTextField
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
-import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
+import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
+import com.example.shopify.ui.screen.auth.common.ErrorCard
+import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.viewModel.RegistrationViewModel
-import com.example.shopify.ui.screen.order.LoadingContent
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun SignUpScreenEvent(
-    viewModel: RegistrationViewModel = hiltViewModel()
+fun SignUpScreen(
+    viewModel: RegistrationViewModel
 ) {
-    val uiEvent:AuthUIEvent<SignUpUserResponseInfo>? by viewModel.uiEvent.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val errorUiState by viewModel.uiErrorState.collectAsState()
 
-    when(uiEvent){
-        is AuthUIEvent.Error -> {
-            SignUpScreen(viewModel = viewModel)
-        }
-        AuthUIEvent.Loading -> {
-            LoadingContent()
-        }
-        is AuthUIEvent.NavigateToHome -> {}
-        null -> {
-            SignUpScreen(viewModel = viewModel)
-        }
+    LaunchedEffect(key1 = Unit){
+        viewModel.uiEvent
+            .onEach {authUIEvent ->
+                when(authUIEvent){
+                    is AuthUIEvent.Loading -> {}
+                    is AuthUIEvent.NavigateToHome -> {}
+                }
+            }
+            .launchIn(this)
     }
-
-
+    SignUpScreenContent(
+        uiState = uiState,
+        errorUiState = errorUiState,
+        onFirstNameTextChange = viewModel::sendFirstNameValue,
+        onSecondNameTextChange = viewModel::sendSecondNameValue,
+        onEmailTextChange = viewModel::sendEmailValue,
+        onPhoneTextChange = viewModel::sendPhoneValue,
+        onPasswordTextChange = viewModel::sendPasswordValue,
+        onSignUp = viewModel::signUp
+    )
 }
 
 @Composable
-private fun SignUpScreen(
-    viewModel: RegistrationViewModel
+private fun SignUpScreenContent(
+    uiState: RegistrationUiState,
+    errorUiState: ErrorAuthUiState,
+    onFirstNameTextChange:(String) -> Unit,
+    onSecondNameTextChange:(String) -> Unit,
+    onEmailTextChange:(String) -> Unit,
+    onPhoneTextChange:(String) -> Unit,
+    onPasswordTextChange:(String) -> Unit,
+    onSignUp:() ->Unit
 ){
-
-    val firstName:String by viewModel.firstName.collectAsState()
-    val firstNameError:Int? by viewModel.firstNameError.collectAsState()
-
-    val lastName:String by viewModel.secondName.collectAsState()
-    val secondNameError:Int? by viewModel.secondNameError.collectAsState()
-
-    val email:String by viewModel.email.collectAsState()
-    val emailError:Int? by viewModel.emailError.collectAsState()
-
-    val phone:String by viewModel.phone.collectAsState()
-    val phoneError:Int? by viewModel.phoneError.collectAsState()
-
-    val password:String by viewModel.password.collectAsState()
-    val passwordError:Int? by viewModel.passwordError.collectAsState()
-
-    Scaffold {
+    Column {
+        AnimatedVisibility(
+            visible = errorUiState.isError,
+            enter = expandVertically(expandFrom = Alignment.Top),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top, animationSpec = tween(1500)),
+        ) {
+            ErrorCard(error = errorUiState.error)
+        }
         Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(horizontal = 40.dp)
+            modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 40.dp)
         ) {
             Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 30.dp)
+                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
             )
 
             AuthHeader()
@@ -103,99 +110,97 @@ private fun SignUpScreen(
             )
 
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
+
             ) {
 
-                Spacer(modifier = Modifier.padding(vertical = 20.dp))
+                Spacer(modifier = Modifier.padding(vertical = 12.dp))
 
                 AuthTextField(
-                    text = firstName,
+                    text = uiState.firstName.value,
                     textFieldHeader = R.string.firstName,
                     placeHolder = R.string.firstName_place_holder,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
-                    isError = firstNameError != null,
-                    errorMessage = firstNameError ?: R.string.nothing,
-                    onTextChanged = { textEmailValue ->
-                        viewModel.firstName.value = textEmailValue
+                    isError = uiState.firstName.error != null,
+                    errorMessage = uiState.firstName.error ?: R.string.nothing,
+                    onTextChanged = { textFirstNameValue ->
+                        onFirstNameTextChange(textFirstNameValue)
                     }
                 )
-                Spacer(modifier = Modifier.padding(vertical = 15.dp))
+
+                Spacer(modifier = Modifier.padding(vertical = 7.dp))
 
                 AuthTextField(
-                    text = lastName,
+                    text = uiState.secondName.value,
                     textFieldHeader = R.string.lastName,
                     placeHolder = R.string.lastName_place_holder,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
-                    isError = secondNameError  != null,
-                    errorMessage = secondNameError ?: R.string.nothing,
-                    onTextChanged = {textPasswordValue ->
-                        viewModel.secondName.value = textPasswordValue
+                    isError = uiState.secondName.error  != null,
+                    errorMessage = uiState.secondName.error ?: R.string.nothing,
+                    onTextChanged = {textSecondValue ->
+                        onSecondNameTextChange(textSecondValue)
                     }
                 )
 
-                Spacer(modifier = Modifier.padding(vertical = 15.dp))
+                Spacer(modifier = Modifier.padding(vertical = 7.dp))
 
                 AuthTextField(
-                    text = phone,
+                    text = uiState.phone.value,
                     textFieldHeader = R.string.phone,
                     placeHolder = R.string.phone_place_holder,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
-                    isError = phoneError  != null,
-                    errorMessage = phoneError ?: R.string.nothing,
-                    onTextChanged = {textPasswordValue ->
-                        viewModel.phone.value = textPasswordValue
+                    isError = uiState.phone.error  != null,
+                    errorMessage = uiState.phone.error ?: R.string.nothing,
+                    onTextChanged = {textPhoneValue ->
+                        onPhoneTextChange(textPhoneValue)
                     }
                 )
-                Spacer(modifier = Modifier.padding(vertical = 15.dp))
+                Spacer(modifier = Modifier.padding(vertical = 7.dp))
                 AuthTextField(
-                    text = email,
+                    text = uiState.email.value,
                     textFieldHeader = R.string.email,
                     placeHolder = R.string.email_place_holder,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
-                    isError = emailError  != null,
-                    errorMessage = emailError ?: R.string.nothing,
-                    onTextChanged = {textPasswordValue ->
-                        viewModel.email.value = textPasswordValue
+                    isError =  uiState.email.error  != null,
+                    errorMessage =  uiState.email.error ?: R.string.nothing,
+                    onTextChanged = {textEmailValue ->
+                        onEmailTextChange(textEmailValue)
                     }
                 )
-                Spacer(modifier = Modifier.padding(vertical = 15.dp))
+                Spacer(modifier = Modifier.padding(vertical = 7.dp))
 
                 AuthPasswordTextField(
-                    text = password,
+                    text = uiState.password.value,
                     textFieldHeader = R.string.password,
                     placeHolder = R.string.password_place_holder,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
-                    isError = passwordError != null,
-                    errorMessage = passwordError ?: R.string.nothing,
-                    onTextChanged = {textPasswordValue -> viewModel.password.value = textPasswordValue }
+                    isError =  uiState.password.error != null,
+                    errorMessage =  uiState.password.error ?: R.string.nothing,
+                    onTextChanged = {textPasswordValue ->  onPasswordTextChange(textPasswordValue)}
                 )
-                Spacer(modifier = Modifier.padding(vertical = 25.dp))
+                Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
                 Button(
                     onClick = {
-                        viewModel.signUp()
+                        onSignUp()
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 5.dp)
-                        .height(50.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
                     shape = RoundedCornerShape(5.dp)
                 ) {
                     Text(text = stringResource(R.string.signin))
                 }
 
-                Spacer(modifier = Modifier.padding(vertical = 10.dp))
+                Spacer(modifier = Modifier.padding(vertical = 12.dp))
 
                 Row(
                     modifier = Modifier.padding(bottom = 50.dp)
@@ -214,10 +219,11 @@ private fun SignUpScreen(
             }
         }
     }
+
 }
 
 @Preview
 @Composable
 private fun PreviewSignUpScreen() {
-    SignUpScreenEvent()
+    SignUpScreen(hiltViewModel())
 }

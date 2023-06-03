@@ -54,8 +54,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     private fun enqueueAuth(query: Storefront.MutationQuery) = callbackFlow {
         val call = graphClient.mutateGraph(query).enqueue { result ->
             when (result) {
-                is GraphCallResult.Success ->
-                    trySend(Resource.Success(result.response))
+                is GraphCallResult.Success -> trySend(Resource.Success(result.response))
 
                 is GraphCallResult.Failure ->
                     trySend(Resource.Error(result.error))

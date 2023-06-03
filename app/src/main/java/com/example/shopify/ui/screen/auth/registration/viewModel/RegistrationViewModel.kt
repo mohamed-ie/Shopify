@@ -7,10 +7,15 @@ import com.example.shopify.helpers.Resource
 import com.example.shopify.model.repository.ShopifyRepository
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
 import com.example.shopify.ui.screen.auth.helper.UserInputValidator
+import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
+import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
+import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -21,56 +26,66 @@ import javax.inject.Inject
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val repository: ShopifyRepository,
-    private val userInputValidator: UserInputValidator
+    private val userInputValidator: Lazy<UserInputValidator>
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow(RegistrationUiState())
+    val uiState = _uiState.asStateFlow()
 
-    val firstName = MutableStateFlow("")
-    private val _firstNameError = MutableStateFlow<Int?>(null)
-    val firstNameError = _firstNameError.asStateFlow()
+    private val _uiEvent = MutableSharedFlow<AuthUIEvent<SignUpUserResponseInfo>>()
+    val uiEvent = _uiEvent.asSharedFlow()
 
-    val secondName = MutableStateFlow("")
-    private val _secondNameError = MutableStateFlow<Int?>(null)
-    val secondNameError = _secondNameError.asStateFlow()
-
-    val email = MutableStateFlow("")
-    private val _emailError = MutableStateFlow<Int?>(null)
-    val emailError = _emailError.asStateFlow()
-
-    val phone = MutableStateFlow("")
-    private val _phoneError = MutableStateFlow<Int?>(null)
-    val phoneError = _phoneError.asStateFlow()
+    private val _uiErrorState = MutableStateFlow(ErrorAuthUiState())
+    val uiErrorState = _uiErrorState.asStateFlow()
 
 
-    val password = MutableStateFlow("")
-    private val _passwordError = MutableStateFlow<Int?>(null)
-    val passwordError = _passwordError.asStateFlow()
-
-
-    private val _uiEvent = MutableStateFlow<AuthUIEvent<SignUpUserResponseInfo>?>(null)
-    val uiEvent = _uiEvent.asStateFlow()
+    fun sendFirstNameValue(value:String){
+        _uiState.update {registrationUiState ->
+            registrationUiState.copy(firstName = registrationUiState.firstName.copy(value = value))
+        }
+    }
+    fun sendSecondNameValue(value:String){
+        _uiState.update {registrationUiState ->
+            registrationUiState.copy(secondName = registrationUiState.secondName.copy(value = value))
+        }
+    }
+    fun sendEmailValue(value:String){
+        _uiState.update {registrationUiState ->
+            registrationUiState.copy(email = registrationUiState.email.copy(value = value))
+        }
+    }
+    fun sendPhoneValue(value:String){
+        _uiState.update {registrationUiState ->
+            registrationUiState.copy(phone = registrationUiState.phone.copy(value = value))
+        }
+    }
+    fun sendPasswordValue(value:String){
+        _uiState.update {registrationUiState ->
+            registrationUiState.copy(password = registrationUiState.password.copy(value = value))
+        }
+    }
 
 
     fun signUp(){
+        _uiErrorState.value = ErrorAuthUiState()
         updateFieldsErrors()
         if (isDataValid()) {
-            _uiEvent.value = AuthUIEvent.Loading
             repository.signUp(
                 SignUpUserInfo(
-                    firstName.value,
-                    secondName.value,
-                    email.value,
-                    phone.value,
-                    password.value
+                    _uiState.value.firstName.value,
+                    _uiState.value.secondName.value,
+                    _uiState.value.email.value,
+                    _uiState.value.phone.value,
+                    _uiState.value.password.value
                 )
             ).onEach { response ->
                 when (response) {
                     is Resource.Error -> {
-                        _uiEvent.emit(AuthUIEvent.Error(response.throwable.message ?: ""))
+                        _uiErrorState.value = ErrorAuthUiState(response.throwable.message ?: "",true)
                     }
 
                     is Resource.Success -> {
                         if (response.data.error != null)
-                            _uiEvent.emit(AuthUIEvent.Error(response.data.error))
+                            _uiErrorState.value = ErrorAuthUiState(response.data.error,true)
                         else
                             _uiEvent.emit(AuthUIEvent.NavigateToHome(response.data))
                     }
@@ -78,8 +93,6 @@ class RegistrationViewModel @Inject constructor(
             }.launchIn(viewModelScope)
         }
     }
-
-
     private fun updateFieldsErrors() {
         updateFirstNameError()
         updateSecondNameError()
@@ -87,58 +100,52 @@ class RegistrationViewModel @Inject constructor(
         updatePhoneError()
         updatePasswordError()
     }
-
     private fun updatePhoneError() {
-        _phoneError.update {
-            if (!userInputValidator.getValidPhone(phone.value))
-                R.string.phone_not_formed_error
+        _uiState.update {registrationUiState ->
+            if (!userInputValidator.get().getValidPhone(registrationUiState.phone.value))
+                registrationUiState.copy(phone = registrationUiState.phone.copy(error = R.string.phone_not_formed_error))
             else
-                null
+                registrationUiState.copy(phone = registrationUiState.phone.copy(error = null))
         }
     }
-
     private fun updateFirstNameError() {
-        _firstNameError.update {
-            if (firstName.value.isBlank())
-                R.string.first_name_not_formed_error
+        _uiState.update {registrationUiState ->
+            if (registrationUiState.firstName.value.isBlank())
+                registrationUiState.copy(firstName = registrationUiState.firstName.copy(error = R.string.first_name_not_formed_error))
             else
-                null
+                registrationUiState.copy(firstName = registrationUiState.firstName.copy(error = null))
         }
     }
-
     private fun updateSecondNameError() {
-        _secondNameError.update {
-            if (secondName.value.isBlank())
-                R.string.second_name_not_formed_error
+        _uiState.update {registrationUiState ->
+            if (registrationUiState.secondName.value.isBlank())
+                registrationUiState.copy(secondName = registrationUiState.secondName.copy(error = R.string.second_name_not_formed_error))
             else
-               null
+                registrationUiState.copy(secondName = registrationUiState.secondName.copy(error = null))
         }
     }
-
     private fun updateEmailError() {
-        _emailError.update {
-            if (!userInputValidator.getValidEmail(email.value))
-                R.string.email_not_formed_error
+        _uiState.update {registrationUiState ->
+            if (!userInputValidator.get().getValidEmail( registrationUiState.email.value))
+                registrationUiState.copy(email = registrationUiState.email.copy(error = R.string.email_not_formed_error))
             else
-                null
+                registrationUiState.copy(email = registrationUiState.email.copy(error = null))
         }
     }
-
     private fun updatePasswordError() {
-        _passwordError.update {
-            if (!userInputValidator.getValidPassword(password.value))
-                R.string.password_not_formed_error
+        _uiState.update {registrationUiState ->
+            if (!userInputValidator.get().getValidPassword( registrationUiState.password.value))
+                registrationUiState.copy(password = registrationUiState.password.copy(error = R.string.password_not_formed_error))
             else
-                null
+                registrationUiState.copy(password = registrationUiState.password.copy(error = null))
         }
     }
-
-     private fun isDataValid(): Boolean =
-        firstNameError.value == null
-                && secondNameError.value == null
-                && phoneError.value == null
-                && emailError.value == null
-                && passwordError.value == null
+    private fun isDataValid(): Boolean =
+         _uiState.value.firstName.error == null
+                &&  _uiState.value.secondName.error == null
+                &&  _uiState.value.email.error == null
+                &&  _uiState.value.phone.error == null
+                &&  _uiState.value.password.error == null
 
 
 }
