@@ -11,3 +11,7 @@ object Auth {
     const val SIGN_IN = "SIGN_IN"
     const val SIGN_UP = "SIGN_UP"
 }
+
+object Landing{
+    const val SPLASH = "SPLASH"
+}

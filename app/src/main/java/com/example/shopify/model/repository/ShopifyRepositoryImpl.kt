@@ -1,12 +1,14 @@
 package com.example.shopify.model.repository
 
 import com.example.shopify.helpers.Resource
+import com.example.shopify.model.local.ShopifyDataStoreManager
 import com.example.shopify.model.repository.generator.ShopifyQueryGenerator
 import com.example.shopify.model.repository.mapper.ShopifyMapper
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
-import com.example.shopify.ui.screen.auth.login.model.SignInUserResponseInfo
+import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
+import com.example.shopify.ui.screen.home.model.Brand
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
@@ -23,6 +25,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     private val graphClient: GraphClient,
     private val queryGenerator: ShopifyQueryGenerator,
     private val mapper: ShopifyMapper,
+    private val dataStoreManager: ShopifyDataStoreManager,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ShopifyRepository {
 
@@ -31,11 +34,30 @@ class ShopifyRepositoryImpl @Inject constructor(
         return enqueueAuth(query).mapResource(mapper::map)
     }
 
-    override fun signIn(userInfo: SignInUserInfo): Flow<Resource<SignInUserResponseInfo>> {
+    override fun signIn(userInfo: SignInUserInfo): Flow<Resource<SignInUserInfoResult>> {
         val query = queryGenerator.generateSingInQuery(userInfo)
-        return enqueueAuth(query).mapResource(mapper::mapToSignInResponse)
+        return enqueueAuth(query).mapResource{response ->
+            mapper.mapToSignInResponse(response,userInfo)
+        }
     }
 
+    override suspend fun saveUserInfo(userResponseInfo: SignInUserInfoResult) =
+        dataStoreManager.saveUserInfo(userResponseInfo)
+
+
+    override fun getUserInfo():Flow<SignInUserInfoResult> =
+        dataStoreManager.getUserInfo()
+
+
+    override fun isLoggedIn():Flow<Boolean> =
+        dataStoreManager.getAccessToken()
+            .map { it != null }
+            .flowOn(defaultDispatcher)
+
+    override fun getBrands(): Flow<Resource<List<Brand>?>> {
+        val query = queryGenerator.generateBrandQuery()
+        return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
+    }
 
     private fun Storefront.QueryRootQuery.enqueue() = callbackFlow {
         val call = graphClient.queryGraph(this@enqueue).enqueue { result ->

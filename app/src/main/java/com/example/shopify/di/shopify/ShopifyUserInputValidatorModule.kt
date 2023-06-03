@@ -1,7 +1,7 @@
 package com.example.shopify.di.shopify
 
-import com.example.shopify.ui.screen.auth.helper.UserInputValidator
-import com.example.shopify.ui.screen.auth.helper.UserInputValidatorImpl
+import com.example.shopify.helpers.UserInputValidator
+import com.example.shopify.helpers.UserInputValidatorImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,5 +15,5 @@ abstract class ShopifyUserInputValidatorModule {
 
     @Binds
     @ViewModelScoped
-    abstract fun bindUserInputValidator(userInputValidatorImpl: UserInputValidatorImpl):UserInputValidator
+    abstract fun bindUserInputValidator(userInputValidatorImpl: UserInputValidatorImpl): UserInputValidator
 }

@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.ui.navigation.Graph
-import com.example.shopify.ui.screen.home.HomeScreen
+import com.example.shopify.ui.screen.home.ui.HomeNavigationBarScreen
 
 
 @Composable
@@ -17,12 +17,10 @@ fun ShopifyGraph(navController: NavHostController) {
     ) {
         authGraph(navController)
 
-        composable(route = Graph.LANDING){
-            navController.navigate(Graph.AUTH)
-        }
+        landingGraph(navController)
 
         composable(route = Graph.HOME){
-            HomeScreen()
+            HomeNavigationBarScreen()
         }
 
     }
