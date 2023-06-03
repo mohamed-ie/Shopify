@@ -53,5 +53,6 @@
     <string name="retry">Retry</string>
     <string name="something_went_wrong">Oops! Something went wrong</string>
     <string name="this_doesnt_seem_right_let_us_try_to_sort_it_out">This doesn\'t seem right! Let us try to sort it out</string>
+    <string name="error_empty_password_field">Hold up!, this field is empty</string>
 
 </resources>
