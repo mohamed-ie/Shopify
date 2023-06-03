@@ -28,7 +28,7 @@ class BrandViewModel @Inject constructor(
             repository.getBrands().collect {
                 when (it) {
                     is Resource.Success -> _brandList.emit(it.data)
-                    is Resource.Error -> it.throwable
+                    is Resource.Error -> it.error
                 }
             }
         }

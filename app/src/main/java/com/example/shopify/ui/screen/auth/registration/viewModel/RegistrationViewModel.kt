@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.R
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UserInputValidator
 import com.example.shopify.model.repository.ShopifyRepository
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
-import com.example.shopify.helpers.UserInputValidator
 import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
 import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
@@ -85,7 +85,7 @@ class RegistrationViewModel @Inject constructor(
                 _uiLoadingState.value = false
                 when (response) {
                     is Resource.Error -> {
-                        _uiErrorState.value = ErrorAuthUiState(response.throwable.message ?: "",true)
+                        _uiErrorState.value = ErrorAuthUiState(response.error.message ,true)
                     }
 
                     is Resource.Success -> {

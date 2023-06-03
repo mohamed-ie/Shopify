@@ -30,26 +30,26 @@ class ShopifyRepositoryImpl @Inject constructor(
 ) : ShopifyRepository {
 
     override fun signUp(userInfo: SignUpUserInfo): Flow<Resource<SignUpUserResponseInfo>> {
-        val query = queryGenerator.generateSingUpQuery(userInfo)
-        return enqueueAuth(query).mapResource(mapper::map)
+       return queryGenerator.generateSingUpQuery(userInfo)
+           .enqueue()
+           .mapResource(mapper::map)
     }
 
     override fun signIn(userInfo: SignInUserInfo): Flow<Resource<SignInUserInfoResult>> {
-        val query = queryGenerator.generateSingInQuery(userInfo)
-        return enqueueAuth(query).mapResource{response ->
-            mapper.mapToSignInResponse(response,userInfo)
-        }
+        return queryGenerator.generateSingInQuery(userInfo)
+            .enqueue()
+            .mapResource { response -> mapper.mapToSignInResponse(response, userInfo) }
     }
 
     override suspend fun saveUserInfo(userResponseInfo: SignInUserInfoResult) =
         dataStoreManager.saveUserInfo(userResponseInfo)
 
 
-    override fun getUserInfo():Flow<SignInUserInfoResult> =
+    override fun getUserInfo(): Flow<SignInUserInfoResult> =
         dataStoreManager.getUserInfo()
 
 
-    override fun isLoggedIn():Flow<Boolean> =
+    override fun isLoggedIn(): Flow<Boolean> =
         dataStoreManager.getAccessToken()
             .map { it != null }
             .flowOn(defaultDispatcher)
@@ -66,20 +66,21 @@ class ShopifyRepositoryImpl @Inject constructor(
                     trySend(Resource.Success(result.response))
 
                 is GraphCallResult.Failure ->
-                    trySend(Resource.Error(result.error))
+                    trySend(Resource.Error(mapper.map(result.error)))
 
             }
         }
         awaitClose { call.cancel() }
     }
 
-    private fun enqueueAuth(query: Storefront.MutationQuery) = callbackFlow {
-        val call = graphClient.mutateGraph(query).enqueue { result ->
+    private fun Storefront.MutationQuery.enqueue() = callbackFlow {
+        val call = graphClient.mutateGraph(this@enqueue).enqueue { result ->
             when (result) {
-                is GraphCallResult.Success -> trySend(Resource.Success(result.response))
+                is GraphCallResult.Success ->
+                    trySend(Resource.Success(result.response))
 
                 is GraphCallResult.Failure ->
-                    trySend(Resource.Error(result.error))
+                    trySend(Resource.Error(mapper.map(result.error)))
 
             }
         }

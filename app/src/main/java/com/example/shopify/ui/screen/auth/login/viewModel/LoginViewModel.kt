@@ -47,7 +47,7 @@ class LoginViewModel @Inject constructor(
             _uiLoadingState.value = false
             when (response) {
                 is Resource.Error -> {
-                    _uiErrorState.value = ErrorAuthUiState(response.throwable.message ?: "",true)
+                    _uiErrorState.value = ErrorAuthUiState(response.error.message ?: "",true)
                 }
 
                 is Resource.Success -> {
