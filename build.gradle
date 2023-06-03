@@ -8,6 +8,7 @@ buildscript {
         preferences_datastore_version = '1.0.0'
         m3_version = '1.2.0-alpha02'
         shopify_version = '16.0.0'
+        data_store_version = '1.0.0'
     }
 }
 

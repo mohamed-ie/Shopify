@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.auth.helper
+package com.example.shopify.helpers
 
 interface UserInputValidator {
     fun getValidEmail(email: String): Boolean

@@ -44,5 +44,14 @@
     <string name="phone_not_formed_error">Hold up, it must be like (+201558653011)</string>
     <string name="nothing">must be like (+201558653011)</string>
     <string name="phone">Phone</string>
+    <string name="category">Category</string>
+    <string name="favourite">Favourite</string>
+    <string name="me">Me</string>
+    <string name="cash">Cash</string>
+    <string name="your_cart_is_empty">Your cart is empty</string>
+    <string name="be_sure_to_fill_your_cart_with_somthing_you_like">Be sure to fill your cart with somthing you like</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Oops! Something went wrong</string>
+    <string name="this_doesnt_seem_right_let_us_try_to_sort_it_out">This doesn\'t seem right! Let us try to sort it out</string>
 
 </resources>

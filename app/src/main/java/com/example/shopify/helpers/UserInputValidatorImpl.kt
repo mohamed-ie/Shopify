@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.auth.helper
+package com.example.shopify.helpers
 
 import com.example.shopify.utils.Constants
 import javax.inject.Inject

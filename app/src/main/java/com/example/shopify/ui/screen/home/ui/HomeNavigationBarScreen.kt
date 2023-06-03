@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.home
+package com.example.shopify.ui.screen.home.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -25,21 +25,26 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shopify.ui.navigation.NavigationBarScreen
 import com.example.shopify.ui.navigation.graph.HomeGraph
 
+
 private val items = listOf<NavigationBarScreen>(
-    NavigationBarScreen.Home
+    NavigationBarScreen.Home,
+    NavigationBarScreen.Category,
+    NavigationBarScreen.Favourite,
+    NavigationBarScreen.Me,
+    NavigationBarScreen.Cart
 )
 
-
 @Composable
-fun HomeScreen(navController: NavHostController = rememberNavController()) {
+fun HomeNavigationBarScreen(navController: NavHostController = rememberNavController()) {
     Scaffold(bottomBar = { HomeNavigationBar(navController = navController) }) { innerPadding ->
         HomeGraph(
             paddingValues = innerPadding,
             navController = navController
         )
-    }
-}
 
+    }
+
+}
 
 @Composable
 private fun HomeNavigationBar(navController: NavController) {
@@ -77,7 +82,7 @@ private fun RowScope.NavigationItem(
                 tint = if (selected) MaterialTheme.colorScheme.primary else LocalContentColor.current
             )
         },
-        label = { Text(stringResource(screen.resourceId)) },
+        label = { if (selected) Text(stringResource(screen.resourceId)) },
         selected = selected,
         onClick = {
             navController.navigate(screen.route) {
