@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.cart.componenet.coupon
+package com.example.shopify.ui.screen.cart.view.componenet.coupon
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -35,14 +35,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.ui.screen.cart.view.cartElevation
 import com.example.shopify.ui.theme.Gray
 import com.example.shopify.ui.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
 
 
 @Composable
-fun CouponCard(
-    state: CouponCardState,
+fun CartCouponCard(
+    state: CartCouponState,
     applyCoupon: () -> Unit,
     clearCoupon: () -> Unit,
     couponValueChanged: (String) -> Unit
@@ -55,7 +56,7 @@ fun CouponCard(
         OutlinedCard(
             modifier = Modifier.padding(8.dp),
             shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = cartElevation),
             border = BorderStroke(
                 width = .8.dp, color = if (textFieldFocused) MaterialTheme.colorScheme.primary
                 else Color.Transparent
@@ -63,7 +64,6 @@ fun CouponCard(
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-
                 TextField(modifier = Modifier
                     .onFocusChanged { textFieldFocused = it.isFocused }
                     .weight(1f),
@@ -137,7 +137,7 @@ fun CouponCard(
 @Composable
 fun PreviewCouponCard() {
     ShopifyTheme {
-        CouponCard(CouponCardState(), {}, {}, {})
+        CartCouponCard(CartCouponState(), {}, {}, {})
     }
 
 }

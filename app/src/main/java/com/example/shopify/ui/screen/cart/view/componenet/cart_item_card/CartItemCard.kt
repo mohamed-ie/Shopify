@@ -1,9 +1,10 @@
-package com.example.shopify.ui.screen.cart.componenet.cart_card
+package com.example.shopify.ui.screen.cart.view.componenet.cart_item_card
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.DeleteOutline
@@ -28,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,17 +57,18 @@ import com.example.shopify.ui.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
 
 @Composable
-fun CartCard(
-    state: CartCardState,
+fun CartItemCard(
+    state: CartItemState,
+    cartItem: CartItem,
     toggleQuantitySelectorVisibility: () -> Unit,
     removeFromCart: () -> Unit,
-    addToWishlist: () -> Unit,
+    moveToWishlist: () -> Unit,
     quantitySelected: (Int) -> Unit
 ) {
-    val cartItem = state.cartItem
     val product = cartItem.product
     Column(
         modifier = Modifier
+            .background(Color.White)
             .fillMaxWidth()
             .padding(12.dp)
     ) {
@@ -214,7 +218,7 @@ fun CartCard(
             Spacer(modifier = Modifier.weight(1f))
 
             //add to wishlist
-            ShopifyOutlinedButton(onClick = addToWishlist) {
+            ShopifyOutlinedButton(onClick = moveToWishlist) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Rounded.FavoriteBorder,
@@ -242,7 +246,7 @@ fun CartCard(
             quantitySelected = quantitySelected
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 
@@ -254,15 +258,18 @@ private fun QuantitySelector(
     isChangingQuantity: Boolean,
     quantitySelected: (Int) -> Unit
 ) {
+    val quantityListState = rememberLazyListState()
+    LaunchedEffect(key1 = Unit, block = {
+        quantityListState.scrollToItem(selected + 1)
+    })
     AnimatedVisibility(
         visible = opened,
         enter = expandVertically(expandFrom = Alignment.Bottom),
         exit = shrinkVertically(shrinkTowards = Alignment.Bottom),
     ) {
         Column {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Spacer(modifier = Modifier.height(20.dp))
+            LazyRow(state = quantityListState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(availableQuantity) {
                     ShopifyOutlinedButton(
                         onClick = { quantitySelected(it + 1) },
@@ -289,21 +296,48 @@ private fun QuantitySelector(
 @Composable
 fun PreviewCartCard() {
     ShopifyTheme {
-        CartCard(
-            CartCardState(
-                cartItem = CartItem(
-                    id = "",
-                    priceAfterDiscount = "EGP 372.00",
-                    priceBeforeDiscount = "EGP 750.00",
-                    discount = "50%",
-                    quantity = 1,
-                    availableQuantity = 5,
-                    product = Product(
-                        name = "Pro Airpods Compatible With Android iPhone White",
-                        collection = "Generic",
-                        thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
-                        vendor = "Egyptian German"
-                    )
+        CartItemCard(
+            CartItemState(),
+            CartItem(
+                id = "",
+                priceAfterDiscount = "EGP 372.00",
+                priceBeforeDiscount = "EGP 750.00",
+                discount = "50%",
+                quantity = 1,
+                availableQuantity = 5,
+                product = Product(
+                    name = "Pro Airpods Compatible With Android iPhone White",
+                    collection = "Generic",
+                    thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
+                    vendor = "Egyptian German"
+                )
+            ),
+            {},
+            {},
+            {},
+            {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCartCardOpenQuntityChooser() {
+    ShopifyTheme {
+        CartItemCard(
+            CartItemState(true, 5),
+            CartItem(
+                id = "",
+                priceAfterDiscount = "EGP 372.00",
+                priceBeforeDiscount = "EGP 750.00",
+                discount = "50%",
+                quantity = 5,
+                availableQuantity = 10,
+                product = Product(
+                    name = "Pro Airpods Compatible With Android iPhone White",
+                    collection = "Generic",
+                    thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
+                    vendor = "Egyptian German"
                 )
             ),
             {},

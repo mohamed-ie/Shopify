@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.cart.componenet.footer
+package com.example.shopify.ui.screen.cart.view.componenet.footer
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
@@ -37,20 +37,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.ui.screen.cart.view.cartElevation
 import com.example.shopify.ui.theme.Gray
 import com.example.shopify.ui.theme.ShopifyTheme
 
 @Composable
 fun CartFooter(itemsCount: Int, totalPrice: String, checkout: () -> Unit) {
     ElevatedCard(
-        elevation = CardDefaults.elevatedCardElevation(12.dp),
+        modifier = Modifier.padding(top = 2.dp),
+        elevation = CardDefaults.elevatedCardElevation(cartElevation),
         shape = RectangleShape,
         colors = CardDefaults.cardColors(Color.White)
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(bottom = 2.dp, top = 8.dp)
+                .padding(horizontal = 16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -61,13 +64,13 @@ fun CartFooter(itemsCount: Int, totalPrice: String, checkout: () -> Unit) {
                         stringResource(id = R.string.one_item)
                     else
                         stringResource(id = R.string.number_of_items, itemsCount),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Gray
                 )
                 Text(
                     text = totalPrice,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
             }

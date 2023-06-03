@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.cart.componenet.total_cost
+package com.example.shopify.ui.screen.cart.view.componenet.total_cost
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.ui.screen.cart.view.cartElevation
 import com.example.shopify.ui.theme.Gray
 import com.example.shopify.ui.theme.Green170
 import com.example.shopify.ui.theme.ShopifyTheme
@@ -36,7 +37,7 @@ fun TotalCostCard(
 ) {
     ElevatedCard(
         modifier = Modifier.padding(8.dp),
-        elevation = CardDefaults.elevatedCardElevation(8.dp),
+        elevation = CardDefaults.elevatedCardElevation(cartElevation),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(Color.White)
     ) {
