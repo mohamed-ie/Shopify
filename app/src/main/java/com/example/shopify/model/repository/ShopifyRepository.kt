@@ -5,6 +5,7 @@ import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
+import com.example.shopify.ui.screen.home.model.Brand
 import kotlinx.coroutines.flow.Flow
 
 interface ShopifyRepository {
@@ -13,4 +14,5 @@ interface ShopifyRepository {
     suspend fun saveUserInfo(userResponseInfo: SignInUserInfoResult)
     fun getUserInfo(): Flow<SignInUserInfoResult>
     fun isLoggedIn(): Flow<Boolean>
+    fun getBrands(): Flow<Resource<List<Brand>?>>
 }

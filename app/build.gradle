@@ -95,7 +95,7 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:$preferences_datastore_version"
 
     //shopify
-    implementation ("com.shopify.mobilebuysdk:buy3:$shopify_version"){
+    implementation("com.shopify.mobilebuysdk:buy3:$shopify_version") {
         exclude group: "com.shopify.graphql.support"
     }
 

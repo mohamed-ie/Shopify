@@ -8,6 +8,7 @@ import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
+import com.example.shopify.ui.screen.home.model.Brand
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
@@ -53,6 +54,10 @@ class ShopifyRepositoryImpl @Inject constructor(
             .map { it != null }
             .flowOn(defaultDispatcher)
 
+    override fun getBrands(): Flow<Resource<List<Brand>?>> {
+        val query = queryGenerator.generateBrandQuery()
+        return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
+    }
 
     private fun Storefront.QueryRootQuery.enqueue() = callbackFlow {
         val call = graphClient.queryGraph(this@enqueue).enqueue { result ->
