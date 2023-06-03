@@ -15,4 +15,11 @@
     <string name="one_item">1 Item</string>
     <string name="number_of_items">%1$s Items</string>
     <string name="checkout">Checkout</string>
+    <string name="cart">Cart</string>
+    <string name="wishlist">Wishlist</string>
+    <string name="deliver_to">Deliver to</string>
+    <string name="shipping_fee">Shipping Fee</string>
+    <string name="taxes">Taxes</string>
+    <string name="total">Total</string>
+    <string name="subtotal">Subtotal</string>
 </resources>
