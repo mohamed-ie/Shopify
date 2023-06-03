@@ -7,7 +7,7 @@ import com.example.shopify.model.repository.ShopifyRepository
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
 import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
-import com.example.shopify.ui.screen.auth.login.model.SignInUserResponseInfo
+import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.login.ui.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,7 +32,7 @@ class LoginViewModel @Inject constructor(
     val uiErrorState = _uiErrorState.asStateFlow()
 
 
-    private val _uiEvent = MutableSharedFlow<AuthUIEvent<SignInUserResponseInfo>>()
+    private val _uiEvent = MutableSharedFlow<AuthUIEvent<SignInUserInfoResult>>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     private val _uiLoadingState = MutableStateFlow(false)

@@ -1,9 +1,10 @@
 package com.example.shopify.ui.screen.auth.login.model
 
-import org.joda.time.DateTime
 
-data class SignInUserResponseInfo(
+data class SignInUserInfoResult(
+    val email:String,
+    val password:String,
     val accessToken:String,
-    val expireTime:DateTime?,
+    val expireTime:String?,
     val error:String
 )
