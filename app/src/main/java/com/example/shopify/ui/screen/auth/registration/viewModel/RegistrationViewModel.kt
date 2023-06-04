@@ -4,13 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.R
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UserInputValidator
 import com.example.shopify.model.repository.ShopifyRepository
 import com.example.shopify.ui.screen.auth.common.AuthUIEvent
-import com.example.shopify.helpers.UserInputValidator
 import com.example.shopify.ui.screen.auth.common.ErrorAuthUiState
 import com.example.shopify.ui.screen.auth.common.RegistrationUiState
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
-import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
 import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,7 +30,7 @@ class RegistrationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<AuthUIEvent<SignUpUserResponseInfo>>()
+    private val _uiEvent = MutableSharedFlow<AuthUIEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     private val _uiErrorState = MutableStateFlow(ErrorAuthUiState())
@@ -85,14 +84,14 @@ class RegistrationViewModel @Inject constructor(
                 _uiLoadingState.value = false
                 when (response) {
                     is Resource.Error -> {
-                        _uiErrorState.value = ErrorAuthUiState(response.throwable.message ?: "",true)
+                        _uiErrorState.value = ErrorAuthUiState(response.error.message ,true)
                     }
 
                     is Resource.Success -> {
                         if (response.data.error != null)
                             _uiErrorState.value = ErrorAuthUiState(response.data.error,true)
                         else
-                            _uiEvent.emit(AuthUIEvent.NavigateToHome(response.data))
+                            _uiEvent.emit(AuthUIEvent.NavigateToHome())
                     }
                 }
             }.launchIn(viewModelScope)

@@ -8,7 +8,6 @@ import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
-import com.example.shopify.ui.screen.cart.model.Cart
 import com.example.shopify.ui.screen.home.model.Brand
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
@@ -31,15 +30,15 @@ class ShopifyRepositoryImpl @Inject constructor(
 ) : ShopifyRepository {
 
     override fun signUp(userInfo: SignUpUserInfo): Flow<Resource<SignUpUserResponseInfo>> {
-        val query = queryGenerator.generateSingUpQuery(userInfo)
-        return enqueueAuth(query).mapResource(mapper::map)
+       return queryGenerator.generateSingUpQuery(userInfo)
+           .enqueue()
+           .mapResource(mapper::map)
     }
 
     override fun signIn(userInfo: SignInUserInfo): Flow<Resource<SignInUserInfoResult>> {
-        val query = queryGenerator.generateSingInQuery(userInfo)
-        return enqueueAuth(query).mapResource { response ->
-            mapper.mapToSignInResponse(response, userInfo)
-        }
+        return queryGenerator.generateSingInQuery(userInfo)
+            .enqueue()
+            .mapResource { response -> mapper.mapToSignInResponse(response, userInfo) }
     }
 
     override suspend fun saveUserInfo(userResponseInfo: SignInUserInfoResult) =
@@ -60,8 +59,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
     }
 
-    override fun getCart(): Flow<Resource<Cart>> {
-        TODO()
+    override fun getCart(): Flow<Resource<Cart>> = flow {
     }
 
 
@@ -72,20 +70,21 @@ class ShopifyRepositoryImpl @Inject constructor(
                     trySend(Resource.Success(result.response))
 
                 is GraphCallResult.Failure ->
-                    trySend(Resource.Error(result.error))
+                    trySend(Resource.Error(mapper.map(result.error)))
 
             }
         }
         awaitClose { call.cancel() }
     }
 
-    private fun enqueueAuth(query: Storefront.MutationQuery) = callbackFlow {
-        val call = graphClient.mutateGraph(query).enqueue { result ->
+    private fun Storefront.MutationQuery.enqueue() = callbackFlow {
+        val call = graphClient.mutateGraph(this@enqueue).enqueue { result ->
             when (result) {
-                is GraphCallResult.Success -> trySend(Resource.Success(result.response))
+                is GraphCallResult.Success ->
+                    trySend(Resource.Success(result.response))
 
                 is GraphCallResult.Failure ->
-                    trySend(Resource.Error(result.error))
+                    trySend(Resource.Error(mapper.map(result.error)))
 
             }
         }
