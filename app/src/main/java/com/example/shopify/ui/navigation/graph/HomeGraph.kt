@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.ui.navigation.Graph
 import com.example.shopify.ui.navigation.NavigationBarScreen
-import com.example.shopify.ui.screen.cart.CartScreen
 import com.example.shopify.ui.screen.category.CategoriesScreen
 import com.example.shopify.ui.screen.favourite.FavoriteScreen
 import com.example.shopify.ui.screen.home.ui.HomeScreen
@@ -34,7 +33,7 @@ fun HomeGraph(paddingValues: PaddingValues, navController: NavHostController) {
             MeScreen()
         }
         composable(route = NavigationBarScreen.Cart.route) {
-            CartScreen()
+//            CartScreen()
         }
 
     }
