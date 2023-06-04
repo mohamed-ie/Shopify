@@ -96,10 +96,23 @@ private fun ProductTopBar(back:() -> Unit){
 @Composable
 fun ProductSnackBar() {
     Row(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp).fillMaxWidth()
+        modifier = Modifier
             .background(Color.White)
-    ) {
+            .padding(horizontal = 15.dp, vertical = 7.dp)
+            .fillMaxWidth()
 
+    ) {
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.fillMaxWidth().height(45.dp),
+            shape = RoundedCornerShape(7.dp)
+        ) {
+            Text(
+                text = "ADD TO CART",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
