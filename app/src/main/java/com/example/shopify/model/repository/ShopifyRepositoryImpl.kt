@@ -9,6 +9,7 @@ import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
 import com.example.shopify.ui.screen.home.model.Brand
+import com.example.shopify.ui.screen.productDetails.model.Product
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
@@ -59,11 +60,17 @@ class ShopifyRepositoryImpl @Inject constructor(
         return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
     }
 
+    override fun getProductDetailsByID(id:String) : Flow<Resource<Product>> {
+        val query = queryGenerator.generateProductDetailsQuery(id)
+        return query.enqueue().mapResource(mapper::mapToProduct)
+    }
+
     private fun Storefront.QueryRootQuery.enqueue() = callbackFlow {
         val call = graphClient.queryGraph(this@enqueue).enqueue { result ->
             when (result) {
-                is GraphCallResult.Success ->
+                is GraphCallResult.Success -> {
                     trySend(Resource.Success(result.response))
+                }
 
                 is GraphCallResult.Failure ->
                     trySend(Resource.Error(mapper.map(result.error)))

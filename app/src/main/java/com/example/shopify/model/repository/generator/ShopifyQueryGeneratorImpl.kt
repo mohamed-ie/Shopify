@@ -52,58 +52,51 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    //8312397005107
-    override fun generateProductDetailsQuery(id:String) : Storefront.QueryRootQuery =
+    override fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery =
         Storefront.query { rootQuery ->
-            rootQuery.node(ID(id)){ nodeQuery ->
-                nodeQuery.id()
-                nodeQuery.onProduct {productQuery ->
+            rootQuery.node(ID("gid://shopify/Product/$id")) { nodeQuery ->
+                nodeQuery.onProduct { productQuery ->
                     productQuery
                         .title()
-                        .description()
-                        .productType()
-                        .createdAt()
                         .vendor()
-                        .isGiftCard
-                        .availableForSale()
+                        .productType()
                         .tags()
+                        .description()
+                        .createdAt()
+                        .isGiftCard
                         .onlineStoreUrl()
                         .requiresSellingPlan()
-                        .media {mediaConnectionQuery ->
-                            mediaConnectionQuery.nodes {mediaQuery ->
-                                mediaQuery
-                                    .mediaContentType()
+                        .totalInventory()
+                        .priceRange { productPriceRangeQuery ->
+                            productPriceRangeQuery.minVariantPrice { moneyV2Query ->
+                                moneyV2Query
+                                    .amount()
+                                    .currencyCode()
+                            }
+                            productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
+                                moneyV2Query
+                                    .amount()
+                                    .currencyCode()
                             }
                         }
-                        .images {imageConnectionQuery ->
-                            imageConnectionQuery.nodes {imageQuery ->
-                                imageQuery
-                                    .id()
-                                    .url()
+                        .images({ imageArguments -> imageArguments.first(5) }) { imageConnectionQuery ->
+                            imageConnectionQuery.nodes { imageQuery ->
+                                imageQuery.url()
                             }
                         }
-                        .variants {variantConnectionQuery ->
-                            variantConnectionQuery.nodes {productVariantQuery ->
-                                productVariantQuery
-                                    .title()
-                                    .price {moneyQuery ->
-                                        moneyQuery.amount()
-                                    }
-                            }
-                        }
-                        .priceRange {productPriceRangeQuery ->
-                            productPriceRangeQuery
-                                .maxVariantPrice {moneyQuery ->
-                                    moneyQuery.amount()
+                        .variants({ variantsArguments->  variantsArguments.first(5)}) { productVariantConnectionQuery ->
+                            productVariantConnectionQuery.edges { productVariantEdgeQuery ->
+                                productVariantEdgeQuery.node { productVariantQuery ->
+                                    productVariantQuery.title()
+                                        .image { imageQuery -> imageQuery.url() }
+                                        .price { moneyV2Query -> moneyV2Query.amount() }
                                 }
-                                .minVariantPrice { moneyQuery ->
-                                    moneyQuery.amount()
-                                }
+                            }
                         }
-
-
                 }
+
             }
+
         }
 
 
