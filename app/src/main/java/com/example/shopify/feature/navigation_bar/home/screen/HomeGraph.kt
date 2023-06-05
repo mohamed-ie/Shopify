@@ -1,4 +1,4 @@
-package com.example.shopify.ui.navigation.graph
+package com.example.shopify.feature.navigation_bar.home.screen
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -6,12 +6,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.shopify.ui.navigation.Brand
-import com.example.shopify.ui.navigation.Graph
-import com.example.shopify.ui.navigation.NavigationBarScreen
-import com.example.shopify.ui.screen.Product.ui.ProductScreen
+import com.example.shopify.feature.Graph
+import com.example.shopify.feature.navigation_bar.NavigationBarScreen
+import com.example.shopify.feature.navigation_bar.home.screen.Product.ui.ProductScreen
 
-fun NavGraphBuilder.brandGraph(navController: NavController, paddingValues: PaddingValues) {
+fun NavGraphBuilder.homeGraph(navController: NavController, paddingValues: PaddingValues) {
     navigation(
         route = Graph.HOME,
         startDestination = NavigationBarScreen.Home.route
@@ -19,7 +18,6 @@ fun NavGraphBuilder.brandGraph(navController: NavController, paddingValues: Padd
         composable("${Brand.PRODUCTS}/{brandName}") {
             ProductScreen(viewModel = hiltViewModel(),
                 paddingValues = paddingValues,
-                brandName = it.arguments?.getString("brandName")!!,
                 navigateToHome = { navController.popBackStack() }
             )
         }
@@ -28,4 +26,9 @@ fun NavGraphBuilder.brandGraph(navController: NavController, paddingValues: Padd
 
         }
     }
+}
+
+object Brand {
+    const val PRODUCTS = "PRODUCTS"
+    const val PRODUCT_DETAILS = "PRODUCT_DETAILS"
 }
