@@ -10,6 +10,7 @@ import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInf
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.productDetails.model.Product
 import com.example.shopify.utils.enqueue
 import com.example.shopify.utils.mapResource
 import com.shopify.buy3.GraphCallResult
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+
 
 
 class ShopifyRepositoryImpl @Inject constructor(
@@ -50,6 +52,11 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getUserInfo(): Flow<SignInUserInfoResult> =
         dataStoreManager.getUserInfo()
 
+    override fun getProductDetailsByID(id:String) : Flow<Resource<Product>> {
+        val query = queryGenerator.generateProductDetailsQuery(id)
+        return query.enqueue().mapResource(mapper::mapToProduct)
+    }
+
 
     override fun isLoggedIn(): Flow<Boolean> =
         dataStoreManager.getAccessToken()
@@ -78,14 +85,14 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     private fun Storefront.MutationQuery.enqueue() =
         graphClient.enqueue(this).map { result ->
-        when (result) {
-            is GraphCallResult.Success ->
-                Resource.Success(result.response)
+            when (result) {
+                is GraphCallResult.Success ->
+                    Resource.Success(result.response)
 
-            is GraphCallResult.Failure ->
-                Resource.Error(mapper.map(result.error))
-        }
-    }.applyDispatcher()
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(result.error))
+            }
+        }.applyDispatcher()
 
     private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
 }

@@ -1,12 +1,12 @@
-package com.example.shopify.ui.screen.productDetails.view
+package com.example.shopify.feature.navigation_bar.productDetails.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.shopify.ui.screen.common.ErrorScreen
-import com.example.shopify.ui.screen.common.LoadingContent
-import com.example.shopify.ui.screen.common.model.ScreenState
-import com.example.shopify.ui.screen.productDetails.viewModel.ProductDetailsViewModel
+import com.example.shopify.feature.common.ErrorScreen
+import com.example.shopify.feature.common.LoadingContent
+import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.productDetails.viewModel.ProductDetailsViewModel
 
 
 @Composable

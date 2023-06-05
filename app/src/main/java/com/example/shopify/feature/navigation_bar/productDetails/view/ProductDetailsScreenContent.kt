@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.productDetails.view
+package com.example.shopify.feature.navigation_bar.productDetails.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -21,23 +21,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.shopify.ui.screen.productDetails.components.AddedCartBottomSheetCard
-import com.example.shopify.ui.screen.productDetails.components.OverViewCard
-import com.example.shopify.ui.screen.productDetails.components.ProductDetailsCard
-import com.example.shopify.ui.screen.productDetails.components.ProductSnackBar
-import com.example.shopify.ui.screen.productDetails.components.ProductTopBar
-import com.example.shopify.ui.screen.productDetails.components.VariantSection
-import com.example.shopify.ui.screen.productDetails.components.VendorCard
-import com.example.shopify.ui.screen.productDetails.model.Discount
-import com.example.shopify.ui.screen.productDetails.model.Price
-import com.example.shopify.ui.screen.productDetails.model.Product
-import com.example.shopify.ui.screen.productDetails.model.VariantItem
-import com.example.shopify.ui.theme.shopifyColors
+import com.example.shopify.feature.navigation_bar.productDetails.components.AddedCartBottomSheetCard
+import com.example.shopify.feature.navigation_bar.productDetails.components.OverViewCard
+import com.example.shopify.feature.navigation_bar.productDetails.components.ProductDetailsCard
+import com.example.shopify.feature.navigation_bar.productDetails.components.ProductSnackBar
+import com.example.shopify.feature.navigation_bar.productDetails.components.ProductTopBar
+import com.example.shopify.feature.navigation_bar.productDetails.components.VariantSection
+import com.example.shopify.feature.navigation_bar.productDetails.components.VendorCard
+import com.example.shopify.feature.navigation_bar.productDetails.model.Discount
+import com.example.shopify.feature.navigation_bar.productDetails.model.Price
+import com.example.shopify.feature.navigation_bar.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.model.VariantItem
+import com.example.shopify.theme.shopifyColors
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +70,8 @@ fun ProductDetailsScreenContent(
                     price = product.price.amount,
                     realPrice = product.discount.realPrice,
                     discountPercent = product.discount.percent.toString(),
-                    quantity = product.totalInventory.toString()
+                    quantity = product.totalInventory.toString(),
+                    isLowStock = variantsState.isLowStock
                 )
 
                 Spacer(modifier = Modifier.height(15.dp))
@@ -100,7 +100,7 @@ fun ProductDetailsScreenContent(
             ProductSnackBar(
                 opened = addToCardState.isOpened,
                 selected = addToCardState.selectedQuantity,
-                availableQuantity = product.totalInventory,
+                availableQuantity = addToCardState.availableQuantity,
                 isChangingQuantity = false,
                 quantitySelected = {selectedQuantity -> addToCardState.sendSelectedQuantity(selectedQuantity) },
                 openQuantity = {addToCardState.openQuantity()},
@@ -148,7 +148,7 @@ private fun ProductDetailsScreenContentPreview(){
                     " These kids' shoes preserve the iconic look of the original," +
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
-            totalInventory = 10,
+            totalInventory = 5,
             variants = listOf(VariantItem("","","","white/1")),
             title = "Ultima show Running Shoes Pink",
             requiresSellingPlan = false,
@@ -166,8 +166,8 @@ private fun ProductDetailsScreenContentPreview(){
                 percent = 30
             )
         ),
-        addToCardState = AddToCardState(sendSelectedQuantity = {i ->}, openQuantity = {}, closeQuantity = {}, addToCard = {}, continueShopping = {}),
-        variantsState = VariantsState(selectVariant = {}),
+        addToCardState = AddToCardState(sendSelectedQuantity = {i ->}, openQuantity = {}, closeQuantity = {}, addToCard = {}, continueShopping = {}, availableQuantity = 5),
+        variantsState = VariantsState(selectVariant = {}, isLowStock = true),
         viewCart = {},
         back = {}
     )

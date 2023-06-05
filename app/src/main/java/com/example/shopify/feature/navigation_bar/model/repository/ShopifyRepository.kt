@@ -7,6 +7,7 @@ import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInf
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.productDetails.model.Product
 import kotlinx.coroutines.flow.Flow
 
 interface ShopifyRepository {
@@ -17,4 +18,5 @@ interface ShopifyRepository {
     fun isLoggedIn(): Flow<Boolean>
     fun getBrands(): Flow<Resource<List<Brand>?>>
     fun getCart():Flow<Resource<Cart>>
+    fun getProductDetailsByID(id: String) : Flow<Resource<Product>>
 }

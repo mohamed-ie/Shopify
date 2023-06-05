@@ -20,6 +20,8 @@ object ShopifyColors {
     val Black = Color(0xFF33363D)
     val Gray = Color(0xFF5B6E81)
     val LightGray = Color(0x9E5B6E81)
+    val ServerColor = Color(0xFFEAEBF4)
+    val DarkGreenColor = Color(0xFF00AA00)
 }
 
 val  MaterialTheme.shopifyColors: ShopifyColors

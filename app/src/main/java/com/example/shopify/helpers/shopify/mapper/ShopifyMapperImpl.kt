@@ -6,6 +6,10 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.productDetails.model.Discount
+import com.example.shopify.feature.navigation_bar.productDetails.model.Price
+import com.example.shopify.feature.navigation_bar.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.model.VariantItem
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
@@ -42,7 +46,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         )
     }
 
-    override fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product  =
+    override fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product =
         (response.data?.node as Storefront.Product).let { storefrontProduct ->
                 Product(
                     title = storefrontProduct.title ?: "",

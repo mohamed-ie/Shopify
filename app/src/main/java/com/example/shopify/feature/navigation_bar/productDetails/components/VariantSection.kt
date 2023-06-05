@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.productDetails.components
+package com.example.shopify.feature.navigation_bar.productDetails.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,9 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.ui.screen.common.component.ShopifyOutlinedButton
-import com.example.shopify.ui.screen.common.component.ShopifyOutlinedButtonState
-import com.example.shopify.ui.screen.productDetails.model.VariantItem
+import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.common.component.ShopifyOutlinedButtonState
+import com.example.shopify.feature.navigation_bar.productDetails.model.VariantItem
 import com.example.shopify.utils.shopifyLoading
 
 @Composable

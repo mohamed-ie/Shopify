@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.productDetails.components
+package com.example.shopify.feature.navigation_bar.productDetails.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -28,16 +28,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.ui.screen.common.component.ShopifyOutlinedButton
-import com.example.shopify.ui.screen.productDetails.model.Price
-import com.example.shopify.ui.theme.shopifyColors
+import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.productDetails.model.Price
+import com.example.shopify.theme.shopifyColors
 import com.example.shopify.utils.shopifyLoading
 
 @Composable
 fun AddedCartBottomSheetCard(
     productTitle:String,
     productPrice: Price,
-    isAdded:Boolean ,
+    isAdded:Boolean,
     continueShopping:()->Unit,
     viewCart:()->Unit
 ) {

@@ -1,15 +1,14 @@
-package com.example.shopify.ui.screen.productDetails.viewModel
+package com.example.shopify.feature.navigation_bar.productDetails.viewModel
 
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.helpers.Resource
-import com.example.shopify.model.repository.ShopifyRepository
-import com.example.shopify.ui.screen.common.model.ScreenState
-import com.example.shopify.ui.screen.productDetails.model.Discount
-import com.example.shopify.ui.screen.productDetails.model.Price
-import com.example.shopify.ui.screen.productDetails.model.Product
-import com.example.shopify.ui.screen.productDetails.view.AddToCardState
-import com.example.shopify.ui.screen.productDetails.view.VariantsState
+import com.example.shopify.feature.navigation_bar.productDetails.model.Discount
+import com.example.shopify.feature.navigation_bar.productDetails.model.Price
+import com.example.shopify.feature.navigation_bar.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.view.AddToCardState
+import com.example.shopify.feature.navigation_bar.productDetails.view.VariantsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +25,8 @@ class ProductDetailsViewModel @Inject constructor(
     private val _productState = MutableStateFlow(Product())
     val productState = _productState.asStateFlow()
 
-    private val _addToCardState = MutableStateFlow(AddToCardState(
+    private val _addToCardState = MutableStateFlow(
+        AddToCardState(
         sendSelectedQuantity = this::sendSelectedQuantity,
         openQuantity = this::openQuantitySection,
         closeQuantity = this::closeQuantitySection,
@@ -40,13 +40,20 @@ class ProductDetailsViewModel @Inject constructor(
     val variantState = _variantState.asStateFlow()
 
     fun getProduct(id:String){
+        //toLoadingScreenState()
         repository.getProductDetailsByID(id)
             .onEach {resource ->
                 when(resource){
-                    is Resource.Error -> {mutableScreenState.value = ScreenState.ERROR}
+                    is Resource.Error -> {toErrorScreenState()}
                     is Resource.Success -> {
-                        mutableScreenState.value = ScreenState.STABLE
-                        _variantState.value = _variantState.value.copy(variants = resource.data.variants)
+                        toStableScreenState()
+                        _addToCardState.value = _addToCardState.value.copy(
+                            availableQuantity = if(resource.data.totalInventory in 2..5) resource.data.totalInventory else resource.data.totalInventory
+                        )
+                        _variantState.value = _variantState.value.copy(
+                            variants = resource.data.variants,
+                            isLowStock = resource.data.totalInventory <= 5
+                        )
                         _productState.value = resource.data.copy(
                             discount = calDiscount(resource.data.price.amount),
                             variants = listOf()
@@ -58,7 +65,7 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
 
-    private fun calDiscount(price:String):Discount{
+    private fun calDiscount(price:String): Discount {
         val realPrice = price.toFloat()
         return Discount(
             realPrice = (realPrice + (realPrice * 0.3)).toString(),
