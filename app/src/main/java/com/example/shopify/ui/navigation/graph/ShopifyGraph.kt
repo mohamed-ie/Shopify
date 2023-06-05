@@ -13,7 +13,7 @@ fun ShopifyGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = Graph.LANDING
+        startDestination = Graph.HOME
     ) {
         authGraph(navController)
 

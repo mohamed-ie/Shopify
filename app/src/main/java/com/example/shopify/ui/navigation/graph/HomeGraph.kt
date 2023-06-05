@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.shopify.ui.navigation.Brand
 import com.example.shopify.ui.navigation.Graph
 import com.example.shopify.ui.navigation.NavigationBarScreen
 import com.example.shopify.ui.screen.cart.CartScreen
@@ -21,8 +22,15 @@ fun HomeGraph(paddingValues: PaddingValues, navController: NavHostController) {
         route = Graph.ROOT,
         startDestination = NavigationBarScreen.Home.route
     ) {
+        brandGraph(navController, paddingValues)
+
         composable(route = NavigationBarScreen.Home.route) {
-            HomeScreen(viewModel = hiltViewModel(), paddingValues)
+            HomeScreen(
+                viewModel = hiltViewModel(),
+                paddingValues,
+                navigateToProduct = { brandName ->
+                    navController.navigate("${Brand.PRODUCTS}/$brandName")
+                })
         }
         composable(route = NavigationBarScreen.Category.route) {
             CategoriesScreen()
