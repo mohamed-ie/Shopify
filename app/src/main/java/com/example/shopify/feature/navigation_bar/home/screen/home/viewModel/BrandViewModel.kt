@@ -21,6 +21,7 @@ class BrandViewModel @Inject constructor(
 
     init {
         getBrandList()
+      //  getProduct("VANS")
     }
 
     fun getBrandList() {
@@ -33,4 +34,14 @@ class BrandViewModel @Inject constructor(
             }
         }
     }
+//    fun getProduct(brandName:String){
+//        viewModelScope.launch(Dispatchers.Default) {
+//            repository.getProductsByBrandName(brandName).collect{
+//                when (it) {
+//                    is Resource.Success -> Log.i("TAG", "getProduct: ")
+//                    is Resource.Error -> it.error
+//                }
+//            }
+//        }
+//    }
 }

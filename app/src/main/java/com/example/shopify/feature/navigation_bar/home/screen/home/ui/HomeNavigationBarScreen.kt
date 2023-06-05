@@ -23,7 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
-import com.example.shopify.feature.navigation_bar.NavigationBarGraph
+import com.example.shopify.ui.navigation.graph.NavigationBarGraph
 
 
 private val items = listOf<NavigationBarScreen>(
