@@ -20,7 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.shopify.ui.theme.ShopifyTheme
+import com.example.shopify.theme.ShopifyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

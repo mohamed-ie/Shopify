@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.Product.model
+package com.example.shopify.feature.navigation_bar.home.screen.Product.model
 
 import com.shopify.buy3.Storefront.MoneyV2
 import com.shopify.graphql.support.ID
