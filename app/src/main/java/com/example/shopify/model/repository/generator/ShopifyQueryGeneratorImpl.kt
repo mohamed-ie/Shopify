@@ -54,7 +54,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     override fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery =
         Storefront.query { rootQuery ->
-            rootQuery.node(ID("gid://shopify/Product/$id")) { nodeQuery ->
+            rootQuery.node(ID(id)) { nodeQuery ->
                 nodeQuery.onProduct { productQuery ->
                     productQuery
                         .title()

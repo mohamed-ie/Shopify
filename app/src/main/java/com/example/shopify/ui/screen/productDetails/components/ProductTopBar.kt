@@ -1,4 +1,4 @@
-package com.example.shopify.ui.screen.productDetails.ui
+package com.example.shopify.ui.screen.productDetails.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -6,21 +6,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,32 +26,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.shopify.R
 import com.example.shopify.ui.screen.common.NamedTopAppBar
-import com.example.shopify.ui.theme.SearchBarColor
-
-
-@Composable
-fun ProductDetailsScreenContent() {
-    Scaffold(
-        topBar = { ProductTopBar() {} },
-        snackbarHost = {
-
-        }
-    ) {
-        Column(modifier = Modifier.padding(it)) {
-            
-        }
-    }
-}
+import com.example.shopify.ui.theme.shopifyColors
 
 @Composable
-private fun ProductTopBar(back:() -> Unit){
+fun ProductTopBar(back:() -> Unit){
     Column(
         modifier = Modifier.background(Color.White),
 
-    ) {
+        ) {
         NamedTopAppBar(back = back)
         Button(
             onClick = { /*TODO*/ },
@@ -64,7 +44,7 @@ private fun ProductTopBar(back:() -> Unit){
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 3.dp)
                 .offset(y = (-7).dp),
-            colors = ButtonDefaults.buttonColors(containerColor = SearchBarColor),
+            colors = ButtonDefaults.buttonColors(containerColor =  MaterialTheme.shopifyColors.ServerColor),
             shape = RoundedCornerShape(7.dp),
             contentPadding = PaddingValues(0.dp)
         ) {
@@ -82,48 +62,29 @@ private fun ProductTopBar(back:() -> Unit){
                 Spacer(modifier = Modifier.width(5.dp))
                 Text(
                     text = stringResource(R.string.search_message),
-                   style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelLarge,
                     color = Color.Gray,
                     fontWeight = FontWeight.Normal
                 )
             }
         }
-        Divider(color = SearchBarColor, thickness = 1.dp)
+        Divider(color =  MaterialTheme.shopifyColors.ServerColor, thickness = 1.dp)
 
     }
 }
-
-@Composable
-fun ProductSnackBar() {
-    Row(
-        modifier = Modifier
-            .background(Color.White)
-            .padding(horizontal = 15.dp, vertical = 7.dp)
-            .fillMaxWidth()
-
-    ) {
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier.fillMaxWidth().height(45.dp),
-            shape = RoundedCornerShape(7.dp)
-        ) {
-            Text(
-                text = "ADD TO CART",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-//@Preview
-//@Composable
-//private fun ProductDetailsScreenContentPreview() {
-//    ProductDetailsScreenContent()
-//}
 
 @Preview
 @Composable
 private fun ProductTopBarPreview() {
-    ProductSnackBar()
+    ProductSnackBar(
+        opened = true,
+        selected = 1,
+        availableQuantity = 10,
+        isChangingQuantity = false,
+        quantitySelected = {},
+        openQuantity = {},
+        closeQuantity = {},
+        addToCard = {}
+
+    )
 }

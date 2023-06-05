@@ -10,6 +10,7 @@ import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
 import com.example.shopify.ui.screen.cart.model.Cart
 import com.example.shopify.ui.screen.home.model.Brand
+import com.example.shopify.ui.screen.productDetails.model.Product
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront

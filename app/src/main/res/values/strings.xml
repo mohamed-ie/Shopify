@@ -55,5 +55,19 @@
     <string name="this_doesnt_seem_right_let_us_try_to_sort_it_out">This doesn\'t seem right! Let us try to sort it out</string>
     <string name="error_empty_password_field">Hold up!, this field is empty</string>
     <string name="search_message">What are you looking for?</string>
+    <string name="add_to_cart">ADD TO CART</string>
+    <string name="qty">QTY</string>
+    <string name="qty_count">1</string>
+    <string name="inclusive_of_vat">(Inclusive of VAT)</string>
+    <string name="low_stock_only_4_left">Low stock: only %1$s left</string>
+    <string name="express">express</string>
+    <string name="variant">Variant</string>
+    <string name="size_guide">Size Guide</string>
+    <string name="sold_by_noon_fashion">Sold by</string>
+    <string name="overview">Overview</string>
+    <string name="added_to_cart">Added to cart</string>
+    <string name="cart_total">Cart Total</string>
+    <string name="continue_shopping">CONTINUE SHOPPING</string>
+    <string name="view_cart">VIEW CART</string>
 
 </resources>

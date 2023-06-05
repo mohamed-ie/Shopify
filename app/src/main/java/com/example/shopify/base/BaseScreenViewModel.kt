@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 open class BaseScreenViewModel : ViewModel() {
-    private val _screenState = MutableStateFlow<ScreenState>(ScreenState.LOADING)
-    val screenState = _screenState.asStateFlow()
+    protected val mutableScreenState = MutableStateFlow<ScreenState>(ScreenState.LOADING)
+    val screenState = mutableScreenState.asStateFlow()
 }

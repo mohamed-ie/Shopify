@@ -5,6 +5,8 @@ import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
 import com.example.shopify.ui.screen.home.model.Brand
+import com.example.shopify.ui.screen.productDetails.model.Discount
+import com.example.shopify.ui.screen.productDetails.model.Price
 import com.example.shopify.ui.screen.productDetails.model.Product
 import com.example.shopify.ui.screen.productDetails.model.VariantItem
 import com.shopify.buy3.GraphError
@@ -54,18 +56,26 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                     isGiftCard = storefrontProduct.isGiftCard ?: false,
                     totalInventory = storefrontProduct.totalInventory ?: 0,
                     vendor = storefrontProduct.vendor ?: "",
-                    images = storefrontProduct.images?.nodes?.map { it.url } ?: listOf(),
+                    image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
                     variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
                         productVariantNode.node.let {productVariant ->
                             VariantItem(
-                                productVariant.image.url,
-                                productVariant.id.toString(),
-                                productVariant.price.amount,
-                                productVariant.title
+                                image = productVariant.image.url,
+                                id = productVariant.id.toString(),
+                                price = productVariant.price.amount,
+                                title = productVariant.title
                             )
                         }
-                    } ?: listOf(),
-                    tags = storefrontProduct.tags ?: listOf()
+                    },
+                    tags = storefrontProduct.tags ?: listOf(),
+                    price = Price(
+                        amount = storefrontProduct.priceRange.minVariantPrice.amount,
+                        currencyCode = storefrontProduct.priceRange.minVariantPrice.currencyCode.name
+                    ),
+                    discount = Discount(
+                        realPrice = "",
+                        percent = 0
+                    )
                 )
             }
 
