@@ -1,27 +1,27 @@
-package com.example.shopify.model.repository
+package com.example.shopify.feature.navigation_bar.model.repository
 
 import com.example.shopify.helpers.Resource
-import com.example.shopify.model.local.ShopifyDataStoreManager
-import com.example.shopify.model.repository.generator.ShopifyQueryGenerator
-import com.example.shopify.model.repository.mapper.ShopifyMapper
-import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
-import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
-import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
-import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
-import com.example.shopify.ui.screen.cart.model.Cart
-import com.example.shopify.ui.screen.home.model.Brand
-import com.example.shopify.ui.screen.productDetails.model.Product
+import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
+import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
+import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
+import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
+import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
+import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
+import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.utils.enqueue
+import com.example.shopify.utils.mapResource
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+
 
 
 class ShopifyRepositoryImpl @Inject constructor(
@@ -33,9 +33,9 @@ class ShopifyRepositoryImpl @Inject constructor(
 ) : ShopifyRepository {
 
     override fun signUp(userInfo: SignUpUserInfo): Flow<Resource<SignUpUserResponseInfo>> {
-       return queryGenerator.generateSingUpQuery(userInfo)
-           .enqueue()
-           .mapResource(mapper::map)
+        return queryGenerator.generateSingUpQuery(userInfo)
+            .enqueue()
+            .mapResource(mapper::map)
     }
 
     override fun signIn(userInfo: SignInUserInfo): Flow<Resource<SignInUserInfoResult>> {
@@ -51,6 +51,11 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getUserInfo(): Flow<SignInUserInfoResult> =
         dataStoreManager.getUserInfo()
 
+    override fun getProductDetailsByID(id:String) : Flow<Resource<Product>> {
+        val query = queryGenerator.generateProductDetailsQuery(id)
+        return query.enqueue().mapResource(mapper::mapToProduct)
+    }
+
 
     override fun isLoggedIn(): Flow<Boolean> =
         dataStoreManager.getAccessToken()
@@ -62,51 +67,31 @@ class ShopifyRepositoryImpl @Inject constructor(
         return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
     }
 
-    override fun getProductDetailsByID(id:String) : Flow<Resource<Product>> {
-        val query = queryGenerator.generateProductDetailsQuery(id)
-        return query.enqueue().mapResource(mapper::mapToProduct)
-    }
-
     override fun getCart(): Flow<Resource<Cart>> = flow {
     }
 
 
-    private fun Storefront.QueryRootQuery.enqueue() = callbackFlow {
-        val call = graphClient.queryGraph(this@enqueue).enqueue { result ->
-            when (result) {
-                is GraphCallResult.Success -> {
-                    trySend(Resource.Success(result.response))
-                }
-
-                is GraphCallResult.Failure ->
-                    trySend(Resource.Error(mapper.map(result.error)))
-
-            }
-        }
-        awaitClose { call.cancel() }
-    }
-
-    private fun Storefront.MutationQuery.enqueue() = callbackFlow {
-        val call = graphClient.mutateGraph(this@enqueue).enqueue { result ->
+    private fun Storefront.QueryRootQuery.enqueue() =
+        graphClient.enqueue(this).map { result ->
             when (result) {
                 is GraphCallResult.Success ->
-                    trySend(Resource.Success(result.response))
+                    Resource.Success(result.response)
 
                 is GraphCallResult.Failure ->
-                    trySend(Resource.Error(mapper.map(result.error)))
-
+                    Resource.Error(mapper.map(result.error))
             }
-        }
-        awaitClose { call.cancel() }
-    }
+        }.applyDispatcher()
 
-    private fun <I, O> Flow<Resource<I>>.mapResource(transform: (I) -> O): Flow<Resource<O>> {
-        return map { resource ->
-            when (resource) {
-                is Resource.Error -> resource
-                is Resource.Success -> Resource.Success(transform(resource.data))
+    private fun Storefront.MutationQuery.enqueue() =
+        graphClient.enqueue(this).map { result ->
+            when (result) {
+                is GraphCallResult.Success ->
+                    Resource.Success(result.response)
+
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(result.error))
             }
-        }.flowOn(defaultDispatcher)
-    }
+        }.applyDispatcher()
 
+    private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
 }
