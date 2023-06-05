@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Shopify</string>
+    <string name="back">Back</string>
+    <string name="home">Home</string>
     <string name="discount">%1$s OFF</string>
     <string name="sold_by">Sold by</string>
     <string name="choose_quantity_clossed">Choose quantity closed</string>
@@ -29,24 +31,22 @@
     <string name="dont_have_an_account_text">Don\'t have an account?</string>
     <string name="sign_up">Sign up</string>
     <string name="create_a_shopify_account">Create a Shopify account</string>
-    <string name="firstName">First Name</string>
+    <string name="first_name">First Name</string>
     <string name="firstName_place_holder">Please enter your first name</string>
-    <string name="lastName">Last Name</string>
+    <string name="last_name">Last Name</string>
     <string name="lastName_place_holder">Please enter your last name</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="phone_place_holder">Please enter your phone number</string>
     <string name="email_not_formed_error">Oh no! Please enter a valid email.</string>
-    <string name="password_not_formed_error">Hold up, this field requires at least 8 characters, one (uppercase, lowercase, number and special) character.</string>
+    <string name="password_not_formed_error">Hold up, this field requires at least 8 characters.</string>
     <string name="first_name_not_formed_error">Hold up, this field requires your first name.</string>
     <string name="second_name_not_formed_error">Hold up, this field requires your second name.</string>
     <string name="phone_not_formed_error">Hold up, it must be like (+201558653011)</string>
     <string name="nothing">must be like (+201558653011)</string>
     <string name="phone">Phone</string>
-    <string name="home">Home</string>
     <string name="category">Category</string>
     <string name="favourite">Favourite</string>
     <string name="me">Me</string>
-    <string name="back">Back</string>
     <string name="cash">Cash</string>
     <string name="your_cart_is_empty">Your cart is empty</string>
     <string name="be_sure_to_fill_your_cart_with_somthing_you_like">Be sure to fill your cart with somthing you like</string>
@@ -54,5 +54,27 @@
     <string name="something_went_wrong">Oops! Something went wrong</string>
     <string name="this_doesnt_seem_right_let_us_try_to_sort_it_out">This doesn\'t seem right! Let us try to sort it out</string>
     <string name="error_empty_password_field">Hold up!, this field is empty</string>
+    <string name="card_information">Card Information</string>
+    <string name="we_accept">We Accept</string>
+    <string name="visa">Visa</string>
+    <string name="mastercard">Mastercard</string>
+    <string name="enter_your_card_number">Enter your card number</string>
+    <string name="card_number">Card Number</string>
+    <string name="mm">MM</string>
+    <string name="yy">YY</string>
+    <string name="expire_month">Expire Month</string>
+    <string name="expire_year">Expire Year</string>
+    <string name="cvv">CVV</string>
+    <string name="secure_code">Secure Code</string>
+    <string name="next">Next</string>
+    <string name="ship_to">Ship To</string>
+    <string name="change">Change</string>
+    <string name="enter_valid_card_number">Enter valid card number</string>
+    <string name="required">Required</string>
+    <string name="expire_year_must_be_in_form">Must be 2 digits ex. 23 </string>
+    <string name="expire_month_must_be_in_form">Must be in range of  01 to 12</string>
+    <string name="not_valid">Not valid</string>
+    <string name="enter_first_name">Enter first name</string>
+    <string name="enter_last_name">Enter last name</string>
 
 </resources>

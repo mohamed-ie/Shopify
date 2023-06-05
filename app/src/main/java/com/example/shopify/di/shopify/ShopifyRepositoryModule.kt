@@ -1,7 +1,7 @@
 package com.example.shopify.di.shopify
 
-import com.example.shopify.model.repository.ShopifyRepository
-import com.example.shopify.model.repository.ShopifyRepositoryImpl
+import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,5 +14,5 @@ abstract class ShopifyRepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindsShopifyRepository(shopifyRepositoryImpl: ShopifyRepositoryImpl):ShopifyRepository
+    abstract fun bindsShopifyRepository(shopifyRepositoryImpl: ShopifyRepositoryImpl): ShopifyRepository
 }
