@@ -13,11 +13,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
         Storefront.mutation { rootQuery ->
             rootQuery.customerCreate(createSingUpCustomerCreateInput(userInfo)) { payload ->
                 payload.customer { customQuery ->
-                    customQuery.firstName()
-                        .lastName()
-                        .email()
-                        .phone()
-                        .id()
+                    customQuery.firstName().lastName().email().phone().id()
                 }.customerUserErrors { userErrorQuery ->
                     userErrorQuery.field().message()
                 }
@@ -28,9 +24,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
         Storefront.mutation { rootQuery ->
             rootQuery.customerAccessTokenCreate(createSingInCustomerCreateInput(userInfo)) { payload ->
                 payload.customerAccessToken { customQuery ->
-                    customQuery
-                        .accessToken()
-                        .expiresAt()
+                    customQuery.accessToken().expiresAt()
                 }.customerUserErrors { userErrorQuery ->
                     userErrorQuery.field().message()
                 }
@@ -39,17 +33,58 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     override fun generateBrandQuery(): Storefront.QueryRootQuery? =
         Storefront.query { rootQuery: Storefront.QueryRootQuery ->
-            rootQuery.collections({ arg -> arg.first(10) }
-            ) { collectionConnectionQuery ->
+            rootQuery.collections({ arg -> arg.first(20) }) { collectionConnectionQuery ->
                 collectionConnectionQuery.edges { collectionEdgeQuery ->
-                    collectionEdgeQuery
-                        .node { collectionQuery ->
-                            collectionQuery
-                                .title()
-                                .image {
-                                    it.url()
-                                }
+                    collectionEdgeQuery.node { collectionQuery ->
+                        collectionQuery.title().image {
+                            it.url()
                         }
+                    }
+                }
+            }
+        }
+
+    override fun generateProductByBrandQuery(brandName: String): Storefront.QueryRootQuery =
+        Storefront.query { rootQuery: Storefront.QueryRootQuery ->
+            rootQuery.collections({ args ->
+                args.query(brandName).first(1)
+            }) { collectionConnectionQuery ->
+                collectionConnectionQuery.edges { collectionEdgeQuery ->
+                    collectionEdgeQuery.node { collectionQuery ->
+                        collectionQuery.products({ args -> args.first(10) }) { product ->
+                            product.edges { productEdge ->
+                                productEdge.node { productNode ->
+                                    productNode.title()
+                                    productNode.description()
+                                    productNode.images({ args -> args.first(5) }) { imageConnectionQuery ->
+                                        imageConnectionQuery
+                                            .edges { imageEdgeQuery ->
+                                                imageEdgeQuery
+                                                    .node { imageQuery ->
+                                                        imageQuery.url()
+                                                    }
+
+                                            }
+                                    }
+                                    productNode.variants({ args -> args.first(5) }) { productVariant ->
+                                        productVariant.edges { variantEdge ->
+                                            variantEdge.node { variantNode ->
+                                                variantNode.availableForSale()
+                                                variantNode.price { price ->
+                                                    price.amount()
+                                                    price.currencyCode()
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+                                }
+                            }
+
+                        }
+                    }
                 }
             }
         }
@@ -145,14 +180,14 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     private fun createSingUpCustomerCreateInput(userInfo: SignUpUserInfo) =
         Storefront.CustomerCreateInput(userInfo.email, userInfo.password)
-            .setFirstName(userInfo.firstName)
-            .setLastName(userInfo.lastName)
-            .setAcceptsMarketing(true)
-            .setPhone(userInfo.phone)
+            .setFirstName(userInfo.firstName).setLastName(userInfo.lastName)
+            .setAcceptsMarketing(true).setPhone(userInfo.phone)
 
 
     private fun createSingInCustomerCreateInput(signInUserInfo: SignInUserInfo) =
-        Storefront.CustomerAccessTokenCreateInput(signInUserInfo.email, signInUserInfo.password)
-
+        Storefront.CustomerAccessTokenCreateInput(
+            signInUserInfo.email,
+            signInUserInfo.password
+        )
 
 }

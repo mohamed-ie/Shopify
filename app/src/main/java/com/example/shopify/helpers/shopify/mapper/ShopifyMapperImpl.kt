@@ -1,11 +1,12 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.example.shopify.helpers.UIError
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
+import com.example.shopify.feature.navigation_bar.home.screen.Product.model.Variants
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
+import com.example.shopify.helpers.UIError
 import com.example.shopify.feature.navigation_bar.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.model.Product
@@ -14,6 +15,7 @@ import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.ImageConnection
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -82,6 +84,29 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             }
 
 
+
+    override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Product> {
+        val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
+            Product(
+                id = it.node.id,
+                title = it.node.title, description = it.node.description,
+                images = mapToImageUrl(it.node.images), variants = mapToVariant(it.node.variants)
+            )
+        } ?: listOf()
+        return res
+    }
+
+    private fun mapToImageUrl(response: ImageConnection): List<String> {
+        return response.edges.map {
+            it.node.url
+        }
+    }
+
+    private fun mapToVariant(response: Storefront.ProductVariantConnection): Variants {
+        return response.edges.firstOrNull()?.node.let {
+            Variants(it!!.availableForSale, it.price)
+        }
+    }
 
     override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand>? {
         return response.data?.collections?.edges?.drop(1)?.map {

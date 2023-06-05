@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.home.screen.home.ui
+package com.example.shopify.ui.screen.home.ui
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.AnimationConstants
@@ -14,6 +14,9 @@ import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,29 +43,49 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.shopify.feature.navigation_bar.home.screen.home.ImageFromUrl
+import com.example.shopify.R
 import com.example.shopify.feature.common.LoadingContent
-import com.example.shopify.feature.common.SearchBarItem
+import com.example.shopify.feature.navigation_bar.home.screen.home.ImageFromUrl
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.home.viewModel.BrandViewModel
 import com.example.shopify.theme.ShopifyTheme
+import com.example.shopify.ui.screen.common.SearchBarItem
 import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(viewModel: BrandViewModel, paddingValues: PaddingValues) {
+fun HomeScreen(
+    viewModel: BrandViewModel, paddingValues: PaddingValues,
+    navigateToProduct: (String) -> Unit
+) {
     viewModel.getBrandList()
     val brandList by viewModel.brandList.collectAsState(initial = listOf())
     LazyColumn(modifier = Modifier.padding(paddingValues)) {
         stickyHeader {
-            SearchBarItem(onSearch = {})
+            Row(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(vertical = 8.dp, horizontal = 10.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.shopfiy_logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .padding(end = 20.dp)
+                )
+                SearchBarItem(onSearch = {})
+            }
         }
         item {
             SalesCard()
@@ -75,12 +99,16 @@ fun HomeScreen(viewModel: BrandViewModel, paddingValues: PaddingValues) {
             )
         }
         if (brandList?.isNotEmpty()!!) {
-            for (i in 0..(brandList?.size ?: 0) step (2))
+            for (i in 0 until (brandList?.size ?: 0) step (2))
                 item {
                     Row() {
-                        BrandListItem(item = brandList!![i])
+                        BrandListItem(item = brandList!![i]) { brandName ->
+                            navigateToProduct(brandName)
+                        }
                         brandList!!.getOrNull(i + 1)?.let {
-                            BrandListItem(item = it)
+                            BrandListItem(item = it) { brandName ->
+                                navigateToProduct(brandName)
+                            }
                         }
                     }
                 }
@@ -94,11 +122,12 @@ fun HomeScreen(viewModel: BrandViewModel, paddingValues: PaddingValues) {
 }
 
 @Composable
-fun RowScope.BrandListItem(item: Brand) {
+fun RowScope.BrandListItem(item: Brand, onItemClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .padding(10.dp)
-            .weight(1f),
+            .weight(1f)
+            .clickable { onItemClick(item.title) },
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
@@ -187,7 +216,7 @@ fun SalesCard() {
 @Composable
 fun PreviewHomeScreen() {
     ShopifyTheme {
-        HomeScreen(viewModel = hiltViewModel(), PaddingValues())
+        HomeScreen(viewModel = hiltViewModel(), PaddingValues(), navigateToProduct = {})
     }
 }
 

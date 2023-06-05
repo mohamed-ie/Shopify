@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar
+package com.example.shopify.ui.navigation.graph
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -7,10 +7,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.feature.Graph
+import com.example.shopify.feature.navigation_bar.NavigationBarScreen
 import com.example.shopify.feature.navigation_bar.category.CategoriesScreen
-import com.example.shopify.feature.navigation_bar.home.screen.home.ui.HomeScreen
+import com.example.shopify.feature.navigation_bar.home.screen.Brand
+import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.wishlist.WishlistScreen
+import com.example.shopify.ui.screen.home.ui.HomeScreen
 
 @Composable
 fun NavigationBarGraph(paddingValues: PaddingValues, navController: NavHostController) {
@@ -19,8 +22,15 @@ fun NavigationBarGraph(paddingValues: PaddingValues, navController: NavHostContr
         route = Graph.ROOT,
         startDestination = NavigationBarScreen.Home.route
     ) {
+        homeGraph(navController, paddingValues)
+
         composable(route = NavigationBarScreen.Home.route) {
-            HomeScreen(viewModel = hiltViewModel(), paddingValues)
+            HomeScreen(
+                viewModel = hiltViewModel(),
+                paddingValues,
+                navigateToProduct = { brandName ->
+                    navController.navigate("${Brand.PRODUCTS}/$brandName")
+                })
         }
         composable(route = NavigationBarScreen.Category.route) {
             CategoriesScreen()
