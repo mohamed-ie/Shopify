@@ -5,6 +5,7 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.model.Product
 import com.shopify.buy3.GraphCallResult
@@ -24,6 +25,7 @@ interface ShopifyMapper {
     fun mapToPaymentCompletionAvailability(result: GraphResponse<Storefront.Mutation>): ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability
     fun mapToPaymentResult(result: GraphCallResult.Success<Storefront.QueryRoot>): ShopifyCreditCardPaymentStrategy.PaymentResult
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product
-    fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Product>
+    fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
 
-}
+
+    }

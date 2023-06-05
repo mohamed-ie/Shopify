@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
-import com.example.shopify.feature.navigation_bar.home.screen.Product.ui.ProductScreen
+import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ProductScreen
 
 fun NavGraphBuilder.homeGraph(navController: NavController, paddingValues: PaddingValues) {
     navigation(

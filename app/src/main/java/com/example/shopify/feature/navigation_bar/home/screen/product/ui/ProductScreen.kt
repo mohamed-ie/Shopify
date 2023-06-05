@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.home.screen.Product.ui
+package com.example.shopify.feature.navigation_bar.home.screen.product.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,7 +32,7 @@ fun ProductScreen(
             onValueChange = { viewModel.updateSliderValue(it) }
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
-            items(productsState.products) {
+            items(productsState.brandProducts) {
                 ProductCard(it)
             }
         }

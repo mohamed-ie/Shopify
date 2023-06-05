@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
-package com.example.shopify.feature.navigation_bar.home.screen.Product.ui
+package com.example.shopify.feature.navigation_bar.home.screen.product.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

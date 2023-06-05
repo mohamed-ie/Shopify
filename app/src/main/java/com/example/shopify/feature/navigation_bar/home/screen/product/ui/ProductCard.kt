@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.home.screen.Product.ui
+package com.example.shopify.feature.navigation_bar.home.screen.product.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
@@ -22,10 +22,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.example.shopify.feature.navigation_bar.home.screen.Product.model.Product
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(brandProduct: BrandProduct) {
     Box() {
         Card(
             modifier = Modifier
@@ -40,12 +40,12 @@ fun ProductCard(product: Product) {
             )
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                ImageCardScrollHorizontally(product.images)
+                ImageCardScrollHorizontally(brandProduct.images)
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
-                    text = product.title,
+                    text = brandProduct.title,
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
@@ -59,14 +59,14 @@ fun ProductCard(product: Product) {
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                     text = buildAnnotatedString {
-                        append(product.variants.price.currencyCode.toString())
+                        append(brandProduct.brandVariants.price.currencyCode.toString())
                         append(" ")
                         withStyle(
                             style = SpanStyle(
                                 fontWeight = FontWeight.Bold,
                             )
                         )
-                        { append(product.variants.price.amount.toString()) }
+                        { append(brandProduct.brandVariants.price.amount.toString()) }
                     },
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.labelMedium

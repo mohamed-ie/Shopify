@@ -3,14 +3,16 @@ package com.example.shopify.helpers.shopify.mapper
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.home.screen.Product.model.Variants
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.helpers.UIError
 import com.example.shopify.feature.navigation_bar.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.model.VariantItem
+
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
@@ -85,12 +87,12 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
 
 
-    override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Product> {
+    override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
-            Product(
+           BrandProduct(
                 id = it.node.id,
                 title = it.node.title, description = it.node.description,
-                images = mapToImageUrl(it.node.images), variants = mapToVariant(it.node.variants)
+                images = mapToImageUrl(it.node.images), brandVariants = mapToVariant(it.node.variants)
             )
         } ?: listOf()
         return res
@@ -102,9 +104,9 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
     }
 
-    private fun mapToVariant(response: Storefront.ProductVariantConnection): Variants {
+    private fun mapToVariant(response: Storefront.ProductVariantConnection): BrandVariants {
         return response.edges.firstOrNull()?.node.let {
-            Variants(it!!.availableForSale, it.price)
+            BrandVariants(it!!.availableForSale, it.price)
         }
     }
 

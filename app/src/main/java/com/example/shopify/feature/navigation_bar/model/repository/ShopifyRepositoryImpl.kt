@@ -1,18 +1,15 @@
 package com.example.shopify.feature.navigation_bar.model.repository
 
-import com.example.shopify.helpers.Resource
-import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
-import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
-import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
+
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.home.screen.Product.model.Product
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
-import com.example.shopify.feature.navigation_bar.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
+import com.example.shopify.feature.navigation_bar.productDetails.model.Product
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
@@ -75,7 +72,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getCart(): Flow<Resource<Cart>> = flow {
     }
 
-    override fun getProductsByBrandName(brandName: String): Flow<Resource<List<Product>>> {
+    override fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>> {
         val query = queryGenerator.generateProductByBrandQuery(brandName)
         return query!!.enqueue().mapResource(mapper::mapToProductsByBrandResponse)
     }
