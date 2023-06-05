@@ -8,4 +8,5 @@ interface ShopifyQueryGenerator {
     fun generateSingUpQuery(userInfo: SignUpUserInfo): Storefront.MutationQuery
     fun generateSingInQuery(userInfo: SignInUserInfo): Storefront.MutationQuery
     fun generateBrandQuery(): Storefront.QueryRootQuery?
+    fun generateProductByBrandQuery(brandName: String): Storefront.QueryRootQuery
 }

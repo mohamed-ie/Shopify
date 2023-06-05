@@ -1,6 +1,8 @@
 package com.example.shopify.model.repository.mapper
 
 import com.example.shopify.helpers.UIError
+import com.example.shopify.ui.screen.Product.model.Product
+import com.example.shopify.ui.screen.Product.model.Variants
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
@@ -8,6 +10,7 @@ import com.example.shopify.ui.screen.home.model.Brand
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.ImageConnection
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -38,6 +41,29 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             response.data?.customerAccessTokenCreate?.customerUserErrors?.getOrNull(0)?.message
                 ?: ""
         )
+    }
+
+    override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Product> {
+        val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
+            Product(
+                id = it.node.id,
+                title = it.node.title, description = it.node.description,
+                images = mapToImageUrl(it.node.images), variants = mapToVariant(it.node.variants)
+            )
+        } ?: listOf()
+        return res
+    }
+
+    private fun mapToImageUrl(response: ImageConnection): List<String> {
+        return response.edges.map {
+            it.node.url
+        }
+    }
+
+    private fun mapToVariant(response: Storefront.ProductVariantConnection): Variants {
+        return response.edges.firstOrNull()?.node.let {
+            Variants(it!!.availableForSale, it.price)
+        }
     }
 
     override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand>? {

@@ -1,6 +1,7 @@
 package com.example.shopify.model.repository.mapper
 
 import com.example.shopify.helpers.UIError
+import com.example.shopify.ui.screen.Product.model.Product
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserResponseInfo
@@ -12,6 +13,12 @@ import com.shopify.buy3.Storefront
 interface ShopifyMapper {
     fun map(response: GraphResponse<Storefront.Mutation>): SignUpUserResponseInfo
     fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand>?
-    fun mapToSignInResponse(response: GraphResponse<Storefront.Mutation>,signInUserInfo: SignInUserInfo): SignInUserInfoResult
-    fun map(error:GraphError): UIError
+    fun mapToSignInResponse(
+        response: GraphResponse<Storefront.Mutation>,
+        signInUserInfo: SignInUserInfo
+    ): SignInUserInfoResult
+
+    fun map(error: GraphError): UIError
+    fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Product>
+
 }

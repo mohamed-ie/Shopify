@@ -1,6 +1,7 @@
 package com.example.shopify.model.repository
 
 import com.example.shopify.helpers.Resource
+import com.example.shopify.ui.screen.Product.model.Product
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
@@ -15,4 +16,5 @@ interface ShopifyRepository {
     fun getUserInfo(): Flow<SignInUserInfoResult>
     fun isLoggedIn(): Flow<Boolean>
     fun getBrands(): Flow<Resource<List<Brand>?>>
+    fun getProductsByBrandName(brandName: String): Flow<Resource<List<Product>>>
 }

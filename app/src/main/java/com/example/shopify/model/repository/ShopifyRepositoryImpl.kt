@@ -4,6 +4,7 @@ import com.example.shopify.helpers.Resource
 import com.example.shopify.model.local.ShopifyDataStoreManager
 import com.example.shopify.model.repository.generator.ShopifyQueryGenerator
 import com.example.shopify.model.repository.mapper.ShopifyMapper
+import com.example.shopify.ui.screen.Product.model.Product
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfo
 import com.example.shopify.ui.screen.auth.login.model.SignInUserInfoResult
 import com.example.shopify.ui.screen.auth.registration.model.SignUpUserInfo
@@ -57,6 +58,11 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getBrands(): Flow<Resource<List<Brand>?>> {
         val query = queryGenerator.generateBrandQuery()
         return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
+    }
+
+    override fun getProductsByBrandName(brandName: String): Flow<Resource<List<Product>>> {
+        val query = queryGenerator.generateProductByBrandQuery(brandName)
+        return query!!.enqueue().mapResource(mapper::mapToProductsByBrandResponse)
     }
 
     private fun Storefront.QueryRootQuery.enqueue() = callbackFlow {
