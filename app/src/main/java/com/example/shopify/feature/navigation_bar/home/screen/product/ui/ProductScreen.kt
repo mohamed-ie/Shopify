@@ -19,7 +19,8 @@ import com.example.shopify.ui.screen.common.SearchBarItem
 fun ProductScreen(
     viewModel: ProductViewModel,
     paddingValues: PaddingValues,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToProductDetails: (String) -> Unit
 ) {
     val productsState by viewModel.productList.collectAsState()
     Column(modifier = Modifier.padding(paddingValues)) {
@@ -33,7 +34,10 @@ fun ProductScreen(
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
             items(productsState.brandProducts) {
-                ProductCard(it)
+                ProductCard(
+                    brandProduct = it,
+                    onProductItemClick = {navigateToProductDetails(it.id)}
+                )
             }
         }
     }

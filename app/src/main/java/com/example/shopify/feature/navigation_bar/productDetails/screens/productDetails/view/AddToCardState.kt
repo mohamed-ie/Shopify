@@ -1,6 +1,7 @@
-package com.example.shopify.feature.navigation_bar.productDetails.view
+package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view
 
-import com.example.shopify.feature.navigation_bar.productDetails.model.Price
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
+
 
 data class AddToCardState (
     val selectedQuantity:Int = 1,

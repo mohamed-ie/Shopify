@@ -7,7 +7,8 @@ import com.example.shopify.feature.auth.screens.registration.model.SignUpUserRes
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
-import com.example.shopify.feature.navigation_bar.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
 import kotlinx.coroutines.flow.Flow
 
@@ -21,4 +22,6 @@ interface ShopifyRepository {
     fun getCart(): Flow<Resource<Cart>>
     fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>>
     fun getProductDetailsByID(id: String) : Flow<Resource<Product>>
+    suspend fun getProductReviewById(productId: String, reviewsCount: Int? = null): List<Review>
+    suspend fun setProductReview(productId: String, review: Review)
 }

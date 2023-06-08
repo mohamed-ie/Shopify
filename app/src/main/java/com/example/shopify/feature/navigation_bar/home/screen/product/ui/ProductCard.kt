@@ -1,6 +1,7 @@
 package com.example.shopify.feature.navigation_bar.home.screen.product.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,8 +26,13 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 
 @Composable
-fun ProductCard(brandProduct: BrandProduct) {
-    Box() {
+fun ProductCard(
+    brandProduct: BrandProduct,
+    onProductItemClick:()->Unit
+) {
+    Box(
+        modifier = Modifier.clickable { onProductItemClick() }
+    ) {
         Card(
             modifier = Modifier
                 .padding(4.dp)
@@ -51,7 +57,6 @@ fun ProductCard(brandProduct: BrandProduct) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium
-
                 )
                 Spacer(modifier = Modifier.padding(bottom = 4.dp))
                 Text(

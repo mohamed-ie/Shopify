@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.productDetails.components
+package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.common.component.ShopifyOutlinedButton
-import com.example.shopify.feature.navigation_bar.productDetails.model.Price
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.theme.shopifyColors
 import com.example.shopify.utils.shopifyLoading
 

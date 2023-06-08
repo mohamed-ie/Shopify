@@ -1,10 +1,12 @@
-package com.example.shopify.feature.navigation_bar.productDetails.view
+package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,19 +26,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.shopify.feature.navigation_bar.productDetails.components.AddedCartBottomSheetCard
-import com.example.shopify.feature.navigation_bar.productDetails.components.OverViewCard
-import com.example.shopify.feature.navigation_bar.productDetails.components.ProductDetailsCard
-import com.example.shopify.feature.navigation_bar.productDetails.components.ProductSnackBar
-import com.example.shopify.feature.navigation_bar.productDetails.components.ProductTopBar
-import com.example.shopify.feature.navigation_bar.productDetails.components.VariantSection
-import com.example.shopify.feature.navigation_bar.productDetails.components.VendorCard
-import com.example.shopify.feature.navigation_bar.productDetails.model.Discount
-import com.example.shopify.feature.navigation_bar.productDetails.model.Price
-import com.example.shopify.feature.navigation_bar.productDetails.model.Product
-import com.example.shopify.feature.navigation_bar.productDetails.model.VariantItem
+import com.example.shopify.R
+import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.AddedCartBottomSheetCard
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.OverViewCard
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.ProductDetailsCard
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.ProductSnackBar
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.ProductTopBar
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.ReviewsSection
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.VariantSection
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.VendorCard
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
+
 import com.example.shopify.theme.shopifyColors
 
 
@@ -45,11 +54,13 @@ fun ProductDetailsScreenContent(
     product: Product,
     addToCardState: AddToCardState,
     variantsState: VariantsState,
-    viewCart:()->Unit,
-    back:()->Unit
+    reviewsState: ReviewsState,
+    viewReviewsMore: () -> Unit,
+    viewCart: () -> Unit,
+    back: () -> Unit,
 ) {
     Scaffold(
-        topBar = { ProductTopBar{back()} },
+        topBar = { ProductTopBar { back() } },
     ) {
         Column(
             modifier = Modifier
@@ -80,7 +91,11 @@ fun ProductDetailsScreenContent(
                     variants = variantsState.variants,
                     selected = variantsState.selectedVariant,
                     isChangingQuantity = false,
-                    quantitySelected = {selectedVariant -> variantsState.selectVariant(selectedVariant)}
+                    quantitySelected = { selectedVariant ->
+                        variantsState.selectVariant(
+                            selectedVariant
+                        )
+                    }
                 )
 
                 Card(
@@ -94,7 +109,33 @@ fun ProductDetailsScreenContent(
                     description = product.description
                 )
                 Spacer(modifier = Modifier.height(15.dp))
+                if (reviewsState.reviewCount != 0)
+                    ReviewsSection(
+                        reviewsState = reviewsState,
+                        divider = {},
+                        lastSection = {
+                            ShopifyOutlinedButton(
+                                onClick = { viewReviewsMore() },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                                border = BorderStroke(
+                                    width = .8.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
 
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.view_more),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(vertical = 5.dp)
+                                )
+                            }
+                        }
+                    )
+                Spacer(modifier = Modifier.height(15.dp))
 
             }
             ProductSnackBar(
@@ -102,10 +143,14 @@ fun ProductDetailsScreenContent(
                 selected = addToCardState.selectedQuantity,
                 availableQuantity = addToCardState.availableQuantity,
                 isChangingQuantity = false,
-                quantitySelected = {selectedQuantity -> addToCardState.sendSelectedQuantity(selectedQuantity) },
-                openQuantity = {addToCardState.openQuantity()},
-                closeQuantity = {addToCardState.closeQuantity()},
-                addToCard = {addToCardState.addToCard()}
+                quantitySelected = { selectedQuantity ->
+                    addToCardState.sendSelectedQuantity(
+                        selectedQuantity
+                    )
+                },
+                openQuantity = { addToCardState.openQuantity() },
+                closeQuantity = { addToCardState.closeQuantity() },
+                addToCard = { addToCardState.addToCard() }
             )
         }
         if (addToCardState.expandBottomSheet) {
@@ -123,8 +168,8 @@ fun ProductDetailsScreenContent(
                     productTitle = product.title,
                     productPrice = addToCardState.totalCartPrice,
                     isAdded = addToCardState.isAdded,
-                    continueShopping = {addToCardState.continueShopping()},
-                    viewCart = {viewCart()}
+                    continueShopping = { addToCardState.continueShopping() },
+                    viewCart = { viewCart() }
                 )
             }
         }
@@ -133,15 +178,12 @@ fun ProductDetailsScreenContent(
 }
 
 
-
-
 @Preview
 @Composable
-private fun ProductDetailsScreenContentPreview(){
+private fun ProductDetailsScreenContentPreview() {
     ProductDetailsScreenContent(
         Product(
             image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
-            isGiftCard = false,
             description = "The Stan Smith owned the tennis court in the '70s." +
                     " Today it runs the streets with the same clean," +
                     " classic style." +
@@ -149,14 +191,9 @@ private fun ProductDetailsScreenContentPreview(){
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("","","","white/1")),
+            variants = listOf(VariantItem("", "", "", "white/1")),
             title = "Ultima show Running Shoes Pink",
-            requiresSellingPlan = false,
-            tags = listOf(),
-            createdAt = "",
             vendor = "Adidas",
-            onlineStoreUrl = "",
-            productType = "",
             price = Price(
                 amount = "172.00",
                 currencyCode = "AED"
@@ -166,8 +203,30 @@ private fun ProductDetailsScreenContentPreview(){
                 percent = 30
             )
         ),
-        addToCardState = AddToCardState(sendSelectedQuantity = {i ->}, openQuantity = {}, closeQuantity = {}, addToCard = {}, continueShopping = {}, availableQuantity = 5),
+        addToCardState = AddToCardState(
+            sendSelectedQuantity = { i -> },
+            openQuantity = {},
+            closeQuantity = {},
+            addToCard = {},
+            continueShopping = {},
+            availableQuantity = 5
+        ),
         variantsState = VariantsState(selectVariant = {}, isLowStock = true),
+        reviewsState = ReviewsState(
+            averageRating = 3.5,
+            reviewCount = 66,
+            ratingCount = 20,
+            reviews = listOf(
+                Review(
+                    reviewer = "",
+                    rate = 2.5,
+                    review = "Perfect phone",
+                    description = "Its very nice experience Ga iloved it",
+                    time = "2 months ago"
+                )
+            )
+        ),
+        viewReviewsMore = {},
         viewCart = {},
         back = {}
     )

@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.productDetails.components
+package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

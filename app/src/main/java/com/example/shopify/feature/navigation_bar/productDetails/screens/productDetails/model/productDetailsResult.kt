@@ -1,22 +1,16 @@
-package com.example.shopify.feature.navigation_bar.productDetails.model
+package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model
 
 
 
 data class Product(
     val image: String = "",
-    val isGiftCard: Boolean = false,
     val description: String = "",
     val totalInventory: Int = 0,
     val variants: List<VariantItem> = listOf(),
     val title: String = "",
     val price: Price = Price("",""),
     val discount: Discount = Discount("",0),
-    val requiresSellingPlan: Boolean = false,
-    val tags: List<String> = listOf(),
-    val createdAt: String = "",
     val vendor: String = "",
-    val onlineStoreUrl: String = "",
-    val productType: String =""
 )
 
 

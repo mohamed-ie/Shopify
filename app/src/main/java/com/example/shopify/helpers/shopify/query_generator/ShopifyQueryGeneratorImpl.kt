@@ -96,21 +96,10 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                     productQuery
                         .title()
                         .vendor()
-                        .productType()
-                        .tags()
                         .description()
-                        .createdAt()
-                        .isGiftCard
-                        .onlineStoreUrl()
-                        .requiresSellingPlan()
                         .totalInventory()
                         .priceRange { productPriceRangeQuery ->
                             productPriceRangeQuery.minVariantPrice { moneyV2Query ->
-                                moneyV2Query
-                                    .amount()
-                                    .currencyCode()
-                            }
-                            productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
                                 moneyV2Query
                                     .amount()
                                     .currencyCode()

@@ -51,7 +51,9 @@ class ProductViewModel @Inject constructor(
             it.brandVariants.price.amount.toFloat()
         }
         _productState.update { oldState ->
-            oldState.copy(minPrice = prices.min(), maxPrice = prices.max(), brandProducts = brandProducts)
+            oldState.copy(minPrice = prices.min(), maxPrice = prices.max(), brandProducts = brandProducts.map {brandProduct ->  
+                brandProduct.copy(id = brandProduct.id.split('/').last())
+            })
         }
     }
 

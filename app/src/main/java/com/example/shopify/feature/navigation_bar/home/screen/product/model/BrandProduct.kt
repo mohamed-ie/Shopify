@@ -4,7 +4,7 @@ import com.shopify.buy3.Storefront.MoneyV2
 import com.shopify.graphql.support.ID
 
 data class BrandProduct(
-    val id: ID,
+    val id: String,
     val title: String, val description: String, val images: List<String>, val brandVariants: BrandVariants
 )
 

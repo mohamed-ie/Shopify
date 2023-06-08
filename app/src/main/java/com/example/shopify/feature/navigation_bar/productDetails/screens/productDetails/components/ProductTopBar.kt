@@ -1,7 +1,5 @@
-package com.example.shopify.feature.navigation_bar.productDetails.components
+package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,17 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.NamedTopAppBar
+import com.example.shopify.feature.navigation_bar.common.HomeTopBar
 import com.example.shopify.theme.shopifyColors
 
-
 @Composable
-fun ProductTopBar(back:() -> Unit){
-    Column(
-        modifier = Modifier.background(Color.White),
-
-        ) {
-        NamedTopAppBar(back = back)
+fun ProductTopBar(back:() -> Unit) {
+    HomeTopBar(back = back){
         Button(
             onClick = { /*TODO*/ },
             modifier = Modifier
@@ -69,23 +61,13 @@ fun ProductTopBar(back:() -> Unit){
                 )
             }
         }
-        Divider(color =  MaterialTheme.shopifyColors.ServerColor, thickness = 1.dp)
-
     }
 }
 
 @Preview
 @Composable
 private fun ProductTopBarPreview() {
-    ProductSnackBar(
-        opened = true,
-        selected = 1,
-        availableQuantity = 10,
-        isChangingQuantity = false,
-        quantitySelected = {},
-        openQuantity = {},
-        closeQuantity = {},
-        addToCard = {}
+    ProductTopBar {
 
-    )
+    }
 }
