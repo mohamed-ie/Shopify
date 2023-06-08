@@ -1,13 +1,17 @@
 package com.example.shopify.feature.navigation_bar.model.repository
 
+
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.home.screen.Product.model.Product
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
+import com.example.shopify.feature.navigation_bar.model.remote.FireStoreManager
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
@@ -21,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -29,6 +34,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     private val queryGenerator: ShopifyQueryGenerator,
     private val mapper: ShopifyMapper,
     private val dataStoreManager: ShopifyDataStoreManager,
+    private val fireStoreManager: FireStoreManager,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ShopifyRepository {
 
@@ -51,6 +57,12 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getUserInfo(): Flow<SignInUserInfoResult> =
         dataStoreManager.getUserInfo()
 
+    override fun getProductDetailsByID(id:String) : Flow<Resource<Product>>  =
+        queryGenerator.generateProductDetailsQuery(id)
+            .enqueue()
+            .mapResource(mapper::mapToProduct)
+
+
 
     override fun isLoggedIn(): Flow<Boolean> =
         dataStoreManager.getAccessToken()
@@ -65,10 +77,21 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getCart(): Flow<Resource<Cart>> = flow {
     }
 
-    override fun getProductsByBrandName(brandName: String): Flow<Resource<List<Product>>> {
+    override fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>> {
         val query = queryGenerator.generateProductByBrandQuery(brandName)
         return query!!.enqueue().mapResource(mapper::mapToProductsByBrandResponse)
     }
+
+    override suspend fun getProductReviewById(productId:String,reviewsCount:Int?) =
+        withContext(defaultDispatcher){
+            fireStoreManager.getReviewsByProductId(productId,reviewsCount).let {documentSnapshots ->
+                mapper.mapSnapShotDocumentToReview(documentSnapshots.take(reviewsCount ?: documentSnapshots.count()))
+            }
+        }
+
+    override suspend fun setProductReview(productId: String,review: Review) =
+        fireStoreManager.setProductReviewByProductId(productId, review)
+
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->

@@ -17,4 +17,12 @@ class Constants private constructor() {
         val USER_EXPIRED_TOKEN_AT = stringPreferencesKey("USER_EXPIRED_TOKEN_AT_PREFERENCES")
     }
 
+    object Shopify{
+        const val PRODUCT_SLANDERED_ID_URL = "gid://shopify/Product/"
+    }
+
+    object DateFormats{
+        const val MONTH_DAY_PATTERN = "dd MMM"
+    }
+
 }

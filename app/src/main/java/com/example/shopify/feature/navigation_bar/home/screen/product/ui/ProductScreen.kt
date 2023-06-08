@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.home.screen.Product.ui
+package com.example.shopify.feature.navigation_bar.home.screen.product.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +19,8 @@ import com.example.shopify.ui.screen.common.SearchBarItem
 fun ProductScreen(
     viewModel: ProductViewModel,
     paddingValues: PaddingValues,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToProductDetails: (String) -> Unit
 ) {
     val productsState by viewModel.productList.collectAsState()
     Column(modifier = Modifier.padding(paddingValues)) {
@@ -32,8 +33,11 @@ fun ProductScreen(
             onValueChange = { viewModel.updateSliderValue(it) }
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
-            items(productsState.products) {
-                ProductCard(it)
+            items(productsState.brandProducts) {
+                ProductCard(
+                    brandProduct = it,
+                    onProductItemClick = {navigateToProductDetails(it.id)}
+                )
             }
         }
     }

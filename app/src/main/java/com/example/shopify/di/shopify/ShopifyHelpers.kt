@@ -1,5 +1,6 @@
 package com.example.shopify.di.shopify
 
+
 import com.example.shopify.helpers.shopify.input_creator.ShopifyInputCreator
 import com.example.shopify.helpers.shopify.input_creator.ShopifyInputCreatorImpl
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
@@ -18,7 +19,7 @@ abstract class ShopifyHelpers {
 
     @Binds
     @Singleton
-    abstract fun bindsShopifyInputCreator(shopifyInputCreatorImpl: ShopifyInputCreatorImpl):ShopifyInputCreator
+    abstract fun bindsShopifyInputCreator(shopifyInputCreatorImpl: ShopifyInputCreatorImpl): ShopifyInputCreator
 
     @Binds
     @Singleton

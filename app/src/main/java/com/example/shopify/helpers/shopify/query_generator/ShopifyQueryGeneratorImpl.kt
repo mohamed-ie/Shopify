@@ -8,7 +8,6 @@ import com.shopify.buy3.Storefront.MutationQuery
 import com.shopify.graphql.support.ID
 import javax.inject.Inject
 
-
 class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateSingUpQuery(userInfo: SignUpUserInfo): Storefront.MutationQuery =
         Storefront.mutation { rootQuery ->
@@ -88,6 +87,42 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                     }
                 }
             }
+        }
+
+    override fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.node(ID(id)) { nodeQuery ->
+                nodeQuery.onProduct { productQuery ->
+                    productQuery
+                        .title()
+                        .vendor()
+                        .description()
+                        .totalInventory()
+                        .priceRange { productPriceRangeQuery ->
+                            productPriceRangeQuery.minVariantPrice { moneyV2Query ->
+                                moneyV2Query
+                                    .amount()
+                                    .currencyCode()
+                            }
+                        }
+                        .images({ imageArguments -> imageArguments.first(5) }) { imageConnectionQuery ->
+                            imageConnectionQuery.nodes { imageQuery ->
+                                imageQuery.url()
+                            }
+                        }
+                        .variants({ variantsArguments->  variantsArguments.first(5)}) { productVariantConnectionQuery ->
+                            productVariantConnectionQuery.edges { productVariantEdgeQuery ->
+                                productVariantEdgeQuery.node { productVariantQuery ->
+                                    productVariantQuery.title()
+                                        .image { imageQuery -> imageQuery.url() }
+                                        .price { moneyV2Query -> moneyV2Query.amount() }
+                                }
+                            }
+                        }
+                }
+
+            }
+
         }
 
     override fun generateServerUrlQuery(): Storefront.QueryRootQuery =

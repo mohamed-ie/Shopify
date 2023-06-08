@@ -54,6 +54,21 @@
     <string name="something_went_wrong">Oops! Something went wrong</string>
     <string name="this_doesnt_seem_right_let_us_try_to_sort_it_out">This doesn\'t seem right! Let us try to sort it out</string>
     <string name="error_empty_password_field">Hold up!, this field is empty</string>
+    <string name="search_message">What are you looking for?</string>
+    <string name="add_to_cart">ADD TO CART</string>
+    <string name="qty">QTY</string>
+    <string name="qty_count">1</string>
+    <string name="inclusive_of_vat">(Inclusive of VAT)</string>
+    <string name="low_stock_only_4_left">Low stock: only %1$s left</string>
+    <string name="express">express</string>
+    <string name="variant">Variant</string>
+    <string name="size_guide">Size Guide</string>
+    <string name="sold_by_noon_fashion">Sold by</string>
+    <string name="overview">Overview</string>
+    <string name="added_to_cart">Added to cart</string>
+    <string name="cart_total">Cart Total</string>
+    <string name="continue_shopping">CONTINUE SHOPPING</string>
+    <string name="view_cart">VIEW CART</string>
     <string name="card_information">Card Information</string>
     <string name="we_accept">We Accept</string>
     <string name="visa">Visa</string>
@@ -76,5 +91,10 @@
     <string name="not_valid">Not valid</string>
     <string name="enter_first_name">Enter first name</string>
     <string name="enter_last_name">Enter last name</string>
+    <string name="user_reviews">User Reviews</string>
+    <string name="based_on_ratings">Based on %1$s ratings</string>
+    <string name="verified_purchase">Verified Purchase</string>
+    <string name="there_are_customer_ratings_and_customer_reviews">There are %1$s customer ratings and %2$s customer reviews</string>
+    <string name="view_more">VIEW MORE</string>
 
 </resources>

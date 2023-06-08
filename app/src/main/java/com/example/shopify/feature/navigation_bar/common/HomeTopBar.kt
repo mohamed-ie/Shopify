@@ -1,0 +1,24 @@
+package com.example.shopify.feature.navigation_bar.common
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.example.shopify.feature.common.NamedTopAppBar
+import com.example.shopify.theme.shopifyColors
+
+@Composable
+fun HomeTopBar(
+    back: () -> Unit,
+    content: @Composable () -> Unit = {},
+){
+    Column(modifier = Modifier.background(Color.White)) {
+        NamedTopAppBar(back = back)
+        content()
+        Divider(color =  MaterialTheme.shopifyColors.ServerColor, thickness = 1.dp)
+    }
+}

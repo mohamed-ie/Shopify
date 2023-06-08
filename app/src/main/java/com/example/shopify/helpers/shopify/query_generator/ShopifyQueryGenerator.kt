@@ -14,8 +14,8 @@ interface ShopifyQueryGenerator {
         checkoutId: ID,
         input: Storefront.CreditCardPaymentInputV2
     ): Storefront.MutationQuery
-
     fun generateUpdateCheckoutReadyQuery(paymentId: ID): Storefront.QueryRootQuery
+    fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery
     fun generateProductByBrandQuery(brandName: String): Storefront.QueryRootQuery
 
 }
