@@ -20,6 +20,7 @@ import com.example.shopify.utils.mapResource
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -106,14 +107,21 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     private fun Storefront.MutationQuery.enqueue() =
         graphClient.enqueue(this).map { result ->
-        when (result) {
-            is GraphCallResult.Success ->
-                Resource.Success(result.response)
+            when (result) {
+                is GraphCallResult.Success ->
+                    Resource.Success(result.response)
 
-            is GraphCallResult.Failure ->
-                Resource.Error(mapper.map(result.error))
-        }
-    }.applyDispatcher()
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(result.error))
+            }
+        }.applyDispatcher()
 
     private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
+
+    override fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
+        return queryGenerator.checkoutCreate(cart).enqueue()
+            .mapResource {
+                mapper.mapToCheckoutId(it)
+            }
+    }
 }

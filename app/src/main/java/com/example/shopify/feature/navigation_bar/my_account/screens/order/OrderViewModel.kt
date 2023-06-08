@@ -1,23 +1,31 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order
 
+import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.helpers.Resource
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.helpers.CreditCardInfoStateHandler
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.PaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
+import com.example.shopify.helpers.Resource
 import com.shopify.buy3.CreditCard
+import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val creditCardInfoStateHandler: CreditCardInfoStateHandler,
-    private val creditCardPaymentStrategy: PaymentStrategy<ShopifyCreditCardPaymentStrategy.ShopifyPaymentInfo, Flow<Resource<ShopifyCreditCardPaymentStrategy.PaymentResult>>>
+    private val creditCardPaymentStrategy: PaymentStrategy<ShopifyCreditCardPaymentStrategy.ShopifyPaymentInfo,
+            Flow<Resource<ShopifyCreditCardPaymentStrategy.PaymentResult>>>,
+    private val repository: ShopifyRepository
 ) : BaseScreenViewModel() {
     val creditCardInfoState = creditCardInfoStateHandler.creditCardInfoState
-
+    private var _checkoutId: ID? = null
     fun onCreditCardEvent(event: CreditCardInfoEvent) {
         when (event) {
             is CreditCardInfoEvent.FirstNameChanged ->
@@ -41,6 +49,20 @@ class OrderViewModel @Inject constructor(
             CreditCardInfoEvent.Checkout ->
                 if (creditCardInfoStateHandler.isValid())
                     processPayment()
+        }
+    }
+
+    fun getCheckOutID(cart: Cart) {
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.getCheckOutId(cart).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        _checkoutId = it.data
+                    }
+
+                    is Resource.Error -> it.error
+                }
+            }
         }
     }
 
