@@ -1,9 +1,11 @@
 package com.example.shopify.di.helpers
 
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandlerImpl
+import com.example.shopify.helpers.validator.TextFieldStateValidator
+import com.example.shopify.helpers.validator.TextFieldStateValidatorImpl
 import com.example.shopify.helpers.validator.auth.UserInputValidator
 import com.example.shopify.helpers.validator.auth.UserInputValidatorImpl
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.helpers.CreditCardInfoStateHandler
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.helpers.CreditCardInfoStateHandlerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,6 +25,11 @@ abstract class HelpersModule {
     @ViewModelScoped
     abstract fun bindCreditCardInfoStateHelper(creditCardInfoStateHandlerImpl: CreditCardInfoStateHandlerImpl):
             CreditCardInfoStateHandler
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindTextFieldStateValidatorHelper(textFieldStateValidatorImpl: TextFieldStateValidatorImpl):
+            TextFieldStateValidator
 
 
 }

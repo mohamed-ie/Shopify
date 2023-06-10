@@ -1,13 +1,14 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import android.annotation.SuppressLint
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.model.remote.FireStore
+import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
+import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
@@ -18,14 +19,13 @@ import com.example.shopify.helpers.UIError
 import com.example.shopify.utils.Constants
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
-
-
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
 import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -60,61 +60,93 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
     override fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product =
         (response.data?.node as Storefront.Product).let { storefrontProduct ->
-                Product(
-                    title = storefrontProduct.title ?: "",
-                    description = storefrontProduct.description ?: "",
-                    totalInventory = storefrontProduct.totalInventory ?: 0,
-                    vendor = storefrontProduct.vendor ?: "",
-                    image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
-                    variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
-                        productVariantNode.node.let {productVariant ->
-                            VariantItem(
-                                image = productVariant.image.url,
-                                id = productVariant.id.toString(),
-                                price = productVariant.price.amount,
-                                title = productVariant.title
-                            )
-                        }
-                    },
-                    price = Price(
-                        amount = storefrontProduct.priceRange.minVariantPrice.amount,
-                        currencyCode = storefrontProduct.priceRange.minVariantPrice.currencyCode.name
-                    ),
-                    discount = Discount(
-                        realPrice = "",
-                        percent = 0
-                    )
+            Product(
+                title = storefrontProduct.title ?: "",
+                description = storefrontProduct.description ?: "",
+                totalInventory = storefrontProduct.totalInventory ?: 0,
+                vendor = storefrontProduct.vendor ?: "",
+                image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
+                variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
+                    productVariantNode.node.let { productVariant ->
+                        VariantItem(
+                            image = productVariant.image.url,
+                            id = productVariant.id.toString(),
+                            price = productVariant.price.amount,
+                            title = productVariant.title
+                        )
+                    }
+                },
+                price = Price(
+                    amount = storefrontProduct.priceRange.minVariantPrice.amount,
+                    currencyCode = storefrontProduct.priceRange.minVariantPrice.currencyCode.name
+                ),
+                discount = Discount(
+                    realPrice = "",
+                    percent = 0
                 )
-            }
+            )
+        }
 
 
-    @SuppressLint("SimpleDateFormat")
-    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>):List<Review> =
-        snapshots.map {documentSnapshot ->
-            documentSnapshot.data.let {snapShotMap ->
+    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review> =
+        snapshots.map { documentSnapshot ->
+            documentSnapshot.data.let { snapShotMap ->
                 Review(
-                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String) ,
+                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String),
                     description = snapShotMap[FireStore.DESCRIPTION_REVIEW_FIELD_KEY] as String,
                     reviewer = snapShotMap[FireStore.REVIEWER_REVIEW_FIELD_KEY] as String,
                     rate = snapShotMap[FireStore.RATE_REVIEW_FIELD_KEY] as Double,
-                    time = SimpleDateFormat(Constants.DateFormats.MONTH_DAY_PATTERN)
+                    time = SimpleDateFormat(
+                        Constants.DateFormats.MONTH_DAY_PATTERN,
+                        Locale.getDefault()
+                    )
                         .format((snapShotMap[FireStore.CREATED_AT_REVIEW_FIELD_KEY] as Timestamp).toDate())
                 )
             }
         }
 
-
-
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
-           BrandProduct(
+            BrandProduct(
                 id = it.node.id.toString(),
-                title = it.node.title, description = it.node.description,
-                images = mapToImageUrl(it.node.images), brandVariants = mapToVariant(it.node.variants)
+                title = it.node.title,
+                description = it.node.description,
+                images = mapToImageUrl(it.node.images),
+                brandVariants = mapToVariant(it.node.variants)
             )
         } ?: listOf()
         return res
     }
+
+    override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean =
+        response.hasErrors
+
+    override fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean {
+        return response.data?.customerAddressDelete?.customerUserErrors?.isEmpty() ?: false
+    }
+
+    override fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo {
+        return graphResponse.data?.customer?.run {
+            MinCustomerInfo(name = firstName, email = email)
+        } ?: MinCustomerInfo()
+    }
+
+    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress> {
+        return response.data?.customer?.addresses?.edges?.map {
+            it.node.run {
+                MyAccountMinAddress(
+                    id = id.toString(),
+                    name = "$firstName $lastName",
+                    address = toAddressString(),
+                    phone = phone
+                )
+            }
+        } ?: emptyList()
+    }
+
+    private fun Storefront.MailingAddress.toAddressString() =
+        "$address1, $address2 ,$city, $country, $province ${if (company.isNotBlank()) ",$company" else ""},$zip"
+
 
     private fun mapToImageUrl(response: ImageConnection): List<String> {
         return response.edges.map {

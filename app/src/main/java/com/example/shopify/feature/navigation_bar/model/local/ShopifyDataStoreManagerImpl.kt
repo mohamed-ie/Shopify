@@ -14,29 +14,51 @@ class ShopifyDataStoreManagerImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : ShopifyDataStoreManager {
     override suspend fun saveUserInfo(signInUserInfoResult: SignInUserInfoResult) {
-        dataStore.edit {userInfoMutablePreference ->
-            userInfoMutablePreference[Constants.DataStoreKeys.USER_ACCESS_TOKEN] = signInUserInfoResult.accessToken
-            userInfoMutablePreference[Constants.DataStoreKeys.USER_EXPIRED_TOKEN_AT] = signInUserInfoResult.expireTime.toString()
-            userInfoMutablePreference[Constants.DataStoreKeys.USER_EMAIL] = signInUserInfoResult.email
-            userInfoMutablePreference[Constants.DataStoreKeys.USER_PASSWORD] = signInUserInfoResult.password
+        dataStore.edit { userInfoMutablePreference ->
+            userInfoMutablePreference[Constants.DataStoreKeys.USER_ACCESS_TOKEN] =
+                signInUserInfoResult.accessToken
+            userInfoMutablePreference[Constants.DataStoreKeys.USER_EXPIRED_TOKEN_AT] =
+                signInUserInfoResult.expireTime.toString()
+            userInfoMutablePreference[Constants.DataStoreKeys.USER_EMAIL] =
+                signInUserInfoResult.email
+            userInfoMutablePreference[Constants.DataStoreKeys.USER_PASSWORD] =
+                signInUserInfoResult.password
         }
     }
 
-    override fun getUserInfo():Flow<SignInUserInfoResult> =
-        dataStore.data.map{ preference->
+    override fun getUserInfo(): Flow<SignInUserInfoResult> =
+        dataStore.data.map { preference ->
             SignInUserInfoResult(
-                preference[Constants.DataStoreKeys.USER_EMAIL] ?: "" ,
-                preference[Constants.DataStoreKeys.USER_PASSWORD] ?: "" ,
+                preference[Constants.DataStoreKeys.USER_EMAIL] ?: "",
+                preference[Constants.DataStoreKeys.USER_PASSWORD] ?: "",
                 preference[Constants.DataStoreKeys.USER_ACCESS_TOKEN] ?: "",
                 preference[Constants.DataStoreKeys.USER_EXPIRED_TOKEN_AT] ?: "",
                 ""
             )
         }
 
-    override fun getAccessToken():Flow<String?> =
-        dataStore.data.map { preference->
-            preference[Constants.DataStoreKeys.USER_ACCESS_TOKEN]
+    override fun getAccessToken(): Flow<String> =
+        dataStore.data.map { preference ->
+            preference[Constants.DataStoreKeys.USER_ACCESS_TOKEN] ?:""
         }
+
+    override fun getCustomerId(): Flow<String> =
+        dataStore.data.map { it[Constants.DataStoreKeys.CUSTOMER_ID] ?: "" }
+
+    override fun getCurrency(): Flow<String> =
+        dataStore.data.map { it[Constants.DataStoreKeys.CURRENCY] ?: "EGP" }
+
+    override suspend fun setCustomerId(id: String) {
+        dataStore.edit { it[Constants.DataStoreKeys.CUSTOMER_ID] = id }
+    }
+
+    override suspend fun clearAccessToken() {
+        dataStore.edit { it[Constants.DataStoreKeys.USER_ACCESS_TOKEN] = "" }
+    }
+
+    override suspend fun setCurrency(currency: String) {
+        dataStore.edit { it[Constants.DataStoreKeys.CURRENCY] = currency }
+    }
 
 
 }

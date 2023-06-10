@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shopify.R
-import com.example.shopify.feature.common.LoadingContent
+import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.home.screen.home.ImageFromUrl
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.home.viewModel.BrandViewModel
@@ -114,7 +114,7 @@ fun HomeScreen(
                 }
         } else {
             item {
-                LoadingContent()
+                LoadingScreen()
             }
 
         }

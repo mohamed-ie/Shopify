@@ -1,14 +1,16 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.example.shopify.helpers.UIError
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
+import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
+import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+import com.example.shopify.helpers.UIError
 import com.google.firebase.firestore.DocumentSnapshot
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
@@ -26,7 +28,13 @@ interface ShopifyMapper {
     fun map(error: GraphError): UIError
     fun mapToPaymentCompletionAvailability(result: GraphResponse<Storefront.Mutation>): ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability
     fun mapToPaymentResult(result: GraphCallResult.Success<Storefront.QueryRoot>): ShopifyCreditCardPaymentStrategy.PaymentResult
+    fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean
+    fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean
+    fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>, ): MinCustomerInfo
+
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product
     fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
     fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review>
+    fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress>
+
 }

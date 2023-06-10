@@ -2,48 +2,35 @@ package com.example.shopify.ui.navigation.graph
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.feature.Graph
-import com.example.shopify.feature.navigation_bar.NavigationBarScreen
 import com.example.shopify.feature.navigation_bar.category.CategoriesScreen
-import com.example.shopify.feature.navigation_bar.home.screen.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
-import com.example.shopify.feature.navigation_bar.my_account.MyAccountScreen
-import com.example.shopify.feature.navigation_bar.my_account.screens.wishlist.WishlistScreen
-import com.example.shopify.ui.screen.home.ui.HomeScreen
+import com.example.shopify.feature.navigation_bar.my_account.myAccountGraph
 
 @Composable
 fun NavigationBarGraph(paddingValues: PaddingValues, navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = NavigationBarScreen.Home.route
+        startDestination = NavigationBarGraph.HOME
     ) {
-        homeGraph(navController, paddingValues)
 
-        composable(route = NavigationBarScreen.Home.route) {
-            HomeScreen(
-                viewModel = hiltViewModel(),
-                paddingValues,
-                navigateToProduct = { brandName ->
-                    navController.navigate("${Brand.PRODUCTS}/$brandName")
-                })
-        }
-        composable(route = NavigationBarScreen.Category.route) {
+        composable(route = NavigationBarGraph.CATEGORY) {
             CategoriesScreen()
         }
-        composable(route = NavigationBarScreen.Favourite.route) {
-            WishlistScreen()
-        }
-        composable(route = NavigationBarScreen.Me.route) {
-            MyAccountScreen()
-        }
-        composable(route = NavigationBarScreen.Cart.route) {
-//            CartScreen()
-        }
+
+        myAccountGraph(paddingValues, navController)
+        homeGraph(navController, paddingValues)
 
     }
+}
+
+object NavigationBarGraph {
+    const val HOME = "HOME_GRAPH"
+    const val CATEGORY = "CATEGORY_GRAPH"
+    const val MY_ACCOUNT = "MY_ACCOUNT_GRAPH"
+    const val CART = "CART_GRAPH"
 }
