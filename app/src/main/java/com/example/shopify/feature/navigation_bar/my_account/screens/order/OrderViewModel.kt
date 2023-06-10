@@ -1,11 +1,11 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order
 
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.helpers.Resource
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.helpers.CreditCardInfoStateHandler
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.PaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
+import com.example.shopify.helpers.Resource
 import com.shopify.buy3.CreditCard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -84,7 +84,9 @@ class OrderViewModel @Inject constructor(
 //        creditCardPaymentStrategy.pay(paymentInfo).onEach { resource ->
 //            when (resource){
 //                is Resource.Error -> {}
-//                is Resource.Success -> {}
+//                is Resource.Success -> {
+//                    resource.data.orderId
+//                }
 //            }
 //        }
     }

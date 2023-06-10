@@ -3,7 +3,7 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.review
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.home.screen.Brand
+import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -32,7 +32,7 @@ class ReviewsDetailsViewModel @Inject constructor(
 
 
     init {
-        state.get<String>(Brand.REVIEW_DETAILS_SAVE_ARGS_KEY)?.also { productId ->
+        state.get<String>(HomeGraph.REVIEW_DETAILS_SAVE_ARGS_KEY)?.also { productId ->
             getProduct(Constants.Shopify.PRODUCT_SLANDERED_ID_URL + productId)
             getProductReview(productId)
         }

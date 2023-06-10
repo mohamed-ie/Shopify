@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Preview
 @Composable
-fun LoadingContent() {
+fun LoadingScreen() {
     val infiniteTransition = rememberInfiniteTransition()
 
     val size by infiniteTransition.animateValue(

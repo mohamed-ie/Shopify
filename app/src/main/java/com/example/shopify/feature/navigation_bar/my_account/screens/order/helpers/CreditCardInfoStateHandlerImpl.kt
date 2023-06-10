@@ -1,9 +1,9 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.model.helpers
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers
 
 import com.example.shopify.R
-import com.example.shopify.helpers.UIText
 import com.example.shopify.feature.common.state.TextFieldState
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoState
+import com.example.shopify.helpers.UIText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
