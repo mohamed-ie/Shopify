@@ -22,8 +22,16 @@ interface ShopifyRepository {
     fun getBrands(): Flow<Resource<List<Brand>?>>
     fun getCart(): Flow<Resource<Cart>>
     fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>>
-    fun getProductDetailsByID(id: String) : Flow<Resource<Product>>
+    fun getProductDetailsByID(id: String): Flow<Resource<Product>>
     suspend fun getProductReviewById(productId: String, reviewsCount: Int? = null): List<Review>
     suspend fun setProductReview(productId: String, review: Review)
     fun getCheckOutId(cart: Cart): Flow<Resource<ID?>>
+    fun getProductsCategory(
+        productType: String,
+        productTag: String
+    ): Flow<Resource<List<BrandProduct>>>
+
+    fun getProductsTag(): Flow<Resource<List<String>>>
+    fun getProductsType(): Flow<Resource<List<String>>>
+
 }

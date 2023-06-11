@@ -124,4 +124,23 @@ class ShopifyRepositoryImpl @Inject constructor(
                 mapper.mapToCheckoutId(it)
             }
     }
+
+    override fun getProductsCategory(
+        productType: String,
+        productTag: String
+    ): Flow<Resource<List<BrandProduct>>> {
+        return queryGenerator.generateProductCategoryQuery(productType, productTag).enqueue()
+            .mapResource(mapper::mapToProductsCategoryResponse)
+    }
+
+    override fun getProductsTag(): Flow<Resource<List<String>>> {
+        return queryGenerator.generateProductTagsQuery().enqueue()
+            .mapResource(mapper::mapToProductsTagsResponse)
+
+    }
+
+    override fun getProductsType(): Flow<Resource<List<String>>> {
+        return queryGenerator.generateProductTypesQuery().enqueue()
+            .mapResource(mapper::mapToProductsTypeResponse)
+    }
 }

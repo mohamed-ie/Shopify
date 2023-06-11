@@ -20,7 +20,14 @@ interface ShopifyQueryGenerator {
     fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery
     fun generateProductByBrandQuery(brandName: String): Storefront.QueryRootQuery
     fun generateUserOrdersQuery(): Storefront.QueryRootQuery
-
-    //    fun CheckoutQuery(cart: Cart): Storefront.CreditCardPaymentInputV2
     fun checkoutCreate(cart: Cart): Storefront.MutationQuery
+    fun generateProductCategoryQuery(
+        productType: String,
+        productTag: String
+    ): Storefront.QueryRootQuery
+
+    fun generateProductTagsQuery(): Storefront.QueryRootQuery
+    fun generateProductTypesQuery(): Storefront.QueryRootQuery
+
+
 }

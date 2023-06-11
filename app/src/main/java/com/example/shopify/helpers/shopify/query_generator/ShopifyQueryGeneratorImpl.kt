@@ -169,6 +169,63 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     }
 
+    override fun generateProductCategoryQuery(productType: String, productTag: String):
+            Storefront.QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.products({ args ->
+                args.query("product_type:$productType tag:$productTag")
+                    .first(20)
+            }) { productConnectionQuery ->
+                productConnectionQuery.edges { productEdgeQuery ->
+                    productEdgeQuery.node { productNode ->
+                        productNode.title()
+                        productNode.description()
+                        productNode.images({ args -> args.first(5) }) { imageConnectionQuery ->
+                            imageConnectionQuery
+                                .edges { imageEdgeQuery ->
+                                    imageEdgeQuery
+                                        .node { imageQuery ->
+                                            imageQuery.url()
+                                        }
+
+                                }
+                        }
+                        productNode.variants({ args -> args.first(5) }) { productVariant ->
+                            productVariant.edges { variantEdge ->
+                                variantEdge.node { variantNode ->
+                                    variantNode.availableForSale()
+                                    variantNode.price { price ->
+                                        price.amount()
+                                        price.currencyCode()
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+    override fun generateProductTagsQuery(): QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.productTags(25) { productTag ->
+                productTag.edges {
+                    it.node()
+                }
+            }
+        }
+
+    override fun generateProductTypesQuery(): QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.productTypes(20) { productType ->
+                productType.edges {
+                    it.node()
+                }
+            }
+        }
 
     override fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery =
         Storefront.query { rootQuery ->

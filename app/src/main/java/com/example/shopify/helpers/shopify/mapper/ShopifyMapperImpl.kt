@@ -60,40 +60,40 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
     override fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product =
         (response.data?.node as Storefront.Product).let { storefrontProduct ->
-                Product(
-                    title = storefrontProduct.title ?: "",
-                    description = storefrontProduct.description ?: "",
-                    totalInventory = storefrontProduct.totalInventory ?: 0,
-                    vendor = storefrontProduct.vendor ?: "",
-                    image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
-                    variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
-                        productVariantNode.node.let {productVariant ->
-                            VariantItem(
-                                image = productVariant.image.url,
-                                id = productVariant.id.toString(),
-                                price = productVariant.price.amount,
-                                title = productVariant.title
-                            )
-                        }
-                    },
-                    price = Price(
-                        amount = storefrontProduct.priceRange.minVariantPrice.amount,
-                        currencyCode = storefrontProduct.priceRange.minVariantPrice.currencyCode.name
-                    ),
-                    discount = Discount(
-                        realPrice = "",
-                        percent = 0
-                    )
+            Product(
+                title = storefrontProduct.title ?: "",
+                description = storefrontProduct.description ?: "",
+                totalInventory = storefrontProduct.totalInventory ?: 0,
+                vendor = storefrontProduct.vendor ?: "",
+                image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
+                variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
+                    productVariantNode.node.let { productVariant ->
+                        VariantItem(
+                            image = productVariant.image.url,
+                            id = productVariant.id.toString(),
+                            price = productVariant.price.amount,
+                            title = productVariant.title
+                        )
+                    }
+                },
+                price = Price(
+                    amount = storefrontProduct.priceRange.minVariantPrice.amount,
+                    currencyCode = storefrontProduct.priceRange.minVariantPrice.currencyCode.name
+                ),
+                discount = Discount(
+                    realPrice = "",
+                    percent = 0
                 )
-            }
+            )
+        }
 
 
     @SuppressLint("SimpleDateFormat")
-    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>):List<Review> =
-        snapshots.map {documentSnapshot ->
-            documentSnapshot.data.let {snapShotMap ->
+    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review> =
+        snapshots.map { documentSnapshot ->
+            documentSnapshot.data.let { snapShotMap ->
                 Review(
-                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String) ,
+                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String),
                     description = snapShotMap[FireStore.DESCRIPTION_REVIEW_FIELD_KEY] as String,
                     reviewer = snapShotMap[FireStore.REVIEWER_REVIEW_FIELD_KEY] as String,
                     rate = snapShotMap[FireStore.RATE_REVIEW_FIELD_KEY] as Double,
@@ -128,6 +128,30 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
     override fun mapToCheckoutId(result: GraphResponse<Storefront.Mutation>): ID? {
         return result.data?.checkoutCreate?.checkout?.id
+    }
+
+    override fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
+        return response.data?.products?.edges?.map {
+            BrandProduct(
+                id = it.node.id.toString(),
+                title = it.node.title,
+                description = it.node.description,
+                images = mapToImageUrl(it.node.images),
+                brandVariants = mapToVariant(it.node.variants)
+            )
+        } ?: listOf()
+    }
+
+    override fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String> {
+        return response.data?.productTypes?.edges?.map {
+            it.node.toString()
+        } ?: listOf()
+    }
+
+    override fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String> {
+        return response.data?.productTags?.edges?.map {
+            it.node.toString()
+        } ?: listOf()
     }
 
     private fun mapToImageUrl(response: ImageConnection): List<String> {

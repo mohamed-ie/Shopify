@@ -33,5 +33,8 @@ interface ShopifyMapper {
     fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
     fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order>
     fun mapToCheckoutId(result: GraphResponse<Storefront.Mutation>): ID?
+    fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
+    fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
+    fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
 
 }
