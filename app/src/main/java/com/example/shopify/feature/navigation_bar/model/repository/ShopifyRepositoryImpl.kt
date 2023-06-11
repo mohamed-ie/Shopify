@@ -10,12 +10,15 @@ import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.remote.FireStoreManager
+import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
+import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
 import com.example.shopify.utils.enqueue
+import com.example.shopify.utils.enqueue1
 import com.example.shopify.utils.mapResource
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
@@ -58,16 +61,10 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getUserInfo(): Flow<SignInUserInfoResult> =
         dataStoreManager.getUserInfo()
 
-    override fun getProductDetailsByID(id:String) : Flow<Resource<Product>>  =
-        queryGenerator.generateProductDetailsQuery(id)
-            .enqueue()
-            .mapResource(mapper::mapToProduct)
-
-
 
     override fun isLoggedIn(): Flow<Boolean> =
         dataStoreManager.getAccessToken()
-            .map { it != null }
+            .map { it?.isNotBlank() ?: false }
             .flowOn(defaultDispatcher)
 
     override fun getBrands(): Flow<Resource<List<Brand>?>> {
@@ -83,16 +80,70 @@ class ShopifyRepositoryImpl @Inject constructor(
         return query!!.enqueue().mapResource(mapper::mapToProductsByBrandResponse)
     }
 
-    override suspend fun getProductReviewById(productId:String,reviewsCount:Int?) =
-        withContext(defaultDispatcher){
-            fireStoreManager.getReviewsByProductId(productId,reviewsCount).let {documentSnapshots ->
-                mapper.mapSnapShotDocumentToReview(documentSnapshots.take(reviewsCount ?: documentSnapshots.count()))
-            }
+    override fun getProductDetailsByID(id: String): Flow<Resource<Product>> =
+        queryGenerator.generateProductDetailsQuery(id)
+            .enqueue()
+            .mapResource(mapper::mapToProduct)
+
+    override suspend fun getProductReviewById(productId: String, reviewsCount: Int?) =
+        withContext(defaultDispatcher) {
+            fireStoreManager.getReviewsByProductId(productId, reviewsCount)
+                .let { documentSnapshots ->
+                    mapper.mapSnapShotDocumentToReview(
+                        documentSnapshots.take(
+                            reviewsCount ?: documentSnapshots.count()
+                        )
+                    )
+                }
         }
 
-    override suspend fun setProductReview(productId: String,review: Review) =
+    override suspend fun updateCurrency(currency: String) {
+        dataStoreManager.setCurrency(currency)
+    }
+
+    override suspend fun setProductReview(productId: String, review: Review) =
         fireStoreManager.setProductReviewByProductId(productId, review)
 
+
+    override suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<Boolean> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+
+        return queryGenerator.generateCreateAddress(accessToken, address)
+            .enqueue1()
+            .mapResource(mapper::isAddressSaved)
+    }
+
+    override suspend fun deleteAddress(addressId: String): Resource<Boolean> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+
+        return queryGenerator.generateDeleteAddressQuery(addressId, accessToken)
+            .enqueue1()
+            .mapResource(mapper::isAddressDeleted)
+    }
+
+    override fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>> = channelFlow {
+        val accessToken = dataStoreManager.getAccessToken().first()
+
+        val minCustomerInfoResource =
+            queryGenerator.generateGetMinCustomerInfoQuery(accessToken)
+                .enqueue1()
+                .mapResource(mapper::mapToMinCustomerInfo)
+
+        dataStoreManager.getCurrency().collect { currency ->
+            send(minCustomerInfoResource.mapResource { it.copy(currency = currency) })
+        }
+    }
+
+    override suspend fun signOut() {
+        dataStoreManager.clearAccessToken()
+    }
+
+    override suspend fun getAddresses(): Resource<List<MyAccountMinAddress>> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        return queryGenerator.generateAddressQuery(accessToken)
+            .enqueue1()
+            .mapResource(mapper::mapToAddresses)
+    }
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->
@@ -115,6 +166,28 @@ class ShopifyRepositoryImpl @Inject constructor(
                     Resource.Error(mapper.map(result.error))
             }
         }.applyDispatcher()
+
+    private suspend fun Storefront.QueryRootQuery.enqueue1() =
+        graphClient.enqueue1(this).run {
+            when (this) {
+                is GraphCallResult.Success ->
+                    Resource.Success(response)
+
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(error))
+            }
+        }
+
+    private suspend fun Storefront.MutationQuery.enqueue1() =
+        graphClient.enqueue1(this).run {
+            when (this) {
+                is GraphCallResult.Success ->
+                    Resource.Success(response)
+
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(error))
+            }
+        }
 
     private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
 
@@ -142,5 +215,15 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getProductsType(): Flow<Resource<List<String>>> {
         return queryGenerator.generateProductTypesQuery().enqueue()
             .mapResource(mapper::mapToProductsTypeResponse)
+    }
+    private fun <I, O> Resource<I>.mapResource(
+        transform: (I) -> O
+    ): Resource<O> {
+        return run {
+            when (this) {
+                is Resource.Error -> this
+                is Resource.Success -> Resource.Success(transform(data))
+            }
+        }
     }
 }

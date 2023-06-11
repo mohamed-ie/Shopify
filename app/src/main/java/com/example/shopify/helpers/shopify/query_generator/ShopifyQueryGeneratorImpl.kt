@@ -10,6 +10,7 @@ import com.shopify.buy3.Storefront.CheckoutLineItemInput
 import com.shopify.buy3.Storefront.CreditCardPaymentInputV2
 import com.shopify.buy3.Storefront.CustomerQuery
 import com.shopify.buy3.Storefront.CustomerQuery.OrdersArguments
+import com.shopify.buy3.Storefront.CustomerAddressCreatePayloadQuery
 import com.shopify.buy3.Storefront.MutationQuery
 import com.shopify.buy3.Storefront.OrderConnectionQuery
 import com.shopify.buy3.Storefront.OrderEdgeQuery
@@ -303,6 +304,58 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                         }
                     }.errorMessage()
                         .ready()
+                }
+            }
+        }
+
+    override fun generateCreateAddress(
+        accessToken: String,
+        address: Storefront.MailingAddressInput
+    ): MutationQuery =
+        Storefront.mutation { mutation: MutationQuery ->
+            mutation.customerAddressCreate(
+                accessToken,
+                address
+            ) { query: CustomerAddressCreatePayloadQuery ->
+                query.customerAddress { }.customerUserErrors { it.message() }
+            }
+        }
+
+    override fun generateDeleteAddressQuery(addressId: String, accessToken: String): MutationQuery =
+        Storefront.mutation { mutation: MutationQuery ->
+            mutation.customerAddressDelete(
+                ID(addressId),
+                accessToken,
+            ) { it.customerUserErrors { it.message() } }
+        }
+
+    override fun generateGetMinCustomerInfoQuery(accessToken: String): Storefront.QueryRootQuery =
+        Storefront.query { query ->
+            query.customer(accessToken) { customer ->
+                customer.firstName()
+                    .email()
+                    .metafield("settings", "currency") { it.value() }
+            }
+        }
+
+    override fun generateAddressQuery(accessToken: String): Storefront.QueryRootQuery =
+        Storefront.query { query ->
+            query.customer(accessToken) { customer ->
+                customer.addresses({args->args.first(250)}) { addresses ->
+                    addresses.edges { edges ->
+                        edges.node { node ->
+                            node.address1()
+                                .address2()
+                                .company()
+                                .country()
+                                .city()
+                                .province()
+                                .zip()
+                                .lastName()
+                                .firstName()
+                                .phone()
+                        }
+                    }
                 }
             }
         }

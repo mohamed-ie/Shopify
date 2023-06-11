@@ -4,6 +4,7 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.MailingAddressInput
 import com.shopify.graphql.support.ID
 
 interface ShopifyQueryGenerator {
@@ -19,6 +20,10 @@ interface ShopifyQueryGenerator {
     fun generateUpdateCheckoutReadyQuery(paymentId: ID): Storefront.QueryRootQuery
     fun generateProductDetailsQuery(id: String): Storefront.QueryRootQuery
     fun generateProductByBrandQuery(brandName: String): Storefront.QueryRootQuery
+    fun generateCreateAddress(
+        accessToken: String,
+        address: MailingAddressInput
+    ): Storefront.MutationQuery
     fun generateUserOrdersQuery(): Storefront.QueryRootQuery
     fun checkoutCreate(cart: Cart): Storefront.MutationQuery
     fun generateProductCategoryQuery(
@@ -30,4 +35,7 @@ interface ShopifyQueryGenerator {
     fun generateProductTypesQuery(): Storefront.QueryRootQuery
 
 
+    fun generateDeleteAddressQuery(addressId: String, accessToken: String): Storefront.MutationQuery
+    fun generateGetMinCustomerInfoQuery(accessToken: String): Storefront.QueryRootQuery
+    fun generateAddressQuery(accessToken: String): Storefront.QueryRootQuery
 }

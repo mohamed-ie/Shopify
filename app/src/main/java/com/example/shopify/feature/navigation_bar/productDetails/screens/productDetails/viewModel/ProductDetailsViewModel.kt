@@ -3,16 +3,16 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.produc
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.home.screen.Brand
+import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
-import com.example.shopify.helpers.Resource
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.AddToCardState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ReviewsState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.VariantsState
+import com.example.shopify.helpers.Resource
 import com.example.shopify.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +51,7 @@ class ProductDetailsViewModel @Inject constructor(
     val productId:String
 
     init {
-        productId = state.get<String>(Brand.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.also {productId ->
+        productId = state.get<String>(HomeGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.also {productId ->
             getProduct(Constants.Shopify.PRODUCT_SLANDERED_ID_URL + productId)
             getProductReview(productId)
         } ?: ""

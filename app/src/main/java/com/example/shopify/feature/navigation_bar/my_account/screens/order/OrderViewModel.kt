@@ -106,7 +106,9 @@ class OrderViewModel @Inject constructor(
 //        creditCardPaymentStrategy.pay(paymentInfo).onEach { resource ->
 //            when (resource){
 //                is Resource.Error -> {}
-//                is Resource.Success -> {}
+//                is Resource.Success -> {
+//                    resource.data.orderId
+//                }
 //            }
 //        }
     }

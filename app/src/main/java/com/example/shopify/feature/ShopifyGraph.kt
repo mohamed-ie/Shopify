@@ -5,8 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.feature.auth.authGraph
-import com.example.shopify.feature.navigation_bar.home.screen.home.ui.HomeNavigationBarScreen
 import com.example.shopify.feature.landing.landingGraph
+import com.example.shopify.feature.navigation_bar.HomeNavigationBarScreen
 
 
 @Composable
@@ -14,7 +14,7 @@ fun ShopifyGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
-        startDestination = Graph.HOME
+        startDestination = Graph.LANDING
     ) {
         authGraph(navController)
 

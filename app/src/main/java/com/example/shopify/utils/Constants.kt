@@ -15,6 +15,8 @@ class Constants private constructor() {
         val USER_PASSWORD = stringPreferencesKey("USER_PASSWORD_PREFERENCES")
         val USER_ACCESS_TOKEN= stringPreferencesKey("USER_ACCESS_TOKEN_PREFERENCES")
         val USER_EXPIRED_TOKEN_AT = stringPreferencesKey("USER_EXPIRED_TOKEN_AT_PREFERENCES")
+        val CUSTOMER_ID = stringPreferencesKey("CUSTOMER_ID")
+        val CURRENCY = stringPreferencesKey("CURRENCY")
     }
 
     object Shopify{

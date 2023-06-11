@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.model.helpers
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers
 
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoState
 import kotlinx.coroutines.flow.StateFlow

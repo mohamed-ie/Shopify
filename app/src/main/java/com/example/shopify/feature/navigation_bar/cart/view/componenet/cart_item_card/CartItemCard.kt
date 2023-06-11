@@ -47,10 +47,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
-import com.example.shopify.feature.navigation_bar.cart.model.CartItem
-import com.example.shopify.feature.navigation_bar.cart.model.Product
 import com.example.shopify.feature.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.common.component.ShopifyOutlinedButtonState
+import com.example.shopify.feature.navigation_bar.cart.model.CartItem
+import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.Green170
 import com.example.shopify.theme.ShopifyTheme
@@ -65,7 +65,7 @@ fun CartItemCard(
     moveToWishlist: () -> Unit,
     quantitySelected: (Int) -> Unit
 ) {
-    val product = cartItem.product
+    val product = cartItem.cartProduct
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -192,7 +192,7 @@ fun CartItemCard(
                         .rotate(angle),
                     imageVector = Icons.Rounded.KeyboardArrowDown,
                     tint = Gray,
-                    contentDescription = stringResource(id = R.string.choose_quantity_clossed)
+                    contentDescription = stringResource(id = R.string.choose_quantity_closed)
                 )
             }
 
@@ -305,7 +305,7 @@ fun PreviewCartCard() {
                 discount = "50%",
                 quantity = 1,
                 availableQuantity = 5,
-                product = Product(
+                cartProduct = CartProduct(
                     name = "Pro Airpods Compatible With Android iPhone White",
                     collection = "Generic",
                     thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
@@ -333,7 +333,7 @@ fun PreviewCartCardOpenQuntityChooser() {
                 discount = "50%",
                 quantity = 5,
                 availableQuantity = 10,
-                product = Product(
+                cartProduct = CartProduct(
                     name = "Pro Airpods Compatible With Android iPhone White",
                     collection = "Generic",
                     thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",

@@ -5,7 +5,7 @@ data class CartItem(
     val discount: String,
     val quantity: Int,
     val availableQuantity: Int,
-    val product: Product,
+    val cartProduct: CartProduct,
     val priceAfterDiscount: String,
     val priceBeforeDiscount: String,
 )

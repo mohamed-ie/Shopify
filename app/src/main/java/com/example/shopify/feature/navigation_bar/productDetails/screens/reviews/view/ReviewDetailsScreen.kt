@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.shopify.feature.common.ErrorScreen
-import com.example.shopify.feature.common.LoadingContent
+import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.reviews.viewModel.ReviewsDetailsViewModel
 
@@ -19,7 +19,7 @@ fun ReviewDetailsScreen(
     val reviewsState by viewModel.reviewState.collectAsState()
 
     when(screenState){
-        ScreenState.LOADING -> LoadingContent()
+        ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> {
             ReviewDetailsScreenContent(
                 reviewsState = reviewsState,

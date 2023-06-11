@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
+import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.model.remote.FireStore
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
@@ -19,13 +19,15 @@ import com.example.shopify.helpers.UIError
 import com.example.shopify.utils.Constants
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
+
+
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
-import com.shopify.graphql.support.ID
 import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -97,7 +99,10 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                     description = snapShotMap[FireStore.DESCRIPTION_REVIEW_FIELD_KEY] as String,
                     reviewer = snapShotMap[FireStore.REVIEWER_REVIEW_FIELD_KEY] as String,
                     rate = snapShotMap[FireStore.RATE_REVIEW_FIELD_KEY] as Double,
-                    time = SimpleDateFormat(Constants.DateFormats.MONTH_DAY_PATTERN)
+                    time = SimpleDateFormat(
+                        Constants.DateFormats.MONTH_DAY_PATTERN,
+                        Locale.getDefault()
+                    )
                         .format((snapShotMap[FireStore.CREATED_AT_REVIEW_FIELD_KEY] as Timestamp).toDate())
                 )
             }
@@ -153,6 +158,36 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             it.node.toString()
         } ?: listOf()
     }
+
+    override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean =
+        response.hasErrors
+
+    override fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean {
+        return response.data?.customerAddressDelete?.customerUserErrors?.isEmpty() ?: false
+    }
+
+    override fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo {
+        return graphResponse.data?.customer?.run {
+            MinCustomerInfo(name = firstName, email = email)
+        } ?: MinCustomerInfo()
+    }
+
+    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress> {
+        return response.data?.customer?.addresses?.edges?.map {
+            it.node.run {
+                MyAccountMinAddress(
+                    id = id.toString(),
+                    name = "$firstName $lastName",
+                    address = toAddressString(),
+                    phone = phone
+                )
+            }
+        } ?: emptyList()
+    }
+
+    private fun Storefront.MailingAddress.toAddressString() =
+        "$address1, $address2 ,$city, $country, $province ${if (company.isNotBlank()) ",$company" else ""},$zip"
+
 
     private fun mapToImageUrl(response: ImageConnection): List<String> {
         return response.edges.map {

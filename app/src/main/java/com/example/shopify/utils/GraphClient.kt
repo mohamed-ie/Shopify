@@ -18,3 +18,15 @@ fun GraphClient.enqueue(query: Storefront.MutationQuery) = flow {
     mutateGraph(query).enqueue(deferred::complete)
     emit(deferred.await())
 }
+
+suspend fun GraphClient.enqueue1(query: Storefront.QueryRootQuery): GraphCallResult<Storefront.QueryRoot> {
+    val deferred = CompletableDeferred<GraphCallResult<Storefront.QueryRoot>>()
+    queryGraph(query).enqueue(deferred::complete)
+    return deferred.await()
+}
+
+suspend fun GraphClient.enqueue1(query: Storefront.MutationQuery): GraphCallResult<Storefront.Mutation> {
+    val deferred = CompletableDeferred<GraphCallResult<Storefront.Mutation>>()
+    mutateGraph(query).enqueue(deferred::complete)
+    return deferred.await()
+}

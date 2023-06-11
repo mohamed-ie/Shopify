@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.home.screen.home.ui
+package com.example.shopify.feature.navigation_bar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -22,16 +22,17 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.shopify.feature.navigation_bar.NavigationBarScreen
+import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
+import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.example.shopify.ui.navigation.graph.NavigationBarGraph
 
 
 private val items = listOf<NavigationBarScreen>(
-    NavigationBarScreen.Home,
-    NavigationBarScreen.Category,
-    NavigationBarScreen.Favourite,
-    NavigationBarScreen.Me,
-    NavigationBarScreen.Cart
+    HomeGraph.Home,
+//    MyAccountGraph.Category,
+//    NavigationBarScreen.Favourite,
+    MyAccountGraph.MyAccount,
+//    NavigationBarScreen.Cart
 )
 
 @Composable
@@ -82,7 +83,7 @@ private fun RowScope.NavigationItem(
                 tint = if (selected) MaterialTheme.colorScheme.primary else LocalContentColor.current
             )
         },
-        label = { if (selected) Text(stringResource(screen.resourceId)) },
+        label = { if (selected) Text(stringResource(screen.name)) },
         selected = selected,
         onClick = {
             navController.navigate(screen.route) {
