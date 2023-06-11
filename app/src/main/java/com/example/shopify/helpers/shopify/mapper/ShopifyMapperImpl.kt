@@ -1,5 +1,6 @@
 package com.example.shopify.helpers.shopify.mapper
 
+import android.annotation.SuppressLint
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
@@ -9,6 +10,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.model.remote.FireStore
 import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
@@ -24,6 +26,7 @@ import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
+import com.shopify.graphql.support.ID
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -88,6 +91,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
 
 
+    @SuppressLint("SimpleDateFormat")
     override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review> =
         snapshots.map { documentSnapshot ->
             documentSnapshot.data.let { snapShotMap ->
@@ -105,10 +109,11 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             }
         }
 
+
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
             BrandProduct(
-                id = it.node.id.toString(),
+                id = it.node.id,
                 title = it.node.title,
                 description = it.node.description,
                 images = mapToImageUrl(it.node.images),
@@ -116,6 +121,43 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         } ?: listOf()
         return res
+    }
+
+    override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
+        return response.data?.customer?.orders?.edges?.map {
+            Order(
+                it.node.orderNumber, it.node.billingAddress,
+                it.node.cancelReason, it.node.processedAt, it.node.totalPrice, it.node.lineItems
+            )
+        } ?: listOf()
+    }
+
+    override fun mapToCheckoutId(result: GraphResponse<Storefront.Mutation>): ID? {
+        return result.data?.checkoutCreate?.checkout?.id
+    }
+
+    override fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
+        return response.data?.products?.edges?.map {
+            BrandProduct(
+                id = it.node.id,
+                title = it.node.title,
+                description = it.node.description,
+                images = mapToImageUrl(it.node.images),
+                brandVariants = mapToVariant(it.node.variants)
+            )
+        } ?: listOf()
+    }
+
+    override fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String> {
+        return response.data?.productTypes?.edges?.map {
+            it.node.toString()
+        } ?: listOf()
+    }
+
+    override fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String> {
+        return response.data?.productTags?.edges?.map {
+            it.node.toString()
+        } ?: listOf()
     }
 
     override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean =

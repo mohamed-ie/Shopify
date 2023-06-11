@@ -12,6 +12,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
+import com.shopify.graphql.support.ID
 import com.shopify.buy3.Storefront
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +28,15 @@ interface ShopifyRepository {
     fun getProductDetailsByID(id: String): Flow<Resource<Product>>
     suspend fun getProductReviewById(productId: String, reviewsCount: Int? = null): List<Review>
     suspend fun setProductReview(productId: String, review: Review)
+    fun getCheckOutId(cart: Cart): Flow<Resource<ID?>>
+    fun getProductsCategory(
+        productType: String,
+        productTag: String
+    ): Flow<Resource<List<BrandProduct>>>
+
+    fun getProductsTag(): Flow<Resource<List<String>>>
+    fun getProductsType(): Flow<Resource<List<String>>>
+
     suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<Boolean>
     suspend fun deleteAddress(addressId: String): Resource<Boolean>
     fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>>

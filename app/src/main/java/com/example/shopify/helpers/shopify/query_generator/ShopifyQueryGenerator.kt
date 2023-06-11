@@ -2,6 +2,7 @@ package com.example.shopify.helpers.shopify.query_generator
 
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.MailingAddressInput
 import com.shopify.graphql.support.ID
@@ -23,6 +24,16 @@ interface ShopifyQueryGenerator {
         accessToken: String,
         address: MailingAddressInput
     ): Storefront.MutationQuery
+    fun generateUserOrdersQuery(): Storefront.QueryRootQuery
+    fun checkoutCreate(cart: Cart): Storefront.MutationQuery
+    fun generateProductCategoryQuery(
+        productType: String,
+        productTag: String
+    ): Storefront.QueryRootQuery
+
+    fun generateProductTagsQuery(): Storefront.QueryRootQuery
+    fun generateProductTypesQuery(): Storefront.QueryRootQuery
+
 
     fun generateDeleteAddressQuery(addressId: String, accessToken: String): Storefront.MutationQuery
     fun generateGetMinCustomerInfoQuery(accessToken: String): Storefront.QueryRootQuery
