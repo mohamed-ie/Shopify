@@ -1,19 +1,15 @@
 package com.example.shopify.feature.navigation_bar.model.remote
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
-import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import java.util.Collections
 import javax.inject.Inject
 
 class FireStoreManagerImpl @Inject constructor(
-    private val fireStore: FirebaseFirestore,
-    private val mapper: ShopifyMapper,
-    private val defaultDispatcher: CoroutineDispatcher
+    private val fireStore: FirebaseFirestore
 ) : FireStoreManager {
     object Customer {
         const val PATH: String = "customer"
