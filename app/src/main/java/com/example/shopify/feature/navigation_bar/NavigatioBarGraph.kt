@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
-import com.example.shopify.feature.navigation_bar.category.CategoriesScreen
+import com.example.shopify.feature.navigation_bar.category.view.CategoryScreen
 import com.example.shopify.feature.navigation_bar.home.screen.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountScreen
@@ -33,7 +33,12 @@ fun NavigationBarGraph(paddingValues: PaddingValues, navController: NavHostContr
                 })
         }
         composable(route = NavigationBarScreen.Category.route) {
-            CategoriesScreen()
+            CategoryScreen(
+                hiltViewModel(),
+                paddingValues,
+                navigateTo = { productId ->
+                    navController.navigate("${Brand.PRODUCT_DETAILS}/$productId")
+                })
         }
         composable(route = NavigationBarScreen.Favourite.route) {
             WishlistScreen()
