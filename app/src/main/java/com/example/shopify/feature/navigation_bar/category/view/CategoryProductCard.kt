@@ -18,9 +18,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shopify.feature.navigation_bar.home.screen.home.ImageFromUrl
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
+import com.shopify.graphql.support.ID
 
 @Composable
-fun CategoryProductCard(product: BrandProduct, onItemClick: (String) -> Unit) {
+fun CategoryProductCard(product: BrandProduct, onItemClick: (ID) -> Unit) {
     Card(
         modifier = Modifier
             .padding(10.dp)

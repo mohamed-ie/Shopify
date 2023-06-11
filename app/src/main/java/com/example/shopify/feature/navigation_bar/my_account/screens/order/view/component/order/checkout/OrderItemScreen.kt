@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.cart.model.CartItem
-import com.example.shopify.feature.navigation_bar.cart.model.Product
+import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
@@ -41,7 +41,7 @@ import com.example.shopify.utils.shopifyLoading
 fun OrderItemScreen(
     cartItem: CartItem,
 ) {
-    val product = cartItem.product
+    val product = cartItem.cartProduct
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -132,7 +132,7 @@ fun PreviewItemScreen() {
                 discount = "50%",
                 quantity = 5,
                 availableQuantity = 10,
-                product = Product(
+                cartProduct = CartProduct(
                     name = "Pro Airpods Compatible With Android iPhone White",
                     collection = "Generic",
                     thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",

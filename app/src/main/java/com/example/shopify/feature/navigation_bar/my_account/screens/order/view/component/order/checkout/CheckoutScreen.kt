@@ -9,7 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shopify.feature.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.model.CartItem
-import com.example.shopify.feature.navigation_bar.cart.model.Product
+import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.OrderViewModel
 import com.example.shopify.theme.ShopifyTheme
 
@@ -41,7 +41,7 @@ fun CheckoutScreen(
                     discount = "50%",
                     quantity = 5,
                     availableQuantity = 10,
-                    product = Product(
+                    cartProduct = CartProduct(
                         name = "Pro Airpods Compatible With Android iPhone White",
                         collection = "Generic",
                         thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
@@ -56,7 +56,7 @@ fun CheckoutScreen(
                     discount = "50%",
                     quantity = 5,
                     availableQuantity = 10,
-                    product = Product(
+                    cartProduct = CartProduct(
                         name = "Pro Airpods Compatible With Android iPhone White",
                         collection = "Generic",
                         thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",

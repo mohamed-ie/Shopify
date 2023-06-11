@@ -27,21 +27,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.LoadingContent
+import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.category.model.CategoryState
 import com.example.shopify.feature.navigation_bar.category.viewModel.CategoryViewModel
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.ui.screen.common.SearchBarItem
+import com.shopify.graphql.support.ID
 
 @Composable
 fun CategoryScreen(
     viewModel: CategoryViewModel,
     paddingValues: PaddingValues,
-    navigateTo: (String) -> Unit
+    navigateTo: (ID) -> Unit
 ) {
     when (viewModel.screenState.collectAsState().value) {
-        ScreenState.LOADING -> LoadingContent()
+        ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> CategoriesScreenContent(
             categoryState = viewModel.categoryState.collectAsState().value,
             paddingValues = paddingValues,
@@ -59,7 +60,7 @@ fun CategoryScreen(
 fun CategoriesScreenContent(
     categoryState: CategoryState,
     paddingValues: PaddingValues,
-    navigateToProductDetails: (String) -> Unit,
+    navigateToProductDetails: (ID) -> Unit,
     updateProductTag: (Int) -> Unit,
     updateProductType: (Int) -> Unit,
 

@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shopify.feature.navigation_bar.cart.model.CartItem
-import com.example.shopify.feature.navigation_bar.cart.model.Product
+import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.theme.ShopifyTheme
 
 @Composable
@@ -56,7 +56,7 @@ fun PreviewOrderScreen() {
                     discount = "50%",
                     quantity = 5,
                     availableQuantity = 10,
-                    product = Product(
+                    cartProduct = CartProduct(
                         name = "Pro Airpods Compatible With Android iPhone White",
                         collection = "Generic",
                         thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
@@ -71,7 +71,7 @@ fun PreviewOrderScreen() {
                     discount = "50%",
                     quantity = 5,
                     availableQuantity = 10,
-                    product = Product(
+                    cartProduct = CartProduct(
                         name = "Pro Airpods Compatible With Android iPhone White",
                         collection = "Generic",
                         thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",

@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.model.remote.FireStore
+import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
+import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
@@ -19,13 +21,12 @@ import com.example.shopify.helpers.UIError
 import com.example.shopify.utils.Constants
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
-
-
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
+import com.shopify.graphql.support.ID
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -112,7 +113,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
             BrandProduct(
-                id = it.node.id.toString(),
+                id = it.node.id,
                 title = it.node.title,
                 description = it.node.description,
                 images = mapToImageUrl(it.node.images),
@@ -138,7 +139,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         return response.data?.products?.edges?.map {
             BrandProduct(
-                id = it.node.id.toString(),
+                id = it.node.id,
                 title = it.node.title,
                 description = it.node.description,
                 images = mapToImageUrl(it.node.images),

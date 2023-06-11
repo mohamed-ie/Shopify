@@ -14,13 +14,14 @@ import com.example.shopify.feature.common.NamedTopAppBar
 import com.example.shopify.ui.screen.Product.ui.Slider
 import com.example.shopify.ui.screen.Product.viewModel.ProductViewModel
 import com.example.shopify.ui.screen.common.SearchBarItem
+import com.shopify.graphql.support.ID
 
 @Composable
 fun ProductScreen(
     viewModel: ProductViewModel,
     paddingValues: PaddingValues,
     navigateToHome: () -> Unit,
-    navigateToProductDetails: (String) -> Unit
+    navigateToProductDetails: (ID) -> Unit
 ) {
     val productsState by viewModel.productList.collectAsState()
     Column(modifier = Modifier.padding(paddingValues)) {
