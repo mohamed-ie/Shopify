@@ -28,10 +28,10 @@ data class Discount(
 )
 
 data class VariantItem(
-	val image: String?,
-	val id: String?,
-	val price:String?,
-	val title: String?
+    val image: String?,
+    val price: String?,
+    val title: String?,
+    val id: ID? = null
 )
 
 

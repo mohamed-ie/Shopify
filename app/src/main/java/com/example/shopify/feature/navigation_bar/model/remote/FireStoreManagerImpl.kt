@@ -2,7 +2,6 @@ package com.example.shopify.feature.navigation_bar.model.remote
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
@@ -12,20 +11,22 @@ import javax.inject.Inject
 
 class FireStoreManagerImpl @Inject constructor(
     private val fireStore: FirebaseFirestore,
-    private val mapper: FireStoreMapper
+    private val mapper: FireStoreMapper,
 ) : FireStoreManager {
     object Customer {
         const val PATH: String = "customer"
 
         object Fields {
             const val CURRENCY: String = "currency"
-            const val WISH_LIST:String = "wishlist"
+            const val CURRENT_CART_ID: String = "current_cart_id"
+            const val WISH_LIST: String = "wishlist"
         }
     }
 
-    companion object Product{
+    companion object Product {
         const val PATH = "product"
         const val REVIEW_PATH = "Review"
+
         object Field {
             const val CREATED_AT_REVIEW = "createdAt"
             const val DESCRIPTION_REVIEW = "description"
@@ -55,6 +56,7 @@ class FireStoreManagerImpl @Inject constructor(
             .document(review.reviewer)
             .set(review.copy(createdAt = FieldValue.serverTimestamp(), time = null))
             .await()
+
     }
 
     override suspend fun updateCurrency(customerId: String, currency: String) {
@@ -65,28 +67,50 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun getCurrency(customerId: String): String {
-       return fireStore.collection(Customer.PATH)
+        return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
             .await()
             .get(Customer.Fields.CURRENCY) as String
     }
 
-    override suspend fun updateWishList(customerId: String,productId: ID){
+    override suspend fun setCurrentCartId(customerId: String, cartId: String) {
         fireStore.collection(Customer.PATH)
             .document(customerId)
-            .update(Customer.Fields.WISH_LIST,FieldValue.arrayUnion(mapper.mapProductIDToEncodedProductId(productId)))
+            .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
             .await()
     }
 
-    override suspend fun removeAWishListProduct(customerId: String,productId: ID){
+    override suspend fun getCurrentCartId(email: String): String? {
+        return fireStore.collection(Customer.PATH)
+            .document(email)
+            .get()
+            .await()
+            .get(Customer.Fields.CURRENT_CART_ID) as String?
+    }
+
+
+    override suspend fun updateWishList(customerId: String, productId: ID) {
         fireStore.collection(Customer.PATH)
             .document(customerId)
-            .update(Customer.Fields.WISH_LIST,FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId)))
+            .update(
+                Customer.Fields.WISH_LIST,
+                FieldValue.arrayUnion(mapper.mapProductIDToEncodedProductId(productId))
+            )
             .await()
     }
 
-    override suspend fun createCustomer(customerId: String){
+    override suspend fun removeAWishListProduct(customerId: String, productId: ID) {
+        fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .update(
+                Customer.Fields.WISH_LIST,
+                FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId))
+            )
+            .await()
+    }
+
+    override suspend fun createCustomer(customerId: String) {
         val customerMap = mapOf(Customer.Fields.CURRENCY to "EGP")
         fireStore.collection(Customer.PATH)
             .document(customerId)
@@ -94,15 +118,13 @@ class FireStoreManagerImpl @Inject constructor(
             .await()
     }
 
-    override suspend fun getWishList(customerId: String):List<ID>{
+    override suspend fun getWishList(customerId: String): List<ID> {
         return (fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
             .await()
             .get(Customer.Fields.WISH_LIST) as? List<*>)
-            ?.map {it as String }
+            ?.map { it as String }
             ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
     }
 }
-
-

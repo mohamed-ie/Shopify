@@ -1,11 +1,12 @@
 package com.example.shopify.helpers.shopify.mapper
 
+import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
@@ -41,5 +42,12 @@ interface ShopifyMapper {
     fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
     fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
     fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress>
+    fun mapToCartId(response: GraphResponse<Storefront.Mutation>): Pair<String?, String?>?
+    fun mapToAddCartLine(response: GraphResponse<Storefront.Mutation>): String?
+    fun mapToCart(graphResponse: GraphResponse<Storefront.QueryRoot>): Cart?
+    fun mapToRemoveCartLines(response: GraphResponse<Storefront.Mutation>): Cart?
+    fun mapToChangeCartLineQuantity(response: GraphResponse<Storefront.Mutation>): Cart?
+    fun mapToApplyCouponToCart(response: GraphResponse<Storefront.Mutation>): Cart?
+    fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String?
 
 }

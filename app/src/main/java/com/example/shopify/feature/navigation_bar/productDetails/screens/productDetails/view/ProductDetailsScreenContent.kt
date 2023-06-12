@@ -194,9 +194,8 @@ private fun ProductDetailsScreenContentPreview() {
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("", "", "", "white/1")),
+            variants = listOf(VariantItem("", "", "white/1")),
             title = "Ultima show Running Shoes Pink",
-            vendor = "Adidas",
             price = Price(
                 amount = "172.00",
                 currencyCode = "AED"
@@ -204,7 +203,8 @@ private fun ProductDetailsScreenContentPreview() {
             discount = Discount(
                 realPrice = "249.00",
                 percent = 30
-            )
+            ),
+            vendor = "Adidas",
         ),
         addToCardState = AddToCardState(
             sendSelectedQuantity = { i -> },

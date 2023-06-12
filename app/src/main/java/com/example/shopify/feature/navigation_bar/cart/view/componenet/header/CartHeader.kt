@@ -45,7 +45,7 @@ fun CartHeader(
     itemsCount: Int,
     address: String,
     navigateToWishlistScreen: () -> Unit,
-    navigateToMapScreen: () -> Unit
+    navigateToAddressesScreen: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.padding(bottom = 2.dp),
@@ -63,6 +63,7 @@ fun CartHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                //cart
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(id = R.string.cart))
@@ -79,7 +80,7 @@ fun CartHeader(
                             }
                         }
                     },
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
                 ShopifyOutlinedButton(onClick = navigateToWishlistScreen) {
@@ -99,44 +100,45 @@ fun CartHeader(
                     )
                 }
             }
+            if (itemsCount != 0) {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier
+                        .clip(shape = MaterialTheme.shapes.small)
+                        .background(color = Color.LightGray.copy(alpha = .5f))
+                        .clickable(onClick = navigateToAddressesScreen)
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
 
-            Row(
-                modifier = Modifier
-                    .clip(shape = MaterialTheme.shapes.small)
-                    .background(color = Color.LightGray.copy(alpha = .5f))
-                    .clickable(onClick = navigateToMapScreen)
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = Icons.Outlined.LocationOn,
+                        contentDescription = null,
+                    )
 
-            ) {
-                Icon(
-                    modifier = Modifier.size(20.dp),
-                    imageVector = Icons.Outlined.LocationOn,
-                    contentDescription = null,
-                )
+                    Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
 
-                Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Thin)) {
+                                append(stringResource(id = R.string.deliver_to))
+                            }
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(" ")
+                                append(address)
+                            }
+                        },
+                        maxLines = 1,
+                        style = MaterialTheme.typography.bodyMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Thin)) {
-                            append(stringResource(id = R.string.deliver_to))
-                        }
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(" ")
-                            append(address)
-                        }
-                    },
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodyMedium,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
 
-                Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
-
+                }
             }
         }
     }

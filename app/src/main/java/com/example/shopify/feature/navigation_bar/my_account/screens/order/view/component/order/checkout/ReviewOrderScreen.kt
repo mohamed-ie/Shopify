@@ -14,13 +14,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shopify.feature.navigation_bar.cart.model.CartItem
+import com.example.shopify.feature.navigation_bar.cart.model.CartLine
 import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.theme.ShopifyTheme
+import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 
 @Composable
 fun ReviewOrderScreens(
-    ordersItems: List<CartItem>
+    ordersItems: List<CartLine>
 ) {
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -37,7 +39,7 @@ fun ReviewOrderScreens(
             modifier = Modifier.padding(top = 4.dp)
         ) {
             items(ordersItems) {
-                OrderItemScreen(cartItem = it)
+                OrderItemScreen(cartLine = it)
             }
         }
     }
@@ -49,33 +51,31 @@ fun PreviewOrderScreen() {
     ShopifyTheme {
         ReviewOrderScreens(
             ordersItems = listOf(
-                CartItem(
-                    id = "",
-                    priceAfterDiscount = "EGP 372.00",
-                    priceBeforeDiscount = "EGP 750.00",
-                    discount = "50%",
-                    quantity = 5,
-                    availableQuantity = 10,
+                CartLine(
+                    id = ID(""),
+                    Storefront.MoneyV2().setAmount("900.00")
+                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
+                    quantity = 1,
+                    availableQuantity = 20,
                     cartProduct = CartProduct(
-                        name = "Pro Airpods Compatible With Android iPhone White",
-                        collection = "Generic",
-                        thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
-                        vendor = "Egyptian German"
+                        name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
+                        collection = "Electronics",
+                        thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
+                        vendor = "Amazon"
                     )
                 ),
 
-                CartItem(
-                    id = "",
-                    priceAfterDiscount = "EGP 372.00",
-                    priceBeforeDiscount = "EGP 750.00",
-                    discount = "50%",
-                    quantity = 5,
-                    availableQuantity = 10,
+                CartLine(
+                    id = ID(""),
+                    Storefront.MoneyV2().setAmount("900.00")
+                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
+                    quantity = 1,
+                    availableQuantity = 20,
                     cartProduct = CartProduct(
-                        name = "Pro Airpods Compatible With Android iPhone White",
-                        collection = "Generic",
-                        thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
-                        vendor = "Egyptian German"
+                        name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
+                        collection = "Electronics",
+                        thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
+                        vendor = "Amazon"
                     )
                 )
             )

@@ -1,20 +1,25 @@
 package com.example.shopify.feature.navigation_bar.cart.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,12 +28,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.feature.address.AddressGraph
+import com.example.shopify.feature.common.component.RemoteErrorHeader
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.cart.model.CartItem
+import com.example.shopify.feature.navigation_bar.cart.model.CartLine
 import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemCard
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemEvent
-import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemState
+import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartLineState
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponCard
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponState
@@ -37,109 +44,165 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.header.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
 import com.example.shopify.theme.Green170
 import com.example.shopify.theme.ShopifyTheme
+import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 
 val cartElevation = 2.dp
 
 @Composable
 fun CartScreenContent(
-    innerPadding: PaddingValues,
-    state: CartState,
-    itemsState: List<CartItemState>,
+    cart: Cart,
+    itemsState: List<CartLineState>,
     couponState: CartCouponState,
     onCartItemEvent: (CartItemEvent) -> Unit,
     onCouponEvent: (CartCouponEvent) -> Unit,
-    navigateTo: (route: String, navOptionBuilder: (() -> Unit)?) -> Unit
+    navigateTo: (route: String) -> Unit
 ) {
-    val cart = state.cart
-    val itemsCount = cart.items.size
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-    ) {
-
+    val itemsCount = cart.lines.size
+    Column(Modifier.fillMaxSize()) {
+        RemoteErrorHeader(error = cart.error)
         CartHeader(
             itemsCount = itemsCount,
-            address = state.address,
+            address = cart.address,
             navigateToWishlistScreen = {
                 //navigateTo()
             },
-            navigateToMapScreen = {
-                //navigateTo()
-            }
+            navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true")) }
         )
-
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(cart.items) { index, cartItem ->
-                CartItemCard(
-                    state = itemsState[index],
-                    cartItem = cartItem,
-                    toggleQuantitySelectorVisibility = {onCartItemEvent(CartItemEvent.ToggleQuantitySelectorVisibility) },
-                    removeFromCart = { onCartItemEvent(CartItemEvent.RemoveItem(cartItem.id)) },
-                    moveToWishlist = { onCartItemEvent(CartItemEvent.MoveToWishlist(cartItem.id)) },
-                    quantitySelected = { onCartItemEvent(CartItemEvent.QuantityChanged(it)) }
-                )
-            }
-
-            item {
-                CartCouponCard(
-                    state = couponState,
-                    applyCoupon = { onCouponEvent(CartCouponEvent.Apply) },
-                    clearCoupon = { onCouponEvent(CartCouponEvent.Clear) },
-                    couponValueChanged = {onCouponEvent(CartCouponEvent.ValueChanged(it))}
-                )
-            }
-
-            item {
-                TotalCostCard(
-                    itemsCount = itemsCount,
-                    subTotalsPrice = cart.subTotalsPrice,
-                    shippingFee = cart.shippingFee,
-                    taxes = cart.taxes,
-                    totalPrice = cart.totalPrice
-                )
-            }
-
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 40.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        modifier = Modifier.size(40.dp),
-                        contentScale = ContentScale.Fit,
-                        painter = painterResource(id = R.drawable.mastercard_logo),
-                        contentDescription = null
-                    )
-                    Image(
-                        modifier = Modifier.size(40.dp),
-                        contentScale = ContentScale.Fit,
-                        painter = painterResource(id = R.drawable.visa_logo),
-                        contentDescription = null
-                    )
-
-                    Text(
-                        text = stringResource(id = R.string.cash),
-                        color = Green170,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic,
+        if (cart.lines.isEmpty())
+            EmptyCart()
+        else
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(cart.lines) { index, cartItem ->
+                    CartItemCard(
+                        state = itemsState[index],
+                        cartLine = cartItem,
+                        toggleQuantitySelectorVisibility = {
+                            onCartItemEvent(
+                                CartItemEvent.ToggleQuantitySelectorVisibility(
+                                    index
+                                )
+                            )
+                        },
+                        removeFromCart = { onCartItemEvent(CartItemEvent.RemoveLine(index)) },
+                        moveToWishlist = { onCartItemEvent(CartItemEvent.MoveToWishlist(index)) },
+                        quantitySelected = {
+                            onCartItemEvent(
+                                CartItemEvent.QuantityChanged(
+                                    index,
+                                    it
+                                )
+                            )
+                        }
                     )
                 }
+
+                item {
+                    CartCouponCard(
+                        state = couponState,
+                        applyCoupon = { onCouponEvent(CartCouponEvent.Apply) },
+                        clearCoupon = { onCouponEvent(CartCouponEvent.Clear) },
+                        couponValueChanged = { onCouponEvent(CartCouponEvent.ValueChanged(it)) }
+                    )
+                }
+
+                item {
+                    TotalCostCard(
+                        itemsCount = itemsCount,
+                        subTotalsPrice = cart.subTotalsPrice?.run { "${currencyCode.name} $amount" }
+                            ?: stringResource(id = R.string.free),
+                        checkout = cart.checkoutPrice?.run { "${currencyCode.name} $amount" }
+                            ?: stringResource(id = R.string.free),
+                        shippingFee = cart.shippingFee?.run { "${currencyCode.name} $amount" }
+                            ?: stringResource(id = R.string.free),
+                        taxes = cart.taxes?.run { "${currencyCode.name} $amount" }
+                            ?: stringResource(id = R.string.free),
+                        discounts = cart.discounts?.run { "${currencyCode.name} $amount" },
+                        totalPrice = cart.totalPrice?.run { "${currencyCode.name} $amount" }
+                            ?: stringResource(id = R.string.free)
+                    )
+                }
+
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = Modifier.size(40.dp),
+                            contentScale = ContentScale.Fit,
+                            painter = painterResource(id = R.drawable.mastercard_logo),
+                            contentDescription = null
+                        )
+                        Image(
+                            modifier = Modifier.size(40.dp),
+                            contentScale = ContentScale.Fit,
+                            painter = painterResource(id = R.drawable.visa_logo),
+                            contentDescription = null
+                        )
+
+                        Text(
+                            text = stringResource(id = R.string.cash),
+                            color = Green170,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
-        }
         CartFooter(
             itemsCount = itemsCount,
-            totalPrice = cart.totalPrice,
+            totalPrice = cart.totalPrice?.run { "${currencyCode.name} $amount" }
+                ?: stringResource(id = R.string.free),
             checkout = {
-                // navigate to confirm location
+                // navigate to place checkout
             }
         )
+    }
+}
+
+@Composable
+private fun EmptyCart() {
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(.4f)
+                .aspectRatio(1f),
+            contentScale = ContentScale.Fit,
+            painter = painterResource(id = R.drawable.no_orders),
+            contentDescription = null
+        )
+
+        Text(
+            text = stringResource(id = R.string.your_cart_is_empty),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.Gray
+        )
+
+        Text(
+            text = stringResource(id = R.string.be_sure_to_fill_your_cart_with_somthing_you_like),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Normal,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.weight(2f))
     }
 }
 
@@ -148,12 +211,11 @@ fun CartScreenContent(
 fun PreviewCartScreenContent() {
     ShopifyTheme {
         val cart = Cart(
-            items = listOf(
-                CartItem(
-                    id = "",
-                    priceAfterDiscount = "EGP 372.00",
-                    priceBeforeDiscount = "EGP 750.00",
-                    discount = "50%",
+            lines = listOf(
+                CartLine(
+                    id = ID(""),
+                    Storefront.MoneyV2().setAmount("372.00")
+                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
                     quantity = 1,
                     availableQuantity = 5,
                     cartProduct = CartProduct(
@@ -163,11 +225,10 @@ fun PreviewCartScreenContent() {
                         vendor = "Egyptian German"
                     )
                 ),
-                CartItem(
-                    id = "",
-                    priceAfterDiscount = "EGP 900.00",
-                    priceBeforeDiscount = "EGP 1000.00",
-                    discount = "10%",
+                CartLine(
+                    id = ID(""),
+                    Storefront.MoneyV2().setAmount("900.00")
+                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
                     quantity = 1,
                     availableQuantity = 20,
                     cartProduct = CartProduct(
@@ -178,20 +239,23 @@ fun PreviewCartScreenContent() {
                     )
                 ),
             ),
-            "EGP 303.00",
-            "EGP 1272.00",
-            "FREE",
-            "EGP 1575.50"
+            Storefront.MoneyV2().setAmount("303.00")
+                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+            Storefront.MoneyV2().setAmount("1272.00")
+                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+            null,
+            Storefront.MoneyV2().setAmount("1575.50")
+                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+            checkoutPrice = Storefront.MoneyV2().setAmount("1575.50")
+                .setCurrencyCode(Storefront.CurrencyCode.EGP),
         )
         CartScreenContent(
-            innerPadding = PaddingValues(),
-            state = CartState(cart),
+            cart = Cart(),
             itemsState = listOf(
-                CartItemState(),
-                CartItemState(chooseQuantityOpened = true, selectedQuantity = 3)
+                CartLineState(),
+                CartLineState(isChooseQuantityOpen = true)
             ),
-            couponState = CartCouponState()
-        ,{},{}){_,_->
+            couponState = CartCouponState(), {}, {}) {
 
         }
     }

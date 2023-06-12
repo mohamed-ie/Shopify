@@ -91,26 +91,26 @@ fun ReviewDetailsContentPreview() {
                 )
             )),
         product = Product(
-        image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
-        description = "The Stan Smith owned the tennis court in the '70s." +
-                " Today it runs the streets with the same clean," +
-                " classic style." +
-                " These kids' shoes preserve the iconic look of the original," +
-                " made in leather with punched 3-Stripes," +
-                " heel and tongue logos and lightweight step-in cushioning.",
-        totalInventory = 5,
-        variants = listOf(VariantItem("","","","white/1")),
-        title = "iPhone 14 Pro 256GB Deep Purple 5G With FaceTime - International Version",
-        vendor = "Adidas",
-        price = Price(
-            amount = "172.00",
-            currencyCode = "AED"
-        ),
-        discount = Discount(
-            realPrice = "249.00",
-            percent = 30
-        )
-    ) ) {
+            image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
+            description = "The Stan Smith owned the tennis court in the '70s." +
+                    " Today it runs the streets with the same clean," +
+                    " classic style." +
+                    " These kids' shoes preserve the iconic look of the original," +
+                    " made in leather with punched 3-Stripes," +
+                    " heel and tongue logos and lightweight step-in cushioning.",
+            totalInventory = 5,
+            variants = listOf(VariantItem("","","white/1")),
+            title = "iPhone 14 Pro 256GB Deep Purple 5G With FaceTime - International Version",
+            price = Price(
+                amount = "172.00",
+                currencyCode = "AED"
+            ),
+            discount = Discount(
+                realPrice = "249.00",
+                percent = 30
+            ),
+            vendor = "Adidas",
+        ) ) {
 
     }
 }

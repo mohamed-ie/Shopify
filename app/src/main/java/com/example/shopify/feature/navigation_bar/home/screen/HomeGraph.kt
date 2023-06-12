@@ -14,7 +14,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.ui.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ProductDetailsScreen
 import com.example.shopify.feature.navigation_bar.productDetails.screens.reviews.view.ReviewDetailsScreen
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
-import com.example.shopify.ui.navigation.graph.NavigationBarGraph
+import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.ui.screen.home.ui.HomeScreen
 
 fun NavGraphBuilder.homeGraph(navController: NavController, paddingValues: PaddingValues) {

@@ -145,6 +145,10 @@ class ProductDetailsViewModel @Inject constructor(
                 currencyCode = _productState.value.price.currencyCode
             )
         )
+
+        viewModelScope.launch {
+            repository.addToCart(_variantState.value.run { variants[selectedVariant-1].id }!!, _addToCardState.value.selectedQuantity)
+        }
     }
 
     private fun sendSelectedVariant(variantIndex: Int) {
