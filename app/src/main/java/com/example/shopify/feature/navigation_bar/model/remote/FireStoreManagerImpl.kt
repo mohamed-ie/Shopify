@@ -1,48 +1,60 @@
 package com.example.shopify.feature.navigation_bar.model.remote
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
-import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
+import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineDispatcher
+import com.shopify.graphql.support.ID
 import kotlinx.coroutines.tasks.await
 import java.util.Collections
 import javax.inject.Inject
 
 class FireStoreManagerImpl @Inject constructor(
     private val fireStore: FirebaseFirestore,
-    private val mapper: ShopifyMapper,
-    private val defaultDispatcher: CoroutineDispatcher
+    private val mapper: FireStoreMapper
 ) : FireStoreManager {
     object Customer {
         const val PATH: String = "customer"
 
         object Fields {
             const val CURRENCY: String = "currency"
+            const val WISH_LIST:String = "wishlist"
+        }
+    }
+
+    companion object Product{
+        const val PATH = "product"
+        const val REVIEW_PATH = "Review"
+        object Field {
+            const val CREATED_AT_REVIEW = "createdAt"
+            const val DESCRIPTION_REVIEW = "description"
+            const val RATE_REVIEW = "rate"
+            const val REVIEW_CONTENT = "review"
+            const val REVIEWER_REVIEW = "reviewer"
         }
     }
 
     override suspend fun getReviewsByProductId(
         id: String,
         reviewsCount: Int?
-    ): List<DocumentSnapshot> =
-        fireStore.collection(FireStore.PRODUCT_COLLECTION_PATH)
+    ): List<Review> =
+        fireStore.collection(PATH)
             .document(id)
-            .collection(FireStore.REVIEW_COLLECTION_PATH)
+            .collection(REVIEW_PATH)
             .get()
             .await()
             .documents
+            .map(mapper::mapSnapShotDocumentsToReview)
 
 
     override suspend fun setProductReviewByProductId(productId: String, review: Review) {
-        fireStore.collection(FireStore.PRODUCT_COLLECTION_PATH)
+        fireStore.collection(PATH)
             .document(productId)
-            .collection(FireStore.REVIEW_COLLECTION_PATH)
+            .collection(REVIEW_PATH)
             .document(review.reviewer)
             .set(review.copy(createdAt = FieldValue.serverTimestamp(), time = null))
             .await()
-
     }
 
     override suspend fun updateCurrency(customerId: String, currency: String) {
@@ -58,6 +70,38 @@ class FireStoreManagerImpl @Inject constructor(
             .get()
             .await()
             .get(Customer.Fields.CURRENCY) as String
+    }
+
+    override suspend fun updateWishList(customerId: String,productId: ID){
+        fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .update(Customer.Fields.WISH_LIST,FieldValue.arrayUnion(mapper.mapProductIDToEncodedProductId(productId)))
+            .await()
+    }
+
+    override suspend fun removeAWishListProduct(customerId: String,productId: ID){
+        fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .update(Customer.Fields.WISH_LIST,FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId)))
+            .await()
+    }
+
+    override suspend fun createCustomer(customerId: String){
+        val customerMap = mapOf(Customer.Fields.CURRENCY to "EGP")
+        fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .set(customerMap)
+            .await()
+    }
+
+    override suspend fun getWishList(customerId: String):List<ID>{
+        return (fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .get()
+            .await()
+            .get(Customer.Fields.WISH_LIST) as? List<*>)
+            ?.map {it as String }
+            ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
     }
 }
 

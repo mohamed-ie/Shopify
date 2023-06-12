@@ -13,7 +13,10 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ReviewsState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.VariantsState
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.firestore.mapper.decodeProductId
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.example.shopify.utils.Constants
+import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,13 +53,25 @@ class ProductDetailsViewModel @Inject constructor(
     private val _reviewState = MutableStateFlow(ReviewsState())
     val reviewState = _reviewState.asStateFlow()
 
-    val productId: String
+    val productId:ID
 
     init {
-        productId = state.get<String>(HomeGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.also { productId ->
-            getProduct(Constants.Shopify.PRODUCT_SLANDERED_ID_URL + productId)
-            getProductReview(productId)
-        } ?: ""
+        productId = state.get<String>(HomeGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.let { productId ->
+            productId.decodeProductId().apply {
+                getProduct(this.toString())
+                getProductReview(this.encodeProductId())
+            }
+        } ?: ID("")
+    }
+
+
+     fun sendFavouriteAction(isFavourite:Boolean) {
+        if(isFavourite)
+            viewModelScope.launch { repository.removeProductWishListById(productId) }
+        else
+            viewModelScope.launch { repository.addProductWishListById(productId) }
+
+        _productState.value = _productState.value.copy(isFavourite = !isFavourite)
     }
 
     private fun getProduct(id: String) {
