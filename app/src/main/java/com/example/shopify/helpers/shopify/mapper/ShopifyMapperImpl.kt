@@ -87,28 +87,11 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
 
 
-    @SuppressLint("SimpleDateFormat")
-    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review> =
-        snapshots.map { documentSnapshot ->
-            documentSnapshot.data.let { snapShotMap ->
-                Review(
-                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String),
-                    description = snapShotMap[FireStore.DESCRIPTION_REVIEW_FIELD_KEY] as String,
-                    reviewer = snapShotMap[FireStore.REVIEWER_REVIEW_FIELD_KEY] as String,
-                    rate = snapShotMap[FireStore.RATE_REVIEW_FIELD_KEY] as Double,
-                    time = SimpleDateFormat(
-                        Constants.DateFormats.MONTH_DAY_PATTERN,
-                        Locale.getDefault()
-                    )
-                        .format((snapShotMap[FireStore.CREATED_AT_REVIEW_FIELD_KEY] as Timestamp).toDate())
-                )
-            }
-        }
 
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
             BrandProduct(
-                id = it.node.id.toString(),
+                id = it.node.id,
                 title = it.node.title,
                 description = it.node.description,
                 images = mapToImageUrl(it.node.images),

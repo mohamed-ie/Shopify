@@ -14,7 +14,6 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 import com.shopify.buy3.Storefront
-import com.shopify.graphql.support.ID
 import kotlinx.coroutines.flow.Flow
 
 interface ShopifyRepository {
