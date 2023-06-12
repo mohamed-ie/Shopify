@@ -1,31 +1,29 @@
 package com.example.shopify.helpers.shopify.mapper
 
+import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.cart.model.CartLine
+import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
-import com.example.shopify.feature.navigation_bar.model.remote.FireStore
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.UIError
-import com.example.shopify.utils.Constants
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentSnapshot
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.shopify.graphql.support.ID
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -71,7 +69,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                     productVariantNode.node.let { productVariant ->
                         VariantItem(
                             image = productVariant.image.url,
-                            id = productVariant.id.toString(),
+                            id = productVariant.id,
                             price = productVariant.price.amount,
                             title = productVariant.title
                         )
@@ -86,24 +84,6 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                     percent = 0
                 )
             )
-        }
-
-
-    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review> =
-        snapshots.map { documentSnapshot ->
-            documentSnapshot.data.let { snapShotMap ->
-                Review(
-                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String),
-                    description = snapShotMap[FireStore.DESCRIPTION_REVIEW_FIELD_KEY] as String,
-                    reviewer = snapShotMap[FireStore.REVIEWER_REVIEW_FIELD_KEY] as String,
-                    rate = snapShotMap[FireStore.RATE_REVIEW_FIELD_KEY] as Double,
-                    time = SimpleDateFormat(
-                        Constants.DateFormats.MONTH_DAY_PATTERN,
-                        Locale.getDefault()
-                    )
-                        .format((snapShotMap[FireStore.CREATED_AT_REVIEW_FIELD_KEY] as Timestamp).toDate())
-                )
-            }
         }
 
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
@@ -173,7 +153,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return response.data?.customer?.addresses?.edges?.map {
             it.node.run {
                 MyAccountMinAddress(
-                    id = id.toString(),
+                    id = id,
                     name = "$firstName $lastName",
                     address = toAddressString(),
                     phone = phone
@@ -195,7 +175,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return response.data?.cartLinesAdd?.userErrors?.getOrNull(0)?.message
     }
 
-    private fun MailingAddress.toAddressString() =
+    private fun Storefront.MailingAddress.toAddressString() =
         "$address1, $address2 ,$city, $country, $province ${if (company.isNotBlank()) ",$company" else ""},$zip"
 
 
@@ -276,7 +256,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     private fun Storefront.Cart.toCart(error: String? = null, couponError: String? = null): Cart =
         run {
             val lines = lines?.edges?.map {
-                val merchandise = it.node.merchandise as ProductVariant
+                val merchandise = it.node.merchandise as Storefront.ProductVariant
                 val product = merchandise.product
 
                 val cartProduct = CartProduct(
@@ -295,12 +275,12 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             }
             val cost = cost
             val coupons = discountAllocations
-                ?.takeIf { it is CartCodeDiscountAllocation }
-                ?.map { it as CartCodeDiscountAllocation }
+                ?.takeIf { it is Storefront.CartCodeDiscountAllocation }
+                ?.map { it as Storefront.CartCodeDiscountAllocation }
                 ?.associate { it.code to it.discountedAmount }
                 ?: emptyMap()
 
-            val mailingAddress = buyerIdentity.deliveryAddressPreferences.getOrNull(0) as? MailingAddress?
+            val mailingAddress = buyerIdentity.deliveryAddressPreferences.getOrNull(0) as? Storefront.MailingAddress?
 
             Cart(
                 lines = lines ?: emptyList(),
@@ -322,10 +302,10 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         response.data?.cartBuyerIdentityUpdate?.userErrors?.getOrNull(0)?.message
 
 
-    private operator fun MoneyV2?.minus(money: MoneyV2?): MoneyV2? {
+    private operator fun Storefront.MoneyV2?.minus(money: Storefront.MoneyV2?): Storefront.MoneyV2? {
         val newAmount = ((this?.amount?.toDouble() ?: 0.0) - (money?.amount?.toDouble() ?: 0.0))
         if (newAmount <= 0.0) return null
-        return MoneyV2().setAmount(newAmount.toString())
+        return Storefront.MoneyV2().setAmount(newAmount.toString())
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
 }

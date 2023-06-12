@@ -63,12 +63,15 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    viewModel: BrandViewModel, paddingValues: PaddingValues,
+    viewModel: BrandViewModel,
+    paddingValues: PaddingValues,
     navigateToProduct: (String) -> Unit
 ) {
     viewModel.getBrandList()
     val brandList by viewModel.brandList.collectAsState(initial = listOf())
-    LazyColumn(modifier = Modifier.padding(paddingValues)) {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)) {
         stickyHeader {
             Row(
                 modifier = Modifier

@@ -1,19 +1,20 @@
-package com.example.shopify.feature.navigation_bar.wishList.view
+package com.example.shopify.feature.wishList.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
 import com.example.shopify.feature.common.ConfirmationDialog
 import com.example.shopify.feature.common.ErrorScreen
 import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.common.state.ScreenState
-import com.example.shopify.feature.navigation_bar.wishList.viewModel.WishListViewModel
+import com.example.shopify.feature.wishList.viewModel.WishListViewModel
 import com.shopify.graphql.support.ID
 
 
@@ -28,9 +29,18 @@ fun WishListScreen(
     val screenState by viewModel.screenState.collectAsState()
     val dialogVisibilityState by viewModel.dialogVisibilityState.collectAsState()
 
-    LaunchedEffect(lifecycleOwner) {
-        viewModel.getWishListProducts()
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                viewModel.getWishListProducts()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
+
     when(screenState){
         ScreenState.LOADING ->  LoadingScreen()
         ScreenState.STABLE -> {

@@ -10,7 +10,6 @@ import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.remote.FireStoreManager
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -30,6 +29,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -97,8 +97,8 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getProductDetailsByID(id: String): Flow<Resource<Product>> =
         queryGenerator.generateProductDetailsQuery(id)
             .enqueue()
-            .mapSuspendResource{
-                mapper.mapToProduct(it).let {product ->
+            .mapSuspendResource {
+                mapper.mapToProduct(it).let { product ->
                     product.copy(isFavourite = isProductWishList(product.id))
                 }
             }
@@ -207,7 +207,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         val email = dataStoreManager.getEmail().first()
         val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
 
-        return queryGenerator.generateUpdateCartAddress(accessToken,cartId,addressId)
+        return queryGenerator.generateUpdateCartAddress(accessToken, cartId, addressId)
             .enqueue1()
             .mapResource(mapper::mapToUpdateCartAddress)
     }
@@ -224,36 +224,26 @@ class ShopifyRepositoryImpl @Inject constructor(
             .enqueue1()
             .mapResource(mapper::mapToCartId)
 
+    override suspend fun addProductWishListById(productId: ID) =
+        fireStoreManager.updateWishList(getUserEmail(), productId)
 
+    override suspend fun removeProductWishListById(productId: ID) =
+        fireStoreManager.removeAWishListProduct(getUserEmail(), productId)
 
-    override suspend fun addProductWishListById(productId:ID) =
-        fireStoreManager.updateWishList(getUserEmail(),productId)
-
-
-    override suspend fun removeProductWishListById(productId:ID) =
-        fireStoreManager.removeAWishListProduct(getUserEmail(),productId)
-
-
-    private suspend fun getWishList(customerId:String):List<ID> =
+    private suspend fun getWishList(customerId: String): List<ID> =
         fireStoreManager.getWishList(customerId)
 
-
-    private suspend fun getUserEmail():String =
+    private suspend fun getUserEmail(): String =
         dataStoreManager.getUserInfo().first().email
 
-
-
-
     override fun getShopifyProductsByWishListIDs() = flow {
-       getWishList(getUserEmail()).forEach {id ->
-           emit(getProductDetailsByID(id.toString()).first())
-       }
+        getWishList(getUserEmail()).forEach { id ->
+            emit(getProductDetailsByID(id.toString()).first())
+        }
     }
 
     private suspend fun isProductWishList(productId: ID): Boolean =
         getWishList(getUserEmail()).find { id -> id == productId } != null
-
-
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->
@@ -326,6 +316,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         return queryGenerator.generateProductTypesQuery().enqueue()
             .mapResource(mapper::mapToProductsTypeResponse)
     }
+
     private fun <I, O> Resource<I>.mapResource(
         transform: (I) -> O
     ): Resource<O> {

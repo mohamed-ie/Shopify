@@ -1,7 +1,9 @@
 package com.example.shopify.feature.navigation_bar
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.shopify.feature.Graph
@@ -11,8 +13,9 @@ import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.myAccountGraph
 
 @Composable
-fun NavigationBarGraph(paddingValues: PaddingValues, navController: NavHostController) {
+fun ColumnScope.NavigationBarGraph(paddingValues: PaddingValues = PaddingValues(), navController: NavHostController) {
     NavHost(
+        modifier = Modifier.weight(1f),
         navController = navController,
         route = Graph.ROOT,
         startDestination = NavigationBarGraph.HOME

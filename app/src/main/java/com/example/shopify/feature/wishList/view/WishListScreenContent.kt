@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.wishList.view
+package com.example.shopify.feature.wishList.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,12 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.shopify.feature.common.ConfirmationDialog
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.view.AddressesEvent
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
-import com.example.shopify.feature.navigation_bar.wishList.components.EmptyWishListScreenContent
-import com.example.shopify.feature.navigation_bar.wishList.components.WishListProductCardItem
-import com.example.shopify.feature.navigation_bar.wishList.components.WishListTopBar
+import com.example.shopify.feature.wishList.components.EmptyWishListScreenContent
+import com.example.shopify.feature.wishList.components.WishListProductCardItem
+import com.example.shopify.feature.wishList.components.WishListTopBar
 import com.example.shopify.theme.shopifyColors
 import com.shopify.graphql.support.ID
 
@@ -31,7 +29,7 @@ fun WishListScreenContent(
     deleteProduct:(ID)->Unit
 ) {
     Scaffold(
-        topBar = { WishListTopBar(itemsCount = productList.count(),back = back)},
+        topBar = { WishListTopBar(itemsCount = productList.count(),back = back) },
         ) {
         if(productList.isEmpty())
             EmptyWishListScreenContent(it)

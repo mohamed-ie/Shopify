@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.wishList.components
+package com.example.shopify.feature.wishList.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -48,6 +48,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.utils.shopifyLoading
+import com.shopify.graphql.support.ID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,7 +203,7 @@ private fun WishListProductCardItemPreview() {
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("", "", "", "white/1")),
+            variants = listOf(VariantItem("", "", "white/1", ID(""))),
             title = "iPhone 14 Pro 256GB Deep Purple 5G With FaceTime - International Version",
             vendor = "Adidas",
             price = Price(

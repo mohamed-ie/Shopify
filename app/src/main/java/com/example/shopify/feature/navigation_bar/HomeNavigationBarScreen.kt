@@ -11,7 +11,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,11 +24,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.shopify.feature.navigation_bar.category.CategoryGraph
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
+import com.example.shopify.feature.navigation_bar.category.CategoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
-import com.example.shopify.ui.navigation.graph.NavigationBarGraph
 
 
 private val items = listOf<NavigationBarScreen>(

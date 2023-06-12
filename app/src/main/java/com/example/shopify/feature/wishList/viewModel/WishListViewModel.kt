@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.wishList.viewModel
+package com.example.shopify.feature.wishList.viewModel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
@@ -40,7 +40,6 @@ class WishListViewModel @Inject constructor(
                     toStableScreenState()
                     _productsState.value.add(productResource.data)
                 }
-
             }
         }.launchIn(viewModelScope)
     }

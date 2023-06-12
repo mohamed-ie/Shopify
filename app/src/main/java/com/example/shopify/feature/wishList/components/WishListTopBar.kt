@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.wishList.components
+package com.example.shopify.feature.wishList.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
