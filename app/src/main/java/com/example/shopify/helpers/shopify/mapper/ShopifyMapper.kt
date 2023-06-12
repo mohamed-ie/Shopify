@@ -8,6 +8,7 @@ import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -17,6 +18,7 @@ import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 
 interface ShopifyMapper {
     fun map(response: GraphResponse<Storefront.Mutation>): SignUpUserResponseInfo
@@ -32,10 +34,13 @@ interface ShopifyMapper {
     fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean
     fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean
     fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>, ): MinCustomerInfo
-
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product
     fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
-    fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review>
+    fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order>
+    fun mapToCheckoutId(result: GraphResponse<Storefront.Mutation>): ID?
+    fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
+    fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
+    fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
     fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress>
     fun mapToCartId(response: GraphResponse<Storefront.Mutation>): Pair<String?, String?>?
     fun mapToAddCartLine(response: GraphResponse<Storefront.Mutation>): String?

@@ -1,4 +1,4 @@
-package com.example.shopify.utils
+package com.example.shopify.utils.shopify
 
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient

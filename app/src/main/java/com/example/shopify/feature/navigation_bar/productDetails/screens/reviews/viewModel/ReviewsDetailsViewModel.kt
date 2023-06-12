@@ -3,12 +3,14 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.review
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.feature.navigation_bar.category.CategoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ReviewsState
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.firestore.mapper.decodeProductId
 import com.example.shopify.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +34,11 @@ class ReviewsDetailsViewModel @Inject constructor(
 
 
     init {
-        state.get<String>(HomeGraph.REVIEW_DETAILS_SAVE_ARGS_KEY)?.also { productId ->
+        state.get<String>(HomeGraph.REVIEW_DETAILS_SAVE_ARGS_KEY)?.apply {
+            getProduct(this.decodeProductId().toString())
+            getProductReview(this)
+        }
+        state.get<String>(CategoryGraph.REVIEW_DETAILS_SAVE_ARGS_KEY)?.also { productId ->
             getProduct(Constants.Shopify.PRODUCT_SLANDERED_ID_URL + productId)
             getProductReview(productId)
         }

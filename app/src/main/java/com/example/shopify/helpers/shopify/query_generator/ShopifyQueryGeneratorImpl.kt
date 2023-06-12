@@ -1,16 +1,27 @@
 package com.example.shopify.helpers.shopify.query_generator
 
+import com.example.shopify.BuildConfig
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.CartBuyerIdentityInput
 import com.shopify.buy3.Storefront.CartLineUpdateInput
 import com.shopify.buy3.Storefront.CartQuery
+import com.shopify.buy3.Storefront.CheckoutCreateInput
+import com.shopify.buy3.Storefront.CheckoutLineItemInput
 import com.shopify.buy3.Storefront.CreditCardPaymentInputV2
+import com.shopify.buy3.Storefront.CustomerQuery
+import com.shopify.buy3.Storefront.CustomerQuery.OrdersArguments
 import com.shopify.buy3.Storefront.CustomerAddressCreatePayloadQuery
 import com.shopify.buy3.Storefront.MailingAddressQuery
 import com.shopify.buy3.Storefront.MutationQuery
+import com.shopify.buy3.Storefront.OrderConnectionQuery
+import com.shopify.buy3.Storefront.OrderEdgeQuery
+import com.shopify.buy3.Storefront.OrderQuery
+import com.shopify.buy3.Storefront.QueryRootQuery
 import com.shopify.graphql.support.ID
+import com.shopify.graphql.support.Input
 import javax.inject.Inject
 
 class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
@@ -90,6 +101,132 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
                         }
                     }
+                }
+            }
+        }
+
+    override fun generateUserOrdersQuery(): Storefront.QueryRootQuery =
+        Storefront.query { root: QueryRootQuery ->
+            root.customer(BuildConfig.ACCESS_TOKEN) { customer: CustomerQuery ->
+                customer.orders({ arg: OrdersArguments -> arg.first(10) }
+                ) { connection: OrderConnectionQuery ->
+                    connection.edges { edge: OrderEdgeQuery ->
+                        edge.node { node: OrderQuery ->
+                            node.orderNumber()
+                            node.billingAddress {
+                                it.address1()
+                                it.address1()
+                                it.name()
+                                it.phone()
+                            }
+                            node.cancelReason()
+                            node.processedAt()
+                            node.totalPrice { price ->
+                                price.amount()
+                                price.currencyCode()
+                            }
+                            node.lineItems { items ->
+                                items.edges { itemsEdge ->
+                                    itemsEdge.node { itemsNode ->
+                                        itemsNode.variant { variant ->
+                                            variant.product { product ->
+                                                product.title()
+                                                product.images { productImage ->
+                                                    productImage.edges { imgEdge ->
+                                                        imgEdge.node { imgNode ->
+                                                            imgNode.url()
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+    override fun checkoutCreate(cart: Cart): Storefront.MutationQuery {
+        var input = CheckoutCreateInput()
+            .setLineItemsInput(
+                Input.value(
+                    listOf(
+                        CheckoutLineItemInput(cart.totalQuantity, ID("")),
+                    )
+                )
+            )
+        val query = Storefront.mutation { mutationQuery ->
+            mutationQuery.checkoutCreate(input) { createPayloadQuery ->
+                createPayloadQuery.checkout {
+                }
+            }
+        }
+        return query
+
+    }
+
+    override fun generateProductCategoryQuery(productType: String, productTag: String):
+            Storefront.QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.products({ args ->
+                args.query("product_type:$productType tag:$productTag")
+                    .first(20)
+            }) { productConnectionQuery ->
+                productConnectionQuery.edges { productEdgeQuery ->
+                    productEdgeQuery.node { productNode ->
+                        productNode.title()
+                        productNode.description()
+                        productNode.images({ args -> args.first(5) }) { imageConnectionQuery ->
+                            imageConnectionQuery
+                                .edges { imageEdgeQuery ->
+                                    imageEdgeQuery
+                                        .node { imageQuery ->
+                                            imageQuery.url()
+                                        }
+
+                                }
+                        }
+                        productNode.variants({ args -> args.first(5) }) { productVariant ->
+                            productVariant.edges { variantEdge ->
+                                variantEdge.node { variantNode ->
+                                    variantNode.availableForSale()
+                                    variantNode.price { price ->
+                                        price.amount()
+                                        price.currencyCode()
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+    override fun generateProductTagsQuery(): QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.productTags(25) { productTag ->
+                productTag.edges {
+                    it.node()
+                }
+            }
+        }
+
+    override fun generateProductTypesQuery(): QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.productTypes(20) { productType ->
+                productType.edges {
+                    it.node()
                 }
             }
         }
@@ -200,6 +337,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             query.customer(accessToken) { customer ->
                 customer.firstName()
                     .email()
+                    .metafield("settings", "currency") { it.value() }
             }
         }
 

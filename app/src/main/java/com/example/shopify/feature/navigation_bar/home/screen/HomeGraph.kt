@@ -13,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.NavigationBarScreen
 import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ProductScreen
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ProductDetailsScreen
 import com.example.shopify.feature.navigation_bar.productDetails.screens.reviews.view.ReviewDetailsScreen
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.ui.screen.home.ui.HomeScreen
 
@@ -36,7 +37,7 @@ fun NavGraphBuilder.homeGraph(navController: NavController, paddingValues: Paddi
                 paddingValues = paddingValues,
                 navigateToHome = { navController.popBackStack() },
                 navigateToProductDetails = { productId ->
-                    navController.navigate("${HomeGraph.PRODUCT_DETAILS}/$productId")
+                    navController.navigate("${HomeGraph.PRODUCT_DETAILS}/${productId.encodeProductId()}")
                 }
             )
         }
@@ -45,7 +46,7 @@ fun NavGraphBuilder.homeGraph(navController: NavController, paddingValues: Paddi
             ProductDetailsScreen(
                 viewModel = hiltViewModel(),
                 back = {navController.popBackStack()},
-                navigateToViewMoreReviews = {productId -> navController.navigate("${HomeGraph.PRODUCT_REVIEW_DETAILS}/$productId")}
+                navigateToViewMoreReviews = {productId -> navController.navigate("${HomeGraph.PRODUCT_REVIEW_DETAILS}/${productId.encodeProductId()}")}
             )
         }
 
@@ -63,7 +64,7 @@ object HomeGraph {
         NavigationBarScreen(route = "HOME", name = R.string.home, icon = Icons.Rounded.Home)
 
     const val PRODUCTS = "PRODUCTS"
-    const val PRODUCT_DETAILS = "PRODUCT_DETAILS"
+    const val PRODUCT_DETAILS = "HOME_PRODUCT_DETAILS"
     const val PRODUCT_DETAILS_SAVE_ARGS_KEY = "PRODUCT_KEY"
     const val REVIEW_DETAILS_SAVE_ARGS_KEY = "REVIEW_DETAILS_KEY"
     const val PRODUCT_REVIEW_DETAILS = "REVIEW_DETAILS"

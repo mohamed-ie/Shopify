@@ -7,12 +7,13 @@ import com.example.shopify.feature.common.ErrorScreen
 import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.viewModel.ProductDetailsViewModel
+import com.shopify.graphql.support.ID
 
 
 @Composable
 fun ProductDetailsScreen(
     viewModel: ProductDetailsViewModel,
-    navigateToViewMoreReviews:(String)->Unit,
+    navigateToViewMoreReviews:(ID)->Unit,
     back:()->Unit
 ) {
     val product by viewModel.productState.collectAsState()
@@ -31,7 +32,8 @@ fun ProductDetailsScreen(
                 reviewsState = reviewsState,
                 viewReviewsMore = {navigateToViewMoreReviews(viewModel.productId)},
                 back = {back()},
-                viewCart = {}
+                viewCart = {},
+                onFavouriteClick = {isFavourite -> viewModel.sendFavouriteAction(isFavourite)}
             )
         }
         ScreenState.ERROR -> ErrorScreen {}

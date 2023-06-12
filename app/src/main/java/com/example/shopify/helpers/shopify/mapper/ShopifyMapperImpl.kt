@@ -1,16 +1,13 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.cart.model.CartLine
-import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
 import com.example.shopify.feature.navigation_bar.model.remote.FireStore
+import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
@@ -26,11 +23,7 @@ import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
-import com.shopify.buy3.Storefront.CartCodeDiscountAllocation
 import com.shopify.buy3.Storefront.ImageConnection
-import com.shopify.buy3.Storefront.MailingAddress
-import com.shopify.buy3.Storefront.MoneyV2
-import com.shopify.buy3.Storefront.ProductVariant
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -61,27 +54,29 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             customerAccessToken?.accessToken ?: "",
             customerAccessToken?.expiresAt?.toDate()?.time.toString().takeIf { it != "null" },
             response.data?.customerAccessTokenCreate?.customerUserErrors?.getOrNull(0)?.message
-                ?: "",
+                ?: ""
         )
     }
 
     override fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product =
         (response.data?.node as Storefront.Product).let { storefrontProduct ->
             Product(
-                image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
+                id = storefrontProduct.id,
+                title = storefrontProduct.title ?: "",
                 description = storefrontProduct.description ?: "",
                 totalInventory = storefrontProduct.totalInventory ?: 0,
+                vendor = storefrontProduct.vendor ?: "",
+                image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
                 variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
                     productVariantNode.node.let { productVariant ->
                         VariantItem(
                             image = productVariant.image.url,
-                            id = productVariant.id,
+                            id = productVariant.id.toString(),
                             price = productVariant.price.amount,
                             title = productVariant.title
                         )
                     }
                 },
-                title = storefrontProduct.title ?: "",
                 price = Price(
                     amount = storefrontProduct.priceRange.minVariantPrice.amount,
                     currencyCode = storefrontProduct.priceRange.minVariantPrice.currencyCode.name
@@ -89,8 +84,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 discount = Discount(
                     realPrice = "",
                     percent = 0
-                ),
-                vendor = storefrontProduct.vendor ?: "",
+                )
             )
         }
 
@@ -115,7 +109,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
             BrandProduct(
-                id = it.node.id.toString(),
+                id = it.node.id,
                 title = it.node.title,
                 description = it.node.description,
                 images = mapToImageUrl(it.node.images),
@@ -123,6 +117,43 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         } ?: listOf()
         return res
+    }
+
+    override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
+        return response.data?.customer?.orders?.edges?.map {
+            Order(
+                it.node.orderNumber, it.node.billingAddress,
+                it.node.cancelReason, it.node.processedAt, it.node.totalPrice, it.node.lineItems
+            )
+        } ?: listOf()
+    }
+
+    override fun mapToCheckoutId(result: GraphResponse<Storefront.Mutation>): ID? {
+        return result.data?.checkoutCreate?.checkout?.id
+    }
+
+    override fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
+        return response.data?.products?.edges?.map {
+            BrandProduct(
+                id = it.node.id,
+                title = it.node.title,
+                description = it.node.description,
+                images = mapToImageUrl(it.node.images),
+                brandVariants = mapToVariant(it.node.variants)
+            )
+        } ?: listOf()
+    }
+
+    override fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String> {
+        return response.data?.productTypes?.edges?.map {
+            it.node.toString()
+        } ?: listOf()
+    }
+
+    override fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String> {
+        return response.data?.productTags?.edges?.map {
+            it.node.toString()
+        } ?: listOf()
     }
 
     override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean =
@@ -142,7 +173,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return response.data?.customer?.addresses?.edges?.map {
             it.node.run {
                 MyAccountMinAddress(
-                    id = id,
+                    id = id.toString(),
                     name = "$firstName $lastName",
                     address = toAddressString(),
                     phone = phone
@@ -298,4 +329,3 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
 }
-

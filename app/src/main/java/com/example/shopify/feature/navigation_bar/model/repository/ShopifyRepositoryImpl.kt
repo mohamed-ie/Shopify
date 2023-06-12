@@ -10,6 +10,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.remote.FireStoreManager
+import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -17,9 +18,10 @@ import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
-import com.example.shopify.utils.enqueue
-import com.example.shopify.utils.enqueue1
 import com.example.shopify.utils.mapResource
+import com.example.shopify.utils.mapSuspendResource
+import com.example.shopify.utils.shopify.enqueue
+import com.example.shopify.utils.shopify.enqueue1
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
@@ -30,7 +32,6 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -96,19 +97,14 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getProductDetailsByID(id: String): Flow<Resource<Product>> =
         queryGenerator.generateProductDetailsQuery(id)
             .enqueue()
-            .mapResource(mapper::mapToProduct)
+            .mapSuspendResource{
+                mapper.mapToProduct(it).let {product ->
+                    product.copy(isFavourite = isProductWishList(product.id))
+                }
+            }
 
     override suspend fun getProductReviewById(productId: String, reviewsCount: Int?) =
-        withContext(defaultDispatcher) {
-            fireStoreManager.getReviewsByProductId(productId, reviewsCount)
-                .let { documentSnapshots ->
-                    mapper.mapSnapShotDocumentToReview(
-                        documentSnapshots.take(
-                            reviewsCount ?: documentSnapshots.count()
-                        )
-                    )
-                }
-        }
+        fireStoreManager.getReviewsByProductId(productId, reviewsCount)
 
     override suspend fun updateCurrency(currency: String) {
         dataStoreManager.setCurrency(currency)
@@ -229,6 +225,36 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapResource(mapper::mapToCartId)
 
 
+
+    override suspend fun addProductWishListById(productId:ID) =
+        fireStoreManager.updateWishList(getUserEmail(),productId)
+
+
+    override suspend fun removeProductWishListById(productId:ID) =
+        fireStoreManager.removeAWishListProduct(getUserEmail(),productId)
+
+
+    private suspend fun getWishList(customerId:String):List<ID> =
+        fireStoreManager.getWishList(customerId)
+
+
+    private suspend fun getUserEmail():String =
+        dataStoreManager.getUserInfo().first().email
+
+
+
+
+    override fun getShopifyProductsByWishListIDs() = flow {
+       getWishList(getUserEmail()).forEach {id ->
+           emit(getProductDetailsByID(id.toString()).first())
+       }
+    }
+
+    private suspend fun isProductWishList(productId: ID): Boolean =
+        getWishList(getUserEmail()).find { id -> id == productId } != null
+
+
+
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->
             when (result) {
@@ -274,6 +300,32 @@ class ShopifyRepositoryImpl @Inject constructor(
         }
 
     private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
+
+    override fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
+        return queryGenerator.checkoutCreate(cart).enqueue()
+            .mapResource {
+                mapper.mapToCheckoutId(it)
+            }
+    }
+
+    override fun getProductsCategory(
+        productType: String,
+        productTag: String
+    ): Flow<Resource<List<BrandProduct>>> {
+        return queryGenerator.generateProductCategoryQuery(productType, productTag).enqueue()
+            .mapResource(mapper::mapToProductsCategoryResponse)
+    }
+
+    override fun getProductsTag(): Flow<Resource<List<String>>> {
+        return queryGenerator.generateProductTagsQuery().enqueue()
+            .mapResource(mapper::mapToProductsTagsResponse)
+
+    }
+
+    override fun getProductsType(): Flow<Resource<List<String>>> {
+        return queryGenerator.generateProductTypesQuery().enqueue()
+            .mapResource(mapper::mapToProductsTypeResponse)
+    }
     private fun <I, O> Resource<I>.mapResource(
         transform: (I) -> O
     ): Resource<O> {
