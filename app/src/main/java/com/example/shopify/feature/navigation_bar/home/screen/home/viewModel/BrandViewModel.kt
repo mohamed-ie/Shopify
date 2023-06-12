@@ -2,9 +2,9 @@ package com.example.shopify.feature.navigation_bar.home.screen.home.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shopify.helpers.Resource
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
+import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.helpers.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,14 +34,4 @@ class BrandViewModel @Inject constructor(
             }
         }
     }
-//    fun getProduct(brandName:String){
-//        viewModelScope.launch(Dispatchers.Default) {
-//            repository.getProductsByBrandName(brandName).collect{
-//                when (it) {
-//                    is Resource.Success -> Log.i("TAG", "getProduct: ")
-//                    is Resource.Error -> it.error
-//                }
-//            }
-//        }
-//    }
 }

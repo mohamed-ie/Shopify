@@ -37,15 +37,17 @@ class ProductDetailsViewModel @Inject constructor(
 
     private val _addToCardState = MutableStateFlow(
         AddToCardState(
-        sendSelectedQuantity = this::sendSelectedQuantity,
-        openQuantity = this::openQuantitySection,
-        closeQuantity = this::closeQuantitySection,
-        addToCard = this::addProductToCart,
-        continueShopping = this::dismissBottomSheet)
+            sendSelectedQuantity = this::sendSelectedQuantity,
+            openQuantity = this::openQuantitySection,
+            closeQuantity = this::closeQuantitySection,
+            addToCard = this::addProductToCart,
+            continueShopping = this::dismissBottomSheet
+        )
     )
     val addToCardState = _addToCardState.asStateFlow()
 
-    private val _variantState = MutableStateFlow(VariantsState(selectVariant = this::sendSelectedVariant))
+    private val _variantState =
+        MutableStateFlow(VariantsState(selectVariant = this::sendSelectedVariant))
     val variantState = _variantState.asStateFlow()
 
     private val _reviewState = MutableStateFlow(ReviewsState())
@@ -72,15 +74,18 @@ class ProductDetailsViewModel @Inject constructor(
         _productState.value = _productState.value.copy(isFavourite = !isFavourite)
     }
 
-    private fun getProduct(id:String){
+    private fun getProduct(id: String) {
         repository.getProductDetailsByID(id)
-            .onEach {resource ->
-                when(resource){
-                    is Resource.Error -> {toErrorScreenState()}
+            .onEach { resource ->
+                when (resource) {
+                    is Resource.Error -> {
+                        toErrorScreenState()
+                    }
+
                     is Resource.Success -> {
                         toStableScreenState()
                         _addToCardState.value = _addToCardState.value.copy(
-                            availableQuantity = if(resource.data.totalInventory in 2..5) resource.data.totalInventory else resource.data.totalInventory
+                            availableQuantity = if (resource.data.totalInventory in 2..5) resource.data.totalInventory else resource.data.totalInventory
                         )
                         _variantState.value = _variantState.value.copy(
                             variants = resource.data.variants,
@@ -97,9 +102,9 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
 
-    private fun getProductReview(productId:String) =
+    private fun getProductReview(productId: String) =
         viewModelScope.launch {
-            repository.getProductReviewById(productId,4).also {reviews ->
+            repository.getProductReviewById(productId, 4).also { reviews ->
                 _reviewState.value = _reviewState.value.copy(
                     reviews = reviews,
                     reviewCount = reviews.count(),
@@ -111,7 +116,7 @@ class ProductDetailsViewModel @Inject constructor(
         }
 
 
-    private fun calDiscount(price:String): Discount {
+    private fun calDiscount(price: String): Discount {
         val realPrice = price.toFloat()
         return Discount(
             realPrice = "%.2f".format((realPrice + (realPrice * 0.3f))),
@@ -119,16 +124,19 @@ class ProductDetailsViewModel @Inject constructor(
         )
     }
 
-    private fun sendSelectedQuantity(selected:Int){
-        _addToCardState.value =  _addToCardState.value.copy(selectedQuantity = selected)
+    private fun sendSelectedQuantity(selected: Int) {
+        _addToCardState.value = _addToCardState.value.copy(selectedQuantity = selected)
     }
-    private fun closeQuantitySection(){
-        _addToCardState.value =  _addToCardState.value.copy(isOpened = false)
+
+    private fun closeQuantitySection() {
+        _addToCardState.value = _addToCardState.value.copy(isOpened = false)
     }
-    private fun openQuantitySection(){
-        _addToCardState.value =  _addToCardState.value.copy(isOpened = true)
+
+    private fun openQuantitySection() {
+        _addToCardState.value = _addToCardState.value.copy(isOpened = true)
     }
-    private fun addProductToCart(){
+
+    private fun addProductToCart() {
         _addToCardState.value = _addToCardState.value.copy(
             isAdded = true,
             expandBottomSheet = true,
@@ -139,24 +147,25 @@ class ProductDetailsViewModel @Inject constructor(
         )
     }
 
-    private fun sendSelectedVariant(variantIndex:Int){
+    private fun sendSelectedVariant(variantIndex: Int) {
         _variantState.value = _variantState.value.copy(selectedVariant = variantIndex)
         //getProduct(_variantState.value.variants[variantIndex - 1].id ?: "")
     }
 
-    private fun dismissBottomSheet(){
+    private fun dismissBottomSheet() {
         _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = false)
     }
 
-    private fun calculateAverageRating(reviews: List<Review>):Float  {
+    private fun calculateAverageRating(reviews: List<Review>): Float {
         val oneStarListCount = reviews.count { review -> review.rate == 1.0 }
         val twoStarListCount = reviews.count { review -> review.rate == 2.0 }
         val threeStarListCount = reviews.count { review -> review.rate == 3.0 }
         val fourStarListCount = reviews.count { review -> review.rate == 4.0 }
         val fiveStarListCount = reviews.count { review -> review.rate == 5.0 }
-        val numberOfRates = (oneStarListCount + twoStarListCount + threeStarListCount + fourStarListCount + fiveStarListCount)
+        val numberOfRates =
+            (oneStarListCount + twoStarListCount + threeStarListCount + fourStarListCount + fiveStarListCount)
         return (((1 * oneStarListCount) + (2 * twoStarListCount) + (3 * threeStarListCount) + (4 * fourStarListCount) + (5 * fiveStarListCount)) /
-                if (numberOfRates!= 0) numberOfRates else 1).toFloat()
+                if (numberOfRates != 0) numberOfRates else 1).toFloat()
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.model.repository
 
+
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
@@ -216,6 +217,32 @@ class ShopifyRepositoryImpl @Inject constructor(
         }
 
     private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
+
+    override fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
+        return queryGenerator.checkoutCreate(cart).enqueue()
+            .mapResource {
+                mapper.mapToCheckoutId(it)
+            }
+    }
+
+    override fun getProductsCategory(
+        productType: String,
+        productTag: String
+    ): Flow<Resource<List<BrandProduct>>> {
+        return queryGenerator.generateProductCategoryQuery(productType, productTag).enqueue()
+            .mapResource(mapper::mapToProductsCategoryResponse)
+    }
+
+    override fun getProductsTag(): Flow<Resource<List<String>>> {
+        return queryGenerator.generateProductTagsQuery().enqueue()
+            .mapResource(mapper::mapToProductsTagsResponse)
+
+    }
+
+    override fun getProductsType(): Flow<Resource<List<String>>> {
+        return queryGenerator.generateProductTypesQuery().enqueue()
+            .mapResource(mapper::mapToProductsTypeResponse)
+    }
     private fun <I, O> Resource<I>.mapResource(
         transform: (I) -> O
     ): Resource<O> {

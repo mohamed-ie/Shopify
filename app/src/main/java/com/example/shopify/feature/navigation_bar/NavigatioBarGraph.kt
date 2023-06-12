@@ -4,9 +4,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.example.shopify.feature.Graph
-import com.example.shopify.feature.navigation_bar.category.CategoriesScreen
+import com.example.shopify.feature.navigation_bar.category.categoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.myAccountGraph
 
@@ -17,13 +16,9 @@ fun NavigationBarGraph(paddingValues: PaddingValues, navController: NavHostContr
         route = Graph.ROOT,
         startDestination = NavigationBarGraph.HOME
     ) {
-
-        composable(route = NavigationBarGraph.CATEGORY) {
-            CategoriesScreen()
-        }
-
         myAccountGraph(paddingValues, navController)
         homeGraph(navController, paddingValues)
+        categoryGraph(paddingValues, navController)
 
     }
 }
