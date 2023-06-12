@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.addresses.view.component
+package com.example.shopify.feature.address.addresses.view.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,6 +17,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,22 +32,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.theme.shopifyColors
+import com.shopify.graphql.support.ID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAccountAddressCard(
     address: MyAccountMinAddress,
+    clickable: Boolean,
     onDelete: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onClick: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.padding(bottom = 2.dp),
         elevation = CardDefaults.elevatedCardElevation(cartElevation),
         shape = RectangleShape,
-        colors = CardDefaults.cardColors(Color.White)
+        colors = CardDefaults.cardColors(Color.White),
+        onClick =  if(clickable) onClick else ({ })
     ) {
         Column(
             modifier = Modifier
@@ -153,11 +159,14 @@ fun PreviewMyAccountAddressCard() {
     ShopifyTheme {
         MyAccountAddressCard(
             MyAccountMinAddress(
-                "",
+                ID(""),
                 "mohamed ibrahim",
                 "kafr fagr",
                 "+201120060103",
                 false
-            ), {}, {})
+            ),false, {}, {}
+        ) {
+
+        }
     }
 }

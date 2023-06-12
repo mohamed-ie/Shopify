@@ -65,13 +65,13 @@ fun CartFooter(itemsCount: Int, totalPrice: String, checkout: () -> Unit) {
                     else
                         stringResource(id = R.string.number_of_items, itemsCount),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = Gray
                 )
                 Text(
                     text = totalPrice,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                 )
             }
 
@@ -86,7 +86,7 @@ fun CartFooter(itemsCount: Int, totalPrice: String, checkout: () -> Unit) {
                     Text(
                         text = stringResource(id = R.string.checkout).uppercase(),
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                     )
                 }
                 AnimatedMovingForwardIcon()
@@ -123,6 +123,7 @@ private fun BoxScope.AnimatedMovingForwardIcon() {
             .padding(end = paddingEnd)
             .clip(shape = MaterialTheme.shapes.extraSmall)
             .background(Color.White)
+            .padding(3.dp)
             .align(Alignment.CenterEnd),
         imageVector = Icons.Rounded.ArrowForward,
         tint = MaterialTheme.colorScheme.primary,

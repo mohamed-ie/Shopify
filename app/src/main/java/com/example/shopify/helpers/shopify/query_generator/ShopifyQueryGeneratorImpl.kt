@@ -3,14 +3,18 @@ package com.example.shopify.helpers.shopify.query_generator
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.CartBuyerIdentityInput
+import com.shopify.buy3.Storefront.CartLineUpdateInput
+import com.shopify.buy3.Storefront.CartQuery
 import com.shopify.buy3.Storefront.CreditCardPaymentInputV2
 import com.shopify.buy3.Storefront.CustomerAddressCreatePayloadQuery
+import com.shopify.buy3.Storefront.MailingAddressQuery
 import com.shopify.buy3.Storefront.MutationQuery
 import com.shopify.graphql.support.ID
 import javax.inject.Inject
 
 class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
-    override fun generateSingUpQuery(userInfo: SignUpUserInfo): Storefront.MutationQuery =
+    override fun generateSingUpQuery(userInfo: SignUpUserInfo): MutationQuery =
         Storefront.mutation { rootQuery ->
             rootQuery.customerCreate(createSingUpCustomerCreateInput(userInfo)) { payload ->
                 payload.customer { customQuery ->
@@ -21,7 +25,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateSingInQuery(userInfo: SignInUserInfo): Storefront.MutationQuery =
+    override fun generateSingInQuery(userInfo: SignInUserInfo): MutationQuery =
         Storefront.mutation { rootQuery ->
             rootQuery.customerAccessTokenCreate(createSingInCustomerCreateInput(userInfo)) { payload ->
                 payload.customerAccessToken { customQuery ->
@@ -183,10 +187,10 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateDeleteAddressQuery(addressId: String, accessToken: String): MutationQuery =
+    override fun generateDeleteAddressQuery(addressId: ID, accessToken: String): MutationQuery =
         Storefront.mutation { mutation: MutationQuery ->
             mutation.customerAddressDelete(
-                ID(addressId),
+                addressId,
                 accessToken,
             ) { it.customerUserErrors { it.message() } }
         }
@@ -196,32 +200,165 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             query.customer(accessToken) { customer ->
                 customer.firstName()
                     .email()
-                    .metafield("settings", "currency") { it.value() }
             }
         }
 
-    override fun generateAddressQuery(accessToken: String): Storefront.QueryRootQuery =
+    override fun generateCreateCustomerCartQuery(
+        accessToken: String,
+        productVariantId: ID,
+        quantity: Int
+    ): MutationQuery {
+        val input = Storefront.CartInput().apply {
+            //set buyer access token
+            buyerIdentity = CartBuyerIdentityInput()
+                .setCustomerAccessToken(accessToken)
+            //add new line
+            val line = Storefront.CartLineInput(productVariantId)
+                .setQuantity(quantity)
+            lines = listOf(line)
+        }
+
+        return Storefront.mutation { mutation ->
+            mutation.cartCreate({ args -> args.input(input) }) { cartCreate ->
+                cartCreate.userErrors { it.message() }
+            }
+        }
+    }
+
+    override fun generateAddCartLineQuery(
+        cartId: ID,
+        productVariantId: ID,
+        quantity: Int
+    ): MutationQuery = Storefront.mutation { mutation ->
+        val line = Storefront.CartLineInput(productVariantId)
+            .setQuantity(quantity)
+
+        val input = listOf(line)
+        mutation.cartLinesAdd(input, cartId) { cartLinesAdd ->
+            cartLinesAdd.userErrors { it.message() }
+        }
+    }
+
+    override fun generateGetCartQuery(cartId: ID): Storefront.QueryRootQuery =
+        Storefront.query { query ->
+            query.cart(cartId) { it.queryCart() }
+        }
+
+    override fun generateAddressesQuery(accessToken: String): Storefront.QueryRootQuery =
         Storefront.query { query ->
             query.customer(accessToken) { customer ->
-                customer.addresses({args->args.first(250)}) { addresses ->
+                customer.addresses({ args -> args.first(250) }) { addresses ->
                     addresses.edges { edges ->
-                        edges.node { node ->
-                            node.address1()
-                                .address2()
-                                .company()
-                                .country()
-                                .city()
-                                .province()
-                                .zip()
-                                .lastName()
-                                .firstName()
-                                .phone()
-                        }
+                        edges.node { it.queryAddress() }
                     }
                 }
             }
         }
 
+    override fun generateRemoveCartLineQuery(cartId: ID, linesId: List<ID>): MutationQuery =
+        Storefront.mutation { mutation ->
+            mutation.cartLinesRemove(cartId, linesId) { cartLinesRemove ->
+                cartLinesRemove
+                    .cart { it.queryCart() }
+                    .userErrors { it.message() }
+            }
+        }
+
+    override fun generateChangeCartLineQuantityQuery(
+        cartId: ID,
+        merchandiseId: ID,
+        quantity: Int
+    ): MutationQuery =
+        Storefront.mutation { mutation ->
+            val lineUpdate = CartLineUpdateInput(merchandiseId)
+                .setQuantity(quantity)
+            mutation.cartLinesUpdate(cartId, listOf(lineUpdate)) { cartLinesUpdate ->
+                cartLinesUpdate
+                    .cart { it.queryCart() }
+                    .userErrors { it.message() }
+            }
+        }
+
+    override fun generateApplyCouponQuery(cartId: ID, coupon: String): MutationQuery =
+        Storefront.mutation { mutation ->
+            mutation.cartDiscountCodesUpdate(
+                cartId,
+                { it.discountCodes(listOf(coupon)) }) { cartDiscountCodesUpdate ->
+                cartDiscountCodesUpdate.cart { it.queryCart() }
+                    .userErrors { it.message() }
+            }
+        }
+
+    override fun generateUpdateCartAddress(accessToken: String,cartId: ID, addressId: ID): MutationQuery =
+        Storefront.mutation { mutation ->
+            val deliveryAddress = Storefront.DeliveryAddressInput()
+                .setCustomerAddressId(addressId)
+            val input = CartBuyerIdentityInput()
+                .setCustomerAccessToken(accessToken)
+                .setDeliveryAddressPreferences(listOf(deliveryAddress))
+            mutation.cartBuyerIdentityUpdate(cartId, input) { cartBuyerIdentityUpdate ->
+                cartBuyerIdentityUpdate.userErrors { it.message() }
+            }
+        }
+
+    private fun MailingAddressQuery.queryAddress() = run {
+        address1()
+            .address2()
+            .company()
+            .country()
+            .city()
+            .province()
+            .zip()
+            .lastName()
+            .firstName()
+            .phone()
+    }
+    private fun CartQuery.queryCart(after: String? = null) = run {
+        cost { cost ->
+            cost.checkoutChargeAmount { it.amount().currencyCode() }
+                .subtotalAmount { it.amount().currencyCode() }
+                .totalAmount { it.amount().currencyCode() }
+                .totalDutyAmount { it.amount().currencyCode() }
+                .totalTaxAmount { it.amount().currencyCode() }
+        }
+            .lines({ args ->
+                args.first(250)
+                    .after(after)
+            }) { lines ->
+                lines.edges { edges ->
+                    edges.node { node ->
+                        node.id()
+                            .quantity()
+                            .merchandise { merchandise ->
+                                merchandise.onProductVariant { productVariant ->
+                                    productVariant.price { it.amount().currencyCode() }
+                                        .image { it.url() }
+                                        .quantityAvailable()
+                                        .product { product ->
+                                            product.title()
+                                                .vendor()
+                                                .productType()
+                                        }
+                                }
+                            }
+                    }
+                }.pageInfo { it.hasNextPage() }
+            }
+            .discountCodes { it.code() }
+            .discountAllocations { discountAllocations ->
+                discountAllocations.discountedAmount {
+                    it.amount().currencyCode()
+                }
+            }
+            .buyerIdentity { buyerIdentity->
+                buyerIdentity.deliveryAddressPreferences{deliveryAddressPreferences->
+                    deliveryAddressPreferences
+                        .onMailingAddress {it.queryAddress()}
+                }.customer {
+                    it.email()
+                }
+            }
+    }
 
     private fun createSingUpCustomerCreateInput(userInfo: SignUpUserInfo) =
         Storefront.CustomerCreateInput(userInfo.email, userInfo.password)

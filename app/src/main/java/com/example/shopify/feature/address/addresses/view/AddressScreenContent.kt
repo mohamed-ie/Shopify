@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.addresses.view
+package com.example.shopify.feature.address.addresses.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,25 +19,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
+import com.example.shopify.feature.address.addresses.view.component.MyAccountAddressCard
 import com.example.shopify.feature.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.view.component.MyAccountAddressCard
+import com.shopify.graphql.support.ID
 
 @Composable
 fun AddressesScreenContent(
-    navigateTo: (String) -> Unit,
     back: () -> Unit,
+    allowPick: Boolean,
     onEvent: (AddressesEvent) -> Unit,
+    navigateTo: (String) -> Unit,
     addresses: List<MyAccountMinAddress>
 ) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = { NamedTopAppBar(back = back) }) { innerPadding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -45,14 +49,18 @@ fun AddressesScreenContent(
                 items(addresses) { address ->
                     MyAccountAddressCard(
                         address = address,
+                        clickable = allowPick,
+                        onClick = {
+                            onEvent(AddressesEvent.UpdateCartAddress(address.id))
+                        },
                         onDelete = {
                             onEvent(
-                                AddressesEvent.ToggleDeleteConfirmationDialogVisibility(
-                                    address.id
-                                )
+                                AddressesEvent.ToggleDeleteConfirmationDialogVisibility(address.id)
                             )
                         },
-                        onEdit = { navigateTo(address.id) }
+                        onEdit = {
+                            /*   navigateTo(address.id)*/
+                        }
                     )
                 }
             }
@@ -61,7 +69,7 @@ fun AddressesScreenContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
-                onClick = { navigateTo(MyAccountGraph.ADD_ADDRESS)},
+                onClick = { navigateTo(MyAccountGraph.ADD_ADDRESS) },
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(
@@ -76,16 +84,16 @@ fun AddressesScreenContent(
 @Preview
 @Composable
 fun PreviewAddressesScreenContent() {
-    AddressesScreenContent( {}, {}, {}, listOf(
+    AddressesScreenContent({}, false, {}, {}, listOf(
         MyAccountMinAddress(
-            "",
+            ID(""),
             "",
             "",
             "",
             false
         ),
         MyAccountMinAddress(
-            "",
+            ID(""),
             "",
             "",
             "",

@@ -28,6 +28,7 @@ fun ShopifyGraph(navController: NavHostController) {
 }
 
 object Graph {
+    const val ADDRESS ="ADDRESS_GRAPH"
     const val ROOT = "ROOT_GRAPH"
     const val LANDING = "LANDING_GRAPH"
     const val AUTH = "AUTH_GRAPH"

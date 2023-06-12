@@ -32,8 +32,10 @@ fun TotalCostCard(
     itemsCount: Int,
     subTotalsPrice: String,
     shippingFee: String,
+    checkout: String,
     taxes: String,
-    totalPrice: String
+    totalPrice: String,
+    discounts: String?
 ) {
     ElevatedCard(
         modifier = Modifier.padding(8.dp),
@@ -61,7 +63,15 @@ fun TotalCostCard(
 
             TotalCostItem(title = stringResource(id = R.string.shipping_fee), value = shippingFee)
 
+            TotalCostItem(title = stringResource(id = R.string.checkout), value = checkout)
+
             TotalCostItem(title = stringResource(id = R.string.taxes), value = taxes)
+            discounts?.let {
+                TotalCostItem(
+                    title = stringResource(id = R.string.discounts),
+                    value = it
+                )
+            }
 
             Divider(Modifier.padding(vertical = 8.dp))
 
@@ -72,13 +82,13 @@ fun TotalCostCard(
                 Text(
                     text = stringResource(id = R.string.total),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                 )
 
                 Text(
                     text = totalPrice,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                 )
             }
         }
@@ -109,6 +119,7 @@ private fun TotalCostItem(title: String, value: String) {
 
     }
 }
+
 @Composable
 private fun TotalCostItem(title: AnnotatedString, value: String) {
     Row(
@@ -138,7 +149,15 @@ private fun TotalCostItem(title: AnnotatedString, value: String) {
 @Composable
 fun PreviewTotalCostCard() {
     ShopifyTheme {
-        TotalCostCard(5, "EGP 915.00", "EGP 20.00", "EGP 100.50", "EGP 1035.50")
+        TotalCostCard(
+            5,
+            "EGP 915.00",
+            "EGP 20.00",
+            "EGP 100.50",
+            "EGP 1035.50",
+            "EGP 1035.50",
+            null
+        )
     }
 }
 
@@ -146,6 +165,6 @@ fun PreviewTotalCostCard() {
 @Composable
 fun PreviewTotalCostCardFreeShippingFee() {
     ShopifyTheme {
-        TotalCostCard(5, "EGP 915.00", "FREE", "EGP 100.50", "EGP 1015.50")
+        TotalCostCard(5, "EGP 915.00", "FREE", "EGP 100.50", "EGP 100.50", "EGP 1015.50", null)
     }
 }

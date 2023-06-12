@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.model.repository
 
+import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
@@ -9,11 +10,11 @@ import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.remote.FireStoreManager
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
 import com.example.shopify.utils.enqueue
@@ -22,11 +23,11 @@ import com.example.shopify.utils.mapResource
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -52,6 +53,12 @@ class ShopifyRepositoryImpl @Inject constructor(
         return queryGenerator.generateSingInQuery(userInfo)
             .enqueue()
             .mapResource { response -> mapper.mapToSignInResponse(response, userInfo) }
+            .map {
+                if (it is Resource.Success)
+                    if (it.data.accessToken.isNotBlank())
+                        dataStoreManager.setEmail(userInfo.email)
+                it
+            }
     }
 
     override suspend fun saveUserInfo(userResponseInfo: SignInUserInfoResult) =
@@ -72,7 +79,13 @@ class ShopifyRepositoryImpl @Inject constructor(
         return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
     }
 
-    override fun getCart(): Flow<Resource<Cart>> = flow {
+    override suspend fun getCart(): Resource<Cart?> {
+        val email = dataStoreManager.getEmail().first()
+        val cartId = fireStoreManager.getCurrentCartId(email) ?: return Resource.Success(null)
+
+        return queryGenerator.generateGetCartQuery(ID(cartId))
+            .enqueue1()
+            .mapResource(mapper::mapToCart)
     }
 
     override fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>> {
@@ -113,7 +126,7 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapResource(mapper::isAddressSaved)
     }
 
-    override suspend fun deleteAddress(addressId: String): Resource<Boolean> {
+    override suspend fun deleteAddress(addressId: ID): Resource<Boolean> {
         val accessToken = dataStoreManager.getAccessToken().first()
 
         return queryGenerator.generateDeleteAddressQuery(addressId, accessToken)
@@ -140,10 +153,81 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun getAddresses(): Resource<List<MyAccountMinAddress>> {
         val accessToken = dataStoreManager.getAccessToken().first()
-        return queryGenerator.generateAddressQuery(accessToken)
+        return queryGenerator.generateAddressesQuery(accessToken)
             .enqueue1()
             .mapResource(mapper::mapToAddresses)
     }
+
+    //this resource returns error message if failed
+    override suspend fun addToCart(productVariantId: ID, quantity: Int): Resource<String?> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        val email = dataStoreManager.getEmail().first()
+
+        return getCartId(email)?.let { cartId ->
+            //add line to cart if already exist
+            queryGenerator.generateAddCartLineQuery(cartId, productVariantId, quantity)
+                .enqueue1()
+                .mapResource(mapper::mapToAddCartLine)
+        } ?:
+        //otherwise create cart with new line
+        createCart(accessToken, productVariantId, quantity)
+            .mapResource { pair ->
+                //also save cart id
+                suspend { pair?.first?.let { fireStoreManager.setCurrentCartId(email, it) } }
+                //return server error message
+                pair?.second
+            }
+    }
+
+    override suspend fun removeCartLines(linesId: List<ID>): Resource<Cart?> {
+        val email = dataStoreManager.getEmail().first()
+        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+
+        return queryGenerator.generateRemoveCartLineQuery(cartId, linesId)
+            .enqueue1()
+            .mapResource(mapper::mapToRemoveCartLines)
+    }
+
+    override suspend fun changeCartLineQuantity(merchandiseId: ID, quantity: Int): Resource<Cart?> {
+        val email = dataStoreManager.getEmail().first()
+        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+
+        return queryGenerator.generateChangeCartLineQuantityQuery(cartId, merchandiseId, quantity)
+            .enqueue1()
+            .mapResource(mapper::mapToChangeCartLineQuantity)
+    }
+
+    override suspend fun applyCouponToCart(coupon: String): Resource<Cart?> {
+        val email = dataStoreManager.getEmail().first()
+        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+
+        return queryGenerator.generateApplyCouponQuery(cartId, coupon)
+            .enqueue1()
+            .mapResource(mapper::mapToApplyCouponToCart)
+    }
+
+    override suspend fun updateCartAddress(addressId: ID): Resource<String?> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        val email = dataStoreManager.getEmail().first()
+        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+
+        return queryGenerator.generateUpdateCartAddress(accessToken,cartId,addressId)
+            .enqueue1()
+            .mapResource(mapper::mapToUpdateCartAddress)
+    }
+
+    private suspend fun getCartId(email: String) =
+        fireStoreManager.getCurrentCartId(email)?.run { ID(this) }
+
+    private suspend fun createCart(
+        accessToken: String,
+        productVariantId: ID,
+        quantity: Int
+    ): Resource<Pair<String?, String?>?> =
+        queryGenerator.generateCreateCustomerCartQuery(accessToken, productVariantId, quantity)
+            .enqueue1()
+            .mapResource(mapper::mapToCartId)
+
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->

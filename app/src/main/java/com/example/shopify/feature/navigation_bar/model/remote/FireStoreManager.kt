@@ -4,8 +4,10 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.google.firebase.firestore.DocumentSnapshot
 
 interface FireStoreManager {
-    suspend fun getReviewsByProductId(id: String,reviewsCount:Int? = null): List<DocumentSnapshot>
+    suspend fun getReviewsByProductId(id: String, reviewsCount: Int? = null): List<DocumentSnapshot>
     suspend fun setProductReviewByProductId(productId: String, review: Review)
     suspend fun updateCurrency(customerId: String, currency: String)
     suspend fun getCurrency(customerId: String): String
+    suspend fun getCurrentCartId(email: String): String?
+    suspend fun setCurrentCartId(customerId: String, cartId: String)
 }

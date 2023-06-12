@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.add_address.view
+package com.example.shopify.feature.address.add_address.view
 
 import com.example.shopify.feature.common.state.TextFieldState
 

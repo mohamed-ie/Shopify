@@ -15,11 +15,12 @@ class FireStoreManagerImpl @Inject constructor(
     private val mapper: ShopifyMapper,
     private val defaultDispatcher: CoroutineDispatcher
 ) : FireStoreManager {
-    object Customer {
+    private object Customer {
         const val PATH: String = "customer"
 
         object Fields {
             const val CURRENCY: String = "currency"
+            const val CURRENT_CART_ID: String = "current_cart_id"
         }
     }
 
@@ -53,11 +54,26 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun getCurrency(customerId: String): String {
-       return fireStore.collection(Customer.PATH)
+        return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
             .await()
             .get(Customer.Fields.CURRENCY) as String
+    }
+
+    override suspend fun setCurrentCartId(customerId: String, cartId: String) {
+        fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
+            .await()
+    }
+
+    override suspend fun getCurrentCartId(email: String): String? {
+        return fireStore.collection(Customer.PATH)
+            .document(email)
+            .get()
+            .await()
+            .get(Customer.Fields.CURRENT_CART_ID) as String?
     }
 }
 

@@ -1,7 +1,9 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model
+package com.example.shopify.feature.address.addresses.model
+
+import com.shopify.graphql.support.ID
 
 class MyAccountMinAddress(
-    val id: String,
+    val id: ID,
     val name: String,
     val address: String,
     val phone: String,

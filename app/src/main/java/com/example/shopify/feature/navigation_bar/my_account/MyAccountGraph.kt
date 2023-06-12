@@ -9,12 +9,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.shopify.R
+import com.example.shopify.feature.address.add_address.view.AddAddressScreen
+import com.example.shopify.feature.address.addresses.view.AddressesScreen
 import com.example.shopify.feature.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
-import com.example.shopify.feature.navigation_bar.my_account.screens.add_address.view.AddAddressScreen
-import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.view.AddressesScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.MyAccountScreen
-import com.example.shopify.ui.navigation.graph.NavigationBarGraph
 
 
 fun NavGraphBuilder.myAccountGraph(paddingValues: PaddingValues, navController: NavHostController) {
@@ -38,13 +38,12 @@ fun NavGraphBuilder.myAccountGraph(paddingValues: PaddingValues, navController: 
                 navigateTo = { navController.navigate(it) }
             )
         }
+        composable(route = MyAccountGraph.ADD_ADDRESS) {
+            AddAddressScreen(viewModel = hiltViewModel(), back = { navController.popBackStack() })
+        }
 
         composable(route = MyAccountGraph.PROFILE) {
 
-        }
-
-        composable(route = MyAccountGraph.ADD_ADDRESS) {
-            AddAddressScreen(viewModel = hiltViewModel(), back = { navController.popBackStack() })
         }
 
         composable(route = MyAccountGraph.ERROR) {

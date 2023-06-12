@@ -6,5 +6,5 @@ data class SignInUserInfoResult(
     val password:String,
     val accessToken:String,
     val expireTime:String?,
-    val error:String
+    val error:String,
 )

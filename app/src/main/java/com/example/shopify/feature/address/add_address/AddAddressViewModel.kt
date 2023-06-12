@@ -1,10 +1,10 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.add_address
+package com.example.shopify.feature.address.add_address
 
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.feature.address.add_address.view.AddAddressEvent
+import com.example.shopify.feature.address.add_address.view.AddAddressState
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
-import com.example.shopify.feature.navigation_bar.my_account.screens.add_address.view.AddAddressEvent
-import com.example.shopify.feature.navigation_bar.my_account.screens.add_address.view.AddAddressState
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.validator.TextFieldStateValidator
 import com.shopify.buy3.Storefront

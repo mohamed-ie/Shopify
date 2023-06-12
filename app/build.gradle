@@ -98,6 +98,7 @@ dependencies {
     //shopify
     implementation("com.shopify.mobilebuysdk:buy3:$shopify_version") {
         exclude group: "com.shopify.graphql.support"
+        exclude group: "com.android.support:support-annotations:28.0.0"
     }
 
     //Data store

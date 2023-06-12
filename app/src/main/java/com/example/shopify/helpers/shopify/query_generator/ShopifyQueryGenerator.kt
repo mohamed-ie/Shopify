@@ -24,7 +24,29 @@ interface ShopifyQueryGenerator {
         address: MailingAddressInput
     ): Storefront.MutationQuery
 
-    fun generateDeleteAddressQuery(addressId: String, accessToken: String): Storefront.MutationQuery
+    fun generateDeleteAddressQuery(addressId: ID, accessToken: String): Storefront.MutationQuery
     fun generateGetMinCustomerInfoQuery(accessToken: String): Storefront.QueryRootQuery
-    fun generateAddressQuery(accessToken: String): Storefront.QueryRootQuery
+    fun generateAddressesQuery(accessToken: String): Storefront.QueryRootQuery
+    fun generateCreateCustomerCartQuery(
+        accessToken: String,
+        productVariantId: ID,
+        quantity: Int
+    ): Storefront.MutationQuery
+
+    fun generateAddCartLineQuery(
+        cartId: ID,
+        productVariantId: ID,
+        quantity: Int
+    ): Storefront.MutationQuery
+
+    fun generateGetCartQuery(cartId: ID): Storefront.QueryRootQuery
+    fun generateRemoveCartLineQuery(cartId: ID, linesId: List<ID>): Storefront.MutationQuery
+    fun generateChangeCartLineQuantityQuery(
+        cartId: ID,
+        merchandiseId: ID,
+        quantity: Int
+    ): Storefront.MutationQuery
+
+    fun generateApplyCouponQuery(cartId: ID, coupon: String): Storefront.MutationQuery
+    fun generateUpdateCartAddress(accessToken: String,cartId: ID, addressId: ID): Storefront.MutationQuery
 }

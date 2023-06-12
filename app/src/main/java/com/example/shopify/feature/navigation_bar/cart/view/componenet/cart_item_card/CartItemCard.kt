@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,23 +48,25 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
 import com.example.shopify.feature.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.common.component.ShopifyOutlinedButtonState
-import com.example.shopify.feature.navigation_bar.cart.model.CartItem
+import com.example.shopify.feature.navigation_bar.cart.model.CartLine
 import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.theme.Gray
-import com.example.shopify.theme.Green170
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
+import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
+import kotlinx.coroutines.delay
 
 @Composable
 fun CartItemCard(
-    state: CartItemState,
-    cartItem: CartItem,
+    state: CartLineState,
+    cartLine: CartLine,
     toggleQuantitySelectorVisibility: () -> Unit,
     removeFromCart: () -> Unit,
     moveToWishlist: () -> Unit,
     quantitySelected: (Int) -> Unit
 ) {
-    val product = cartItem.cartProduct
+    val product = cartLine.cartProduct
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -115,49 +116,32 @@ fun CartItemCard(
                     color = Gray
                 )
 
+                Spacer(modifier = Modifier.height(4.dp))
+
                 //product name
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                //price
+                Text(
+                    text = cartLine.price.run { "${currencyCode.name} $amount" },
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //price after discount
-                Text(
-                    text = cartItem.priceAfterDiscount,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Row {
-                    //price before discount
-                    Text(
-                        text = cartItem.priceBeforeDiscount,
-                        color = Gray,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        textDecoration = TextDecoration.LineThrough,
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    //discount
-                    Text(
-                        text = stringResource(id = R.string.discount, cartItem.discount),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Green170,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-
+                //sold by
                 Text(
                     text = buildAnnotatedString {
                         append(stringResource(id = R.string.sold_by))
                         append(" ")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Medium)) {
                             append(product.vendor)
                         }
                     },
@@ -172,19 +156,20 @@ fun CartItemCard(
             //quantity selected
             ShopifyOutlinedButton(
                 onClick = toggleQuantitySelectorVisibility,
-                state = if (state.chooseQuantityOpened)
+                state = if (state.isChooseQuantityOpen)
                     ShopifyOutlinedButtonState.Active
                 else
                     ShopifyOutlinedButtonState.Normal
             ) {
                 Text(
-                    text = "${cartItem.quantity}",
-                    fontWeight = FontWeight.Bold
+                    modifier = Modifier.shopifyLoading(state.isChangingQuantity),
+                    text = "${cartLine.quantity}",
+                    fontWeight = FontWeight.Medium
                 )
 
                 Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
 
-                val angle by animateFloatAsState(targetValue = if (state.chooseQuantityOpened) 0f else 180f)
+                val angle by animateFloatAsState(targetValue = if (state.isChooseQuantityOpen) 0f else 180f)
 
                 Icon(
                     modifier = Modifier
@@ -229,7 +214,7 @@ fun CartItemCard(
                 Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
 
                 Text(
-                    modifier = Modifier.shopifyLoading(enabled = state.isAddingToWishlist),
+                    modifier = Modifier.shopifyLoading(enabled = state.isMovingToWishlist),
                     text = stringResource(id = R.string.move_to_wishlist),
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray
@@ -239,10 +224,9 @@ fun CartItemCard(
 
 
         QuantitySelector(
-            opened = state.chooseQuantityOpened,
-            selected = state.selectedQuantity,
-            availableQuantity = cartItem.availableQuantity,
-            isChangingQuantity = state.isChangingQuantity,
+            opened = state.isChooseQuantityOpen,
+            selected = cartLine.quantity,
+            availableQuantity = cartLine.availableQuantity,
             quantitySelected = quantitySelected
         )
 
@@ -255,34 +239,34 @@ private fun QuantitySelector(
     opened: Boolean,
     selected: Int,
     availableQuantity: Int,
-    isChangingQuantity: Boolean,
     quantitySelected: (Int) -> Unit
 ) {
     val quantityListState = rememberLazyListState()
-    LaunchedEffect(key1 = Unit, block = {
-        quantityListState.scrollToItem(selected + 1)
-    })
     AnimatedVisibility(
         visible = opened,
         enter = expandVertically(expandFrom = Alignment.Bottom),
         exit = shrinkVertically(shrinkTowards = Alignment.Bottom),
     ) {
+        LaunchedEffect(key1 = Unit, block = {
+            delay(800)
+            quantityListState.animateScrollToItem(selected - 1)
+        })
+
         Column {
             Spacer(modifier = Modifier.height(20.dp))
             LazyRow(state = quantityListState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(availableQuantity) {
                     ShopifyOutlinedButton(
-                        onClick = { quantitySelected(it + 1) },
-                        state = if ((it + 1) == selected)
+                        onClick = { quantitySelected(it+1) },
+                        state = if ((it) == selected-1)
                             ShopifyOutlinedButtonState.Selected
                         else
                             ShopifyOutlinedButtonState.Normal
                     ) {
                         Text(
                             modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .shopifyLoading(enabled = isChangingQuantity),
-                            text = "${it + 1}",
+                                .padding(horizontal = 4.dp),
+                            text = "${it+1}",
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
@@ -297,12 +281,11 @@ private fun QuantitySelector(
 fun PreviewCartCard() {
     ShopifyTheme {
         CartItemCard(
-            CartItemState(),
-            CartItem(
-                id = "",
-                priceAfterDiscount = "EGP 372.00",
-                priceBeforeDiscount = "EGP 750.00",
-                discount = "50%",
+            CartLineState(),
+            CartLine(
+                id = ID(""),
+                Storefront.MoneyV2().setAmount("372.00")
+                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
                 quantity = 1,
                 availableQuantity = 5,
                 cartProduct = CartProduct(
@@ -322,15 +305,14 @@ fun PreviewCartCard() {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewCartCardOpenQuntityChooser() {
+fun PreviewCartCardOpenQuantityChooser() {
     ShopifyTheme {
         CartItemCard(
-            CartItemState(true, 5),
-            CartItem(
-                id = "",
-                priceAfterDiscount = "EGP 372.00",
-                priceBeforeDiscount = "EGP 750.00",
-                discount = "50%",
+            CartLineState(true, ),
+            CartLine(
+                id = ID(""),
+                Storefront.MoneyV2().setAmount("372.00")
+                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
                 quantity = 5,
                 availableQuantity = 10,
                 cartProduct = CartProduct(

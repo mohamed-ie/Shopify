@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.add_address.view
+package com.example.shopify.feature.address.add_address.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -6,7 +6,7 @@ import androidx.compose.runtime.collectAsState
 import com.example.shopify.feature.common.ErrorScreen
 import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.common.state.ScreenState
-import com.example.shopify.feature.navigation_bar.my_account.screens.add_address.AddAddressViewModel
+import com.example.shopify.feature.address.add_address.AddAddressViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
