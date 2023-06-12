@@ -86,7 +86,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
             BrandProduct(
-                id = it.node.id.toString(),
+                id = it.node.id,
                 title = it.node.title,
                 description = it.node.description,
                 images = mapToImageUrl(it.node.images),

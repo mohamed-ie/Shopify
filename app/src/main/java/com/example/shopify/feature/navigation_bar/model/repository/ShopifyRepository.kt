@@ -13,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 import kotlinx.coroutines.flow.Flow
 
 interface ShopifyRepository {
@@ -34,4 +35,6 @@ interface ShopifyRepository {
     suspend fun signOut()
     suspend fun getAddresses(): Resource<List<MyAccountMinAddress>>
     fun getShopifyProductsByWishListIDs(): Flow<Resource<Product>>
+    suspend fun addProductWishListById(productId: ID)
+    suspend fun removeProductWishListById(productId: ID)
 }

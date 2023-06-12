@@ -13,6 +13,7 @@ data class Product(
     val price: Price = Price("",""),
     val discount: Discount = Discount("",0),
     val vendor: String = "",
+    val isFavourite:Boolean = false
 )
 
 

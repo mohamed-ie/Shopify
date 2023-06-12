@@ -12,4 +12,5 @@ interface FireStoreManager {
     suspend fun updateWishList(customerId: String, productId: ID)
     suspend fun getWishList(customerId: String): List<ID>
     suspend fun createCustomer(customerId: String)
+    suspend fun removeAWishListProduct(customerId: String, productId: ID)
 }

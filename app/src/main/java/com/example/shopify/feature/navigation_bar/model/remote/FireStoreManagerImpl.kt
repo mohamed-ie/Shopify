@@ -79,6 +79,13 @@ class FireStoreManagerImpl @Inject constructor(
             .await()
     }
 
+    override suspend fun removeAWishListProduct(customerId: String,productId: ID){
+        fireStore.collection(Customer.PATH)
+            .document(customerId)
+            .update(Customer.Fields.WISH_LIST,FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId)))
+            .await()
+    }
+
     override suspend fun createCustomer(customerId: String){
         val customerMap = mapOf(Customer.Fields.CURRENCY to "EGP")
         fireStore.collection(Customer.PATH)

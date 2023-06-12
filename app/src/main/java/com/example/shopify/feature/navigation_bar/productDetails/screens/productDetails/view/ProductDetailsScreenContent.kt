@@ -57,6 +57,7 @@ fun ProductDetailsScreenContent(
     reviewsState: ReviewsState,
     viewReviewsMore: () -> Unit,
     viewCart: () -> Unit,
+    onFavouriteClick:(Boolean) -> Unit,
     back: () -> Unit,
 ) {
     Scaffold(
@@ -82,7 +83,9 @@ fun ProductDetailsScreenContent(
                     realPrice = product.discount.realPrice,
                     discountPercent = product.discount.percent.toString(),
                     quantity = product.totalInventory.toString(),
-                    isLowStock = variantsState.isLowStock
+                    isLowStock = variantsState.isLowStock,
+                    isFavourite = product.isFavourite,
+                    onFavouriteClick = onFavouriteClick
                 )
 
                 Spacer(modifier = Modifier.height(15.dp))
@@ -228,7 +231,8 @@ private fun ProductDetailsScreenContentPreview() {
         ),
         viewReviewsMore = {},
         viewCart = {},
-        back = {}
+        back = {},
+        onFavouriteClick = {}
     )
 }
 

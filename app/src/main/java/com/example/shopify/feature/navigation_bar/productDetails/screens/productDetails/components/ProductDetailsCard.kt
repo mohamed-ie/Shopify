@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.rounded.BrokenImage
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +54,9 @@ fun ProductDetailsCard(
     realPrice:String,
     discountPercent:String,
     quantity:String,
-    isLowStock:Boolean
+    isLowStock:Boolean,
+    isFavourite:Boolean,
+    onFavouriteClick:(Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -102,7 +105,7 @@ fun ProductDetailsCard(
                 }
             )
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = { onFavouriteClick(isFavourite) },
                 modifier = Modifier
                     .padding(top = 15.dp)
                     .shadow(5.dp, shape = CircleShape, spotColor = Color.Black)
@@ -111,12 +114,23 @@ fun ProductDetailsCard(
                     .background(Color.White)
 
             ) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = Color.Gray
-                )
+                if (isFavourite) {
+                    Icon(
+                        imageVector = Icons.Rounded.Favorite,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                else{
+                    Icon(
+                        imageVector =  Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Gray
+                    )
+                }
+
             }
         }
         Spacer(modifier = Modifier.height(25.dp))
@@ -210,6 +224,9 @@ fun PreviewProductDetailsCard() {
         realPrice = "249.00",
         discountPercent = "30%",
         quantity = "4",
-        isLowStock = false
-    )
+        isLowStock = false,
+        isFavourite = true,
+    ){
+
+    }
 }

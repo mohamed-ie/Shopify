@@ -31,18 +31,19 @@ class FireStoreMapperImpl @Inject constructor() : FireStoreMapper {
 
 
     override fun mapEncodedToDecodedProductId(encodedProductId:String):ID =
-        ID(String.decodeProductId(encodedProductId))
+        encodedProductId.decodeProductId()
 
 
     override fun mapProductIDToEncodedProductId(productId:ID) =
-        String.encodeProductId(productId.toString())
+        productId.encodeProductId()
 
 
-
-    private fun String.Companion.decodeProductId(encodedProductId:String):String =
-        URLDecoder.decode(encodedProductId, StandardCharsets.UTF_8.toString())
-
-
-    private fun String.Companion.encodeProductId(productId:String):String =
-        URLEncoder.encode(productId, StandardCharsets.UTF_8.toString())
 }
+
+
+fun String.decodeProductId():ID =
+    ID(URLDecoder.decode(this, StandardCharsets.UTF_8.toString()))
+
+
+fun ID.encodeProductId():String =
+    URLEncoder.encode(this.toString(), StandardCharsets.UTF_8.toString())

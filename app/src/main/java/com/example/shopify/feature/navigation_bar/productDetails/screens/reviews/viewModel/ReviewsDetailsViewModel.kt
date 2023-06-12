@@ -9,6 +9,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ReviewsState
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.firestore.mapper.decodeProductId
 import com.example.shopify.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,9 +33,9 @@ class ReviewsDetailsViewModel @Inject constructor(
 
 
     init {
-        state.get<String>(HomeGraph.REVIEW_DETAILS_SAVE_ARGS_KEY)?.also { productId ->
-            getProduct(Constants.Shopify.PRODUCT_SLANDERED_ID_URL + productId)
-            getProductReview(productId)
+        state.get<String>(HomeGraph.REVIEW_DETAILS_SAVE_ARGS_KEY)?.apply {
+            getProduct(this.decodeProductId().toString())
+            getProductReview(this)
         }
     }
 

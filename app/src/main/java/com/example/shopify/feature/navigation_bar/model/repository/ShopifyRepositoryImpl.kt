@@ -17,6 +17,7 @@ import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
 import com.example.shopify.utils.mapResource
+import com.example.shopify.utils.mapSuspendResource
 import com.example.shopify.utils.shopify.enqueue
 import com.example.shopify.utils.shopify.enqueue1
 import com.shopify.buy3.GraphCallResult
@@ -83,7 +84,11 @@ class ShopifyRepositoryImpl @Inject constructor(
     override fun getProductDetailsByID(id: String): Flow<Resource<Product>> =
         queryGenerator.generateProductDetailsQuery(id)
             .enqueue()
-            .mapResource(mapper::mapToProduct)
+            .mapSuspendResource{
+                mapper.mapToProduct(it).let {product ->
+                    product.copy(isFavourite = isProductWishList(product.id))
+                }
+            }
 
     override suspend fun getProductReviewById(productId: String, reviewsCount: Int?) =
         fireStoreManager.getReviewsByProductId(productId, reviewsCount)
@@ -137,6 +142,14 @@ class ShopifyRepositoryImpl @Inject constructor(
     }
 
 
+    override suspend fun addProductWishListById(productId:ID) =
+        fireStoreManager.updateWishList(getUserEmail(),productId)
+
+
+    override suspend fun removeProductWishListById(productId:ID) =
+        fireStoreManager.removeAWishListProduct(getUserEmail(),productId)
+
+
     private suspend fun getWishList(customerId:String):List<ID> =
         fireStoreManager.getWishList(customerId)
 
@@ -146,11 +159,17 @@ class ShopifyRepositoryImpl @Inject constructor(
 
 
 
+
     override fun getShopifyProductsByWishListIDs() = flow {
        getWishList(getUserEmail()).forEach {id ->
            emit(getProductDetailsByID(id.toString()).first())
        }
     }
+
+    private suspend fun isProductWishList(productId: ID): Boolean =
+        getWishList(getUserEmail()).find { id -> id == productId } != null
+
+
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->

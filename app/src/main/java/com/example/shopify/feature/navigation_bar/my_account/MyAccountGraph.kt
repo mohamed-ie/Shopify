@@ -11,9 +11,13 @@ import androidx.navigation.navigation
 import com.example.shopify.R
 import com.example.shopify.feature.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
+import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.my_account.screens.add_address.view.AddAddressScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.view.AddressesScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.MyAccountScreen
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ProductDetailsScreen
+import com.example.shopify.feature.navigation_bar.wishList.view.WishListScreen
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.example.shopify.ui.navigation.graph.NavigationBarGraph
 
 
@@ -51,6 +55,20 @@ fun NavGraphBuilder.myAccountGraph(paddingValues: PaddingValues, navController: 
             ErrorScreen { navController.popBackStack() }
         }
 
+        composable(route = MyAccountGraph.WISHLIST) {
+            WishListScreen(
+                viewModel = hiltViewModel(),
+                back = { navController.popBackStack() },
+                navigateToProductDetails = { productId -> navController.navigate("${MyAccountGraph.PRODUCT_DETAILS}/${productId.encodeProductId()}") })
+        }
+
+        composable(route = "${MyAccountGraph.PRODUCT_DETAILS}/{${MyAccountGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY}}") {
+            ProductDetailsScreen(
+                viewModel = hiltViewModel(),
+                navigateToViewMoreReviews ={},
+                back = {navController.popBackStack()})
+        }
+
     }
 }
 
@@ -66,4 +84,7 @@ object MyAccountGraph {
     const val ADD_ADDRESS = "ADD_ADDRESS"
     const val PROFILE = "PROFILE"
     const val ERROR = "PROFILE"
+    const val WISHLIST = "WISHLIST"
+    const val PRODUCT_DETAILS = "PRODUCT_DETAILS"
+    const val PRODUCT_DETAILS_SAVE_ARGS_KEY = "PRODUCT_KEY"
 }
