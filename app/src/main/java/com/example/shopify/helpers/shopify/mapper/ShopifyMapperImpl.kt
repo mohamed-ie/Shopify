@@ -6,7 +6,6 @@ import com.example.shopify.feature.auth.screens.registration.model.SignUpUserRes
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandVariants
-import com.example.shopify.feature.navigation_bar.model.remote.FireStore
 import com.example.shopify.feature.navigation_bar.my_account.screens.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
@@ -14,18 +13,12 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.UIError
-import com.example.shopify.utils.Constants
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentSnapshot
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -61,6 +54,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product =
         (response.data?.node as Storefront.Product).let { storefrontProduct ->
             Product(
+                id = storefrontProduct.id,
                 title = storefrontProduct.title ?: "",
                 description = storefrontProduct.description ?: "",
                 totalInventory = storefrontProduct.totalInventory ?: 0,
@@ -88,22 +82,6 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
 
 
-    override fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review> =
-        snapshots.map { documentSnapshot ->
-            documentSnapshot.data.let { snapShotMap ->
-                Review(
-                    review = (snapShotMap?.get(FireStore.REVIEW_CONTENT_REVIEW_FIELD_KEY) as String),
-                    description = snapShotMap[FireStore.DESCRIPTION_REVIEW_FIELD_KEY] as String,
-                    reviewer = snapShotMap[FireStore.REVIEWER_REVIEW_FIELD_KEY] as String,
-                    rate = snapShotMap[FireStore.RATE_REVIEW_FIELD_KEY] as Double,
-                    time = SimpleDateFormat(
-                        Constants.DateFormats.MONTH_DAY_PATTERN,
-                        Locale.getDefault()
-                    )
-                        .format((snapShotMap[FireStore.CREATED_AT_REVIEW_FIELD_KEY] as Timestamp).toDate())
-                )
-            }
-        }
 
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {

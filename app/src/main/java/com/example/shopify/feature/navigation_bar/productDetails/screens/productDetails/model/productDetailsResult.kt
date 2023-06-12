@@ -1,8 +1,10 @@
 package com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model
 
+import com.shopify.graphql.support.ID
 
 
 data class Product(
+    val id:ID = ID(""),
     val image: String = "",
     val description: String = "",
     val totalInventory: Int = 0,

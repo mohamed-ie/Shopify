@@ -31,10 +31,8 @@ interface ShopifyMapper {
     fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean
     fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean
     fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>, ): MinCustomerInfo
-
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product
     fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
-    fun mapSnapShotDocumentToReview(snapshots: List<DocumentSnapshot>): List<Review>
     fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress>
 
 }

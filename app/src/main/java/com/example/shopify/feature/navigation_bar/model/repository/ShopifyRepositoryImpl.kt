@@ -16,12 +16,13 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
-import com.example.shopify.utils.enqueue
-import com.example.shopify.utils.enqueue1
 import com.example.shopify.utils.mapResource
+import com.example.shopify.utils.shopify.enqueue
+import com.example.shopify.utils.shopify.enqueue1
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -29,7 +30,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -86,16 +86,7 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapResource(mapper::mapToProduct)
 
     override suspend fun getProductReviewById(productId: String, reviewsCount: Int?) =
-        withContext(defaultDispatcher) {
-            fireStoreManager.getReviewsByProductId(productId, reviewsCount)
-                .let { documentSnapshots ->
-                    mapper.mapSnapShotDocumentToReview(
-                        documentSnapshots.take(
-                            reviewsCount ?: documentSnapshots.count()
-                        )
-                    )
-                }
-        }
+        fireStoreManager.getReviewsByProductId(productId, reviewsCount)
 
     override suspend fun updateCurrency(currency: String) {
         dataStoreManager.setCurrency(currency)
@@ -143,6 +134,22 @@ class ShopifyRepositoryImpl @Inject constructor(
         return queryGenerator.generateAddressQuery(accessToken)
             .enqueue1()
             .mapResource(mapper::mapToAddresses)
+    }
+
+
+    private suspend fun getWishList(customerId:String):List<ID> =
+        fireStoreManager.getWishList(customerId)
+
+
+    private suspend fun getUserEmail():String =
+        dataStoreManager.getUserInfo().first().email
+
+
+
+    override fun getShopifyProductsByWishListIDs() = flow {
+       getWishList(getUserEmail()).forEach {id ->
+           emit(getProductDetailsByID(id.toString()).first())
+       }
     }
 
     private fun Storefront.QueryRootQuery.enqueue() =

@@ -33,4 +33,5 @@ interface ShopifyRepository {
     suspend fun updateCurrency(currency: String)
     suspend fun signOut()
     suspend fun getAddresses(): Resource<List<MyAccountMinAddress>>
+    fun getShopifyProductsByWishListIDs(): Flow<Resource<Product>>
 }

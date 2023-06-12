@@ -2,6 +2,7 @@ package com.example.shopify.feature.navigation_bar.wishList.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -17,12 +18,14 @@ import com.example.shopify.feature.navigation_bar.wishList.components.EmptyWishL
 import com.example.shopify.feature.navigation_bar.wishList.components.WishListProductCardItem
 import com.example.shopify.feature.navigation_bar.wishList.components.WishListTopBar
 import com.example.shopify.theme.shopifyColors
+import com.shopify.graphql.support.ID
 
 
 @Composable
 fun WishListScreenContent(
     productList:List<Product>,
-    back:()->Unit
+    back:()->Unit,
+    navigateToProductDetails:(ID)->Unit
 ) {
     Scaffold(
         topBar = { WishListTopBar(itemsCount = productList.count(),back = back)},
@@ -35,12 +38,15 @@ fun WishListScreenContent(
                 contentPadding = PaddingValues(5.dp),
                 modifier = Modifier
                     .background(MaterialTheme.shopifyColors.ServerColor)
+                    .fillMaxSize()
                     .padding(it)
             ){
                 items(productList){product ->
-                    WishListProductCardItem(product = product
-                        , navigateToProductDetails = { /*TODO*/ }) {
-                    }
+                    WishListProductCardItem(
+                        product = product,
+                        navigateToProductDetails = { navigateToProductDetails(product.id)},
+                        deleteProduct = {}
+                    )
                 }
             }
     }
@@ -137,6 +143,7 @@ private fun WishListScreenContentPreview() {
 //                )
 //            )
         ),
-        back = {}
+        back = {},
+        navigateToProductDetails = {}
     )
 }
