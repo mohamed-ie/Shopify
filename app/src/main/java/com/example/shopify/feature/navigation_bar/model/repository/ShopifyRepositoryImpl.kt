@@ -33,8 +33,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-
-
 class ShopifyRepositoryImpl @Inject constructor(
     private val graphClient: GraphClient,
     private val queryGenerator: ShopifyQueryGenerator,
@@ -75,9 +73,9 @@ class ShopifyRepositoryImpl @Inject constructor(
             .map { it?.isNotBlank() ?: false }
             .flowOn(defaultDispatcher)
 
-    override fun getBrands(): Flow<Resource<List<Brand>?>> {
+    override fun getBrands(): Flow<Resource<List<Brand>>> {
         val query = queryGenerator.generateBrandQuery()
-        return query!!.enqueue().mapResource(mapper::mapToBrandResponse)
+        return query.enqueue().mapResource(mapper::mapToBrandResponse)
     }
 
     override suspend fun getCart(): Resource<Cart?> {
@@ -89,9 +87,17 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapResource(mapper::mapToCart)
     }
 
-    override fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>> {
+    override suspend fun getProductsByBrandName(brandName: String): Resource<List<BrandProduct>> {
         val query = queryGenerator.generateProductByBrandQuery(brandName)
-        return query!!.enqueue().mapResource(mapper::mapToProductsByBrandResponse)
+        val email = dataStoreManager.getEmail().first()
+        val wishList = fireStoreManager.getWishList(email)
+        return query.enqueue1()
+            .mapResource(mapper::mapToProductsByBrandResponse)
+            .mapResource { brandProduct ->
+                brandProduct.map {
+                    it.copy(isFavourite = wishList.contains(it.id))
+                }
+            }
     }
 
     override fun getProductDetailsByID(id: String): Flow<Resource<Product>> =

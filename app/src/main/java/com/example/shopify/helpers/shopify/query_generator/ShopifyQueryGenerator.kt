@@ -10,7 +10,7 @@ import com.shopify.graphql.support.ID
 interface ShopifyQueryGenerator {
     fun generateSingUpQuery(userInfo: SignUpUserInfo): Storefront.MutationQuery
     fun generateSingInQuery(userInfo: SignInUserInfo): Storefront.MutationQuery
-    fun generateBrandQuery(): Storefront.QueryRootQuery?
+    fun generateBrandQuery(): Storefront.QueryRootQuery
     fun generateServerUrlQuery(): Storefront.QueryRootQuery
     fun generatePaymentCompletionAvailabilityQuery(
         checkoutId: ID,

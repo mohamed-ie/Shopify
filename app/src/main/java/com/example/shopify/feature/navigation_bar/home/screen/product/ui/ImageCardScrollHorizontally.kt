@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,9 +20,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.rounded.BrokenImage
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,27 +33,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.shopify.feature.navigation_bar.home.screen.home.ImageFromUrl
+import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.theme.ShopifyTheme
+import com.example.shopify.utils.shopifyLoading
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ColumnScope.ImageCardScrollHorizontally(images: List<String>) {
+fun ColumnScope.ImageCardScrollHorizontally(
+    images: List<String>,
+    isFavourite: Boolean,
+    addToFavourite: () -> Unit
+) {
     val pagerState = rememberPagerState(
         initialPage = 0, initialPageOffsetFraction = 0f
     ) {
         images.size
     }
-    HorizontalPager(
-        state = pagerState, modifier = Modifier.weight(1f)
-    ) { page ->
-        Card(
-            shape = MaterialTheme.shapes.small,
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+    Box() {
+
+        HorizontalPager(
+            state = pagerState, modifier = Modifier.fillMaxWidth()
+        ) { page ->
+            SubcomposeAsyncImage(
+                modifier = Modifier
+                    .aspectRatio(1f, false)
+                    .padding(15.dp),
+                contentScale = ContentScale.Inside,
+                model = images[page],
+                contentDescription = null,
+                loading = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .shopifyLoading()
+                    )
+                },
+                error = {
+                    Icon(
+                        modifier = Modifier.fillMaxSize(),
+                        imageVector = Icons.Rounded.BrokenImage,
+                        tint = Color.Gray,
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+        IconButton(
+            onClick = { },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 16.dp, end = 16.dp)
+                .shadow(1.dp, shape = CircleShape, spotColor = Color.Black)
+                .clip(CircleShape)
+                .size(35.dp)
+                .background(Color.White)
+
         ) {
-            ImageFromUrl(url = images[page])
+            if (isFavourite) {
+                Icon(
+                    imageVector = Icons.Rounded.Favorite,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.Gray
+                )
+            }
+
         }
     }
     Spacer(modifier = Modifier.height(8.dp))

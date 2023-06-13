@@ -46,7 +46,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateBrandQuery(): QueryRootQuery? =
+    override fun generateBrandQuery(): QueryRootQuery =
         Storefront.query { rootQuery: QueryRootQuery ->
             rootQuery.collections({ arg -> arg.first(20) }) { collectionConnectionQuery ->
                 collectionConnectionQuery.edges { collectionEdgeQuery ->

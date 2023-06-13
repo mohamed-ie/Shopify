@@ -191,10 +191,10 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
     }
 
-    override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand>? {
+    override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand> {
         return response.data?.collections?.edges?.drop(1)?.map {
             Brand(title = it.node.title, url = it.node.image?.url)
-        }
+        } ?: listOf()
     }
 
     override fun map(error: GraphError): UIError =

@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
+import com.example.shopify.feature.Graph
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.component.MyAccountSignedInHeader
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.component.SettingItem
 import com.example.shopify.theme.ShopifyTheme
@@ -80,7 +80,7 @@ fun MyAccountSignedInScreenContent(
                 SettingItem(
                     text = stringResource(id = R.string.addresses),
                     icon = Icons.Outlined.PinDrop,
-                    onClick = { navigateTo(MyAccountGraph.ADDRESSES) }
+                    onClick = { navigateTo(Graph.ADDRESS) }
                 )
             }
         }

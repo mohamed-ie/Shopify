@@ -11,10 +11,8 @@ import androidx.navigation.navigation
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
+import com.example.shopify.feature.navigation_bar.home.screen.home.ui.HomeScreen
 import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ProductScreen
-import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
-import com.example.shopify.helpers.firestore.mapper.encodeProductId
-import com.example.shopify.ui.screen.home.ui.HomeScreen
 
 fun NavGraphBuilder.homeGraph(navController: NavHostController, paddingValues: PaddingValues) {
     navigation(
@@ -25,19 +23,15 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController, paddingValues: P
         composable(route = HomeGraph.Home.route) {
             HomeScreen(
                 viewModel = hiltViewModel(),
-                paddingValues = paddingValues,
-                navigateToProduct = {
-                    navController.navigate("${HomeGraph.PRODUCTS}/$it")
-                })
+                navigateTo = navController::navigate
+            )
         }
 
         composable("${HomeGraph.PRODUCTS}/{brandName}") {
-            ProductScreen(viewModel = hiltViewModel(),
-                paddingValues = paddingValues,
-                navigateToHome = { navController.popBackStack() },
-                navigateToProductDetails = { productId ->
-                    navController.navigate("${ProductDetailsGraph.PRODUCT_DETAILS}/${productId.encodeProductId()}")
-                }
+            ProductScreen(
+                viewModel = hiltViewModel(),
+                back = navController::popBackStack,
+                navigateTo = navController::navigate
             )
         }
     }
