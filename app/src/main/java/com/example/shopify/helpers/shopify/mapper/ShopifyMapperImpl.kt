@@ -260,6 +260,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 val product = merchandise.product
 
                 val cartProduct = CartProduct(
+                    id = product.id,
                     name = product.title,
                     thumbnail = merchandise.image.url,
                     collection = product.productType,

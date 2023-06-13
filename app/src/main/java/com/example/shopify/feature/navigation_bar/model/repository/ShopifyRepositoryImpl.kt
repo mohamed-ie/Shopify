@@ -103,14 +103,14 @@ class ShopifyRepositoryImpl @Inject constructor(
                 }
             }
 
-    override suspend fun getProductReviewById(productId: String, reviewsCount: Int?) =
+    override suspend fun getProductReviewById(productId: ID, reviewsCount: Int?) =
         fireStoreManager.getReviewsByProductId(productId, reviewsCount)
 
     override suspend fun updateCurrency(currency: String) {
         dataStoreManager.setCurrency(currency)
     }
 
-    override suspend fun setProductReview(productId: String, review: Review) =
+    override suspend fun setProductReview(productId: ID, review: Review) =
         fireStoreManager.setProductReviewByProductId(productId, review)
 
 
@@ -225,25 +225,29 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapResource(mapper::mapToCartId)
 
     override suspend fun addProductWishListById(productId: ID) =
-        fireStoreManager.updateWishList(getUserEmail(), productId)
+        fireStoreManager.updateWishList(dataStoreManager.getEmail().first(), productId)
 
     override suspend fun removeProductWishListById(productId: ID) =
-        fireStoreManager.removeAWishListProduct(getUserEmail(), productId)
+        fireStoreManager.removeAWishListProduct(dataStoreManager.getEmail().first(), productId)
 
     private suspend fun getWishList(customerId: String): List<ID> =
         fireStoreManager.getWishList(customerId)
 
-    private suspend fun getUserEmail(): String =
-        dataStoreManager.getUserInfo().first().email
+
 
     override fun getShopifyProductsByWishListIDs() = flow {
-        getWishList(getUserEmail()).forEach { id ->
+        getWishList(dataStoreManager.getEmail().first())
+            .also {productList ->
+                productList.ifEmpty {
+                    emit(Resource.Success(null))
+                }
+            }.forEach { id ->
             emit(getProductDetailsByID(id.toString()).first())
         }
     }
 
     private suspend fun isProductWishList(productId: ID): Boolean =
-        getWishList(getUserEmail()).find { id -> id == productId } != null
+        getWishList(dataStoreManager.getEmail().first()).find { id -> id == productId } != null
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->

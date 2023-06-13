@@ -26,8 +26,8 @@ interface ShopifyRepository {
     suspend fun getCart(): Resource<Cart?>
     fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>>
     fun getProductDetailsByID(id: String): Flow<Resource<Product>>
-    suspend fun getProductReviewById(productId: String, reviewsCount: Int? = null): List<Review>
-    suspend fun setProductReview(productId: String, review: Review)
+    suspend fun getProductReviewById(productId: ID, reviewsCount: Int? = null): List<Review>
+    suspend fun setProductReview(productId: ID, review: Review)
     fun getCheckOutId(cart: Cart): Flow<Resource<ID?>>
     fun getProductsCategory(
         productType: String,
@@ -46,7 +46,7 @@ interface ShopifyRepository {
     suspend fun changeCartLineQuantity(merchandiseId: ID, quantity: Int): Resource<Cart?>
     suspend fun applyCouponToCart(coupon: String): Resource<Cart?>
     suspend fun updateCartAddress(addressId: ID): Resource<String?>
-    fun getShopifyProductsByWishListIDs(): Flow<Resource<Product>>
+    fun getShopifyProductsByWishListIDs(): Flow<Resource<Product?>>
     suspend fun addProductWishListById(productId: ID)
     suspend fun removeProductWishListById(productId: ID)
 }

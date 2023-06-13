@@ -38,6 +38,7 @@ fun AddedCartBottomSheetCard(
     productTitle:String,
     productPrice: Price,
     isAdded:Boolean,
+    isTotalPriceAdded:Boolean,
     continueShopping:()->Unit,
     viewCart:()->Unit
 ) {
@@ -98,6 +99,7 @@ fun AddedCartBottomSheetCard(
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.DarkGray,
+                modifier = Modifier.shopifyLoading(!isTotalPriceAdded)
             )
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -141,6 +143,7 @@ fun AddedCartBottomSheetPreview() {
         Price("4,199.00","AED"),
         isAdded = false,
         continueShopping = {},
-        viewCart = {}
+        viewCart = {},
+        isTotalPriceAdded = false
     )
 }

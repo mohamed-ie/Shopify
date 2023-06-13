@@ -11,6 +11,8 @@ import com.example.shopify.feature.navigation_bar.cart.cartNavigation
 import com.example.shopify.feature.navigation_bar.category.categoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.myAccountGraph
+import com.example.shopify.feature.navigation_bar.productDetails.productDetailsGraph
+import com.example.shopify.feature.wishList.wishListGraph
 
 @Composable
 fun ColumnScope.NavigationBarGraph(paddingValues: PaddingValues = PaddingValues(), navController: NavHostController) {
@@ -24,6 +26,8 @@ fun ColumnScope.NavigationBarGraph(paddingValues: PaddingValues = PaddingValues(
         homeGraph(navController, paddingValues)
         categoryGraph(paddingValues, navController)
         cartNavigation(navController)
+        wishListGraph(navController)
+        productDetailsGraph(navController)
     }
 }
 
