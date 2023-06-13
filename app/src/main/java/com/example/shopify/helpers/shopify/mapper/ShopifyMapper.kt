@@ -11,9 +11,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.UIError
-import com.google.firebase.firestore.DocumentSnapshot
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
@@ -22,7 +20,7 @@ import com.shopify.graphql.support.ID
 
 interface ShopifyMapper {
     fun map(response: GraphResponse<Storefront.Mutation>): SignUpUserResponseInfo
-    fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand>?
+    fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand>
     fun mapToSignInResponse(
         response: GraphResponse<Storefront.Mutation>,
         signInUserInfo: SignInUserInfo

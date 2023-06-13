@@ -8,7 +8,8 @@ data class BrandProduct(
     val title: String,
     val description: String,
     val images: List<String>,
-    val brandVariants: BrandVariants
+    val brandVariants: BrandVariants,
+    val isFavourite: Boolean = false
 )
 
 data class BrandVariants(val availableForSale: Boolean, val price: MoneyV2)

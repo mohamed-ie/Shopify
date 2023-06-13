@@ -22,9 +22,9 @@ interface ShopifyRepository {
     suspend fun saveUserInfo(userResponseInfo: SignInUserInfoResult)
     fun getUserInfo(): Flow<SignInUserInfoResult>
     fun isLoggedIn(): Flow<Boolean>
-    fun getBrands(): Flow<Resource<List<Brand>?>>
+    fun getBrands(): Flow<Resource<List<Brand>>>
     suspend fun getCart(): Resource<Cart?>
-    fun getProductsByBrandName(brandName: String): Flow<Resource<List<BrandProduct>>>
+    suspend fun getProductsByBrandName(brandName: String): Resource<List<BrandProduct>>
     fun getProductDetailsByID(id: String): Flow<Resource<Product>>
     suspend fun getProductReviewById(productId: ID, reviewsCount: Int? = null): List<Review>
     suspend fun setProductReview(productId: ID, review: Review)

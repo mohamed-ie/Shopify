@@ -1,12 +1,13 @@
-package com.example.shopify.ui.screen.Product.viewModel
+package com.example.shopify.feature.navigation_bar.home.screen.product.viewModel
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.ProductsState
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.helpers.Resource
+import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val repository: ShopifyRepository,
-    private val state: SavedStateHandle
-) : ViewModel() {
+    private val repository: ShopifyRepository, private val state: SavedStateHandle
+) : BaseScreenViewModel() {
     private var _productState = MutableStateFlow(ProductsState())
     val productList = _productState.asStateFlow()
     private var brandProducts: List<BrandProduct> = listOf()
@@ -31,18 +31,17 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-    fun getProduct(brandName: String) {
-        viewModelScope.launch(Dispatchers.Default) {
-            repository.getProductsByBrandName(brandName).collect {
-                when (it) {
-                    is Resource.Success -> {
-                        brandProducts = it.data
-                        updateState()
-                    }
+    private fun getProduct(brandName: String) = viewModelScope.launch(Dispatchers.Default) {
 
-                    is Resource.Error -> it.error
-                }
+        when (val it = repository.getProductsByBrandName(brandName)) {
+            is Resource.Success -> {
+                brandProducts = it.data
+                updateState()
+                toStableScreenState()
             }
+
+            is Resource.Error ->
+                toErrorScreenState()
         }
     }
 
@@ -51,7 +50,9 @@ class ProductViewModel @Inject constructor(
             it.brandVariants.price.amount.toFloat()
         }
         _productState.update { oldState ->
-            oldState.copy(minPrice = prices.min(), maxPrice = prices.max(), brandProducts = brandProducts)
+            oldState.copy(
+                minPrice = prices.min(), maxPrice = prices.max(), brandProducts = brandProducts
+            )
         }
     }
 
@@ -62,6 +63,18 @@ class ProductViewModel @Inject constructor(
         _productState.update {
             it.copy(sliderValue = newValue, brandProducts = filterProducts)
         }
+    }
+
+    fun onFavourite(id: ID, favourite: Boolean) {
+        if (favourite) viewModelScope.launch { repository.removeProductWishListById(id) }
+        else viewModelScope.launch { repository.addProductWishListById(id) }
+    }
+
+    fun hideDialog() {
+    }
+
+    fun apply() {
+
     }
 }
 
