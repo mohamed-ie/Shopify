@@ -2,6 +2,7 @@ package com.example.shopify.feature.navigation_bar.model.remote
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
@@ -37,11 +38,11 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun getReviewsByProductId(
-        id: String,
+        id: ID,
         reviewsCount: Int?
     ): List<Review> =
         fireStore.collection(PATH)
-            .document(id)
+            .document(id.encodeProductId())
             .collection(REVIEW_PATH)
             .get()
             .await()
@@ -49,9 +50,9 @@ class FireStoreManagerImpl @Inject constructor(
             .map(mapper::mapSnapShotDocumentsToReview)
 
 
-    override suspend fun setProductReviewByProductId(productId: String, review: Review) {
+    override suspend fun setProductReviewByProductId(productId: ID, review: Review) {
         fireStore.collection(PATH)
-            .document(productId)
+            .document(productId.encodeProductId())
             .collection(REVIEW_PATH)
             .document(review.reviewer)
             .set(review.copy(createdAt = FieldValue.serverTimestamp(), time = null))

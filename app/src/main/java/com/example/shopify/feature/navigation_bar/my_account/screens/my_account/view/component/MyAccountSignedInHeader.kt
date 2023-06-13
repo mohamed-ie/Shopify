@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
+import com.example.shopify.feature.Graph
 import com.example.shopify.theme.ShopifyTheme
 
 @Composable
@@ -85,7 +85,7 @@ fun MyAccountSignedInHeader(
                 MyHeaderListItem(
                     name = stringResource(id = R.string.wishlist),
                     icon = Icons.Rounded.Favorite,
-                    onClick = { navigateTo(MyAccountGraph.WISHLIST) }
+                    onClick = { navigateTo(Graph.WISH_LIST) }
                 )
 
             }

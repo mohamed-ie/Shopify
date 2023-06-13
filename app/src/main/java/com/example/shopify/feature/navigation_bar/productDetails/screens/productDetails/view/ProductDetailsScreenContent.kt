@@ -161,7 +161,7 @@ fun ProductDetailsScreenContent(
             val windowInsets = if (edgeToEdgeEnabled)
                 WindowInsets(0) else BottomSheetDefaults.windowInsets
             ModalBottomSheet(
-                onDismissRequest = { /*TODO*/ },
+                onDismissRequest = { addToCardState.continueShopping() },
                 windowInsets = windowInsets,
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
                 containerColor = Color.White,
@@ -171,6 +171,7 @@ fun ProductDetailsScreenContent(
                     productTitle = product.title,
                     productPrice = addToCardState.totalCartPrice,
                     isAdded = addToCardState.isAdded,
+                    isTotalPriceAdded = addToCardState.isTotalPriceLoaded,
                     continueShopping = { addToCardState.continueShopping() },
                     viewCart = { viewCart() }
                 )

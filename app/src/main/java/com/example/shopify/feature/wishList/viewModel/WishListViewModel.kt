@@ -3,8 +3,11 @@ package com.example.shopify.feature.wishList.viewModel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
+import com.example.shopify.feature.wishList.view.WishedBottomSheetState
+import com.example.shopify.feature.wishList.view.WishedProductState
 import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +24,16 @@ class WishListViewModel @Inject constructor(
     private val repository: ShopifyRepository,
 ) : BaseScreenViewModel() {
 
-    private val _productsState = MutableStateFlow(mutableStateListOf<Product>())
+    private val _productsState = MutableStateFlow(mutableStateListOf<WishedProductState>())
     val productsState= _productsState.asStateFlow()
+
+    private val _wishedBottomSheetState = MutableStateFlow(WishedBottomSheetState())
+    val wishedBottomSheetState = _wishedBottomSheetState.asStateFlow()
 
     private val _dialogVisibilityState = MutableStateFlow(false)
     val dialogVisibilityState= _dialogVisibilityState.asStateFlow()
 
-    val deletedProduct = MutableStateFlow(ID(""))
+    private val deletedProduct = MutableStateFlow(ID(""))
 
 
     fun getWishListProducts(){
@@ -38,7 +44,7 @@ class WishListViewModel @Inject constructor(
                 is Resource.Error -> {toErrorScreenState()}
                 is Resource.Success -> {
                     toStableScreenState()
-                    _productsState.value.add(productResource.data)
+                    productResource.data?.let { _productsState.value.add(WishedProductState(product = it)) }
                 }
             }
         }.launchIn(viewModelScope)
@@ -61,7 +67,44 @@ class WishListViewModel @Inject constructor(
         }
     }
 
+    fun addToCart(productIndex: Int){
+        _productsState.value[productIndex].also {wishedProduct ->
+            viewModelScope.launch {
+                _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = true)
+                wishedProduct.product.variants[0].id?.let {variantId ->
+                    when(repository.addToCart(variantId,1)){
+                        is Resource.Error -> {}
+                        is Resource.Success -> {
+                            _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = false)
+                            _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
+                                isAdded = true,
+                                expandBottomSheet = true,
+                                productTitle = wishedProduct.product.title
+                            )
+                            sendTotalCart(repository.getCart())
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    fun sendContinueShopping(){
+        _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(expandBottomSheet = false)
+    }
+    private fun sendTotalCart(response:Resource<Cart?>){
+        when(response){
+            is Resource.Error -> {}
+            is Resource.Success -> {
+                _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
+                    isTotalPriceLoaded = true,
+                    totalCartPrice = Price(
+                        amount = response.data?.totalPrice?.amount ?: "",
+                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
+                    )
+                )
 
-
+            }
+        }
+    }
 }

@@ -3,8 +3,9 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.produc
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
@@ -14,8 +15,6 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.VariantsState
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.firestore.mapper.decodeProductId
-import com.example.shopify.helpers.firestore.mapper.encodeProductId
-import com.example.shopify.utils.Constants
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,10 +55,10 @@ class ProductDetailsViewModel @Inject constructor(
     val productId:ID
 
     init {
-        productId = state.get<String>(HomeGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.let { productId ->
+        productId = state.get<String>(ProductDetailsGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.let { productId ->
             productId.decodeProductId().apply {
                 getProduct(this.toString())
-                getProductReview(this.encodeProductId())
+                getProductReview(this)
             }
         } ?: ID("")
     }
@@ -102,7 +101,7 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
 
-    private fun getProductReview(productId: String) =
+    private fun getProductReview(productId: ID) =
         viewModelScope.launch {
             repository.getProductReviewById(productId, 4).also { reviews ->
                 _reviewState.value = _reviewState.value.copy(
@@ -137,17 +136,33 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun addProductToCart() {
-        _addToCardState.value = _addToCardState.value.copy(
-            isAdded = true,
-            expandBottomSheet = true,
-            totalCartPrice = Price(
-                amount = (_productState.value.price.amount.toFloat() * _addToCardState.value.selectedQuantity).toString(),
-                currencyCode = _productState.value.price.currencyCode
-            )
-        )
+        _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
+        _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let {variantId ->
+            viewModelScope.launch {
+                when(repository.addToCart(variantId,_addToCardState.value.selectedQuantity)){
+                    is Resource.Error -> {}
+                    is Resource.Success -> {
+                        _addToCardState.value = _addToCardState.value.copy(isAdded = true)
+                        sendTotalCart(repository.getCart())
+                    }
+                }
+            }
+        }
+    }
 
-        viewModelScope.launch {
-            repository.addToCart(_variantState.value.run { variants[selectedVariant-1].id }!!, _addToCardState.value.selectedQuantity)
+    private fun sendTotalCart(response:Resource<Cart?>){
+        when(response){
+            is Resource.Error -> {}
+            is Resource.Success -> {
+                _addToCardState.value = _addToCardState.value.copy(
+                    isTotalPriceLoaded = true,
+                    totalCartPrice = Price(
+                        amount = response.data?.totalPrice?.amount ?: "",
+                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
+                    )
+                )
+
+            }
         }
     }
 
