@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -128,6 +128,7 @@ fun PreviewItemScreen() {
     ShopifyTheme {
         OrderItemScreen(
                     CartLine(
+                        productVariantID = ID(""),
                         id = ID(""),
                         Storefront.MoneyV2().setAmount("900.00")
                             .setCurrencyCode(Storefront.CurrencyCode.EGP),

@@ -283,6 +283,7 @@ fun PreviewCartCard() {
         CartItemCard(
             CartLineState(),
             CartLine(
+                productVariantID = ID(""),
                 id = ID(""),
                 Storefront.MoneyV2().setAmount("372.00")
                     .setCurrencyCode(Storefront.CurrencyCode.EGP),
@@ -310,6 +311,7 @@ fun PreviewCartCardOpenQuantityChooser() {
         CartItemCard(
             CartLineState(true, ),
             CartLine(
+                productVariantID = ID(""),
                 id = ID(""),
                 Storefront.MoneyV2().setAmount("372.00")
                     .setCurrencyCode(Storefront.CurrencyCode.EGP),

@@ -24,8 +24,9 @@ interface ShopifyQueryGenerator {
         accessToken: String,
         address: MailingAddressInput
     ): Storefront.MutationQuery
-    fun generateUserOrdersQuery(): Storefront.QueryRootQuery
-    fun checkoutCreate(cart: Cart): Storefront.MutationQuery
+
+    fun generateUserOrdersQuery(accessToken: String): Storefront.QueryRootQuery
+    fun checkoutCreate(cart: Cart, email: String): Storefront.MutationQuery
     fun generateProductCategoryQuery(
         productType: String,
         productTag: String

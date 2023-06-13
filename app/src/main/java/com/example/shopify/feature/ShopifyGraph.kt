@@ -33,6 +33,7 @@ object Graph {
     const val LANDING = "LANDING_GRAPH"
     const val AUTH = "AUTH_GRAPH"
     const val HOME = "HOME_GRAPH"
+    const val CHECK_OUT = "CHECK_OUT"
     const val WISH_LIST = "WISH_LIST_GRAPH"
     const val PRODUCT_DETAILS = "PRODUCT_DETAILS_GRAPH"
 }

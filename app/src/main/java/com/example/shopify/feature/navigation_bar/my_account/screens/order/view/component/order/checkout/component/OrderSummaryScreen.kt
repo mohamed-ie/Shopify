@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -23,16 +23,17 @@ import androidx.compose.ui.unit.sp
 import com.example.shopify.theme.ShopifyTheme
 
 @Composable
-fun OrderSummaryScreen() {
-    val itemsCount = 5
-    val subtotal = "100.00"
-    val shippingFees = "10.00"
-    val discount = "20.00"
-    val total = "EGE 90.00"
+fun OrderSummaryScreen(
+    itemsCount: Int,
+    subtotal: String,
+    shippingFees: String,
+    discount: String,
+    taxes: String,
+    total: String,
+) {
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(16.dp)
     ) {
         Row(
@@ -72,6 +73,7 @@ fun OrderSummaryScreen() {
                 OrderSummaryRow(label = "Subtotal", value = subtotal)
                 OrderSummaryRow(label = "Shipping Fees", value = shippingFees)
                 OrderSummaryRow(label = "Discount", value = discount)
+                OrderSummaryRow(label = "Taxes", value = taxes)
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
                 OrderSummaryRow(label = "Total", value = total)
             }
@@ -104,6 +106,6 @@ fun OrderSummaryRow(label: String, value: String) {
 @Composable
 fun PreviewOrderSummaryScreen() {
     ShopifyTheme {
-        OrderSummaryScreen()
+        OrderSummaryScreen(0, "", "", "", "", "")
     }
 }

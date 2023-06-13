@@ -135,5 +135,9 @@
     <string name="start_adding_items_you_love_to_your_wishlist_by_tapping_on_the_heart_icon">Start adding items you love to your wishlist by tapping on the heart icon</string>
     <string name="delete_alert_message">Are you sure you want to remove this product</string>
     <string name="discounts">Discounts</string>
+    <string name="you_dont_have_any_orders_yet">you dont have any orders yet</string>
+    <string name="what_are_you_waiting_for_start_shopping">what are you waiting for start shopping</string>
+    <string name="show_orders_from">show orders from</string>
+    <string name="the_start">The start</string>
 
 </resources>

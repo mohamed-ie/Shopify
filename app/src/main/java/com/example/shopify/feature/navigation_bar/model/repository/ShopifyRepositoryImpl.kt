@@ -295,8 +295,9 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
 
-    override fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
-        return queryGenerator.checkoutCreate(cart).enqueue()
+    override suspend fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
+        val email = dataStoreManager.getEmail().first()
+        return queryGenerator.checkoutCreate(cart, email).enqueue()
             .mapResource {
                 mapper.mapToCheckoutId(it)
             }

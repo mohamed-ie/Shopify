@@ -1,7 +1,6 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,7 +24,6 @@ fun ReviewOrderScreens(
     ordersItems: List<CartLine>
 ) {
     Column(modifier = Modifier
-        .fillMaxWidth()
         .padding(16.dp)) {
         Text(
             text = "Review Your Orders",
@@ -52,6 +50,7 @@ fun PreviewOrderScreen() {
         ReviewOrderScreens(
             ordersItems = listOf(
                 CartLine(
+                    productVariantID = ID(""),
                     id = ID(""),
                     Storefront.MoneyV2().setAmount("900.00")
                         .setCurrencyCode(Storefront.CurrencyCode.EGP),
@@ -66,6 +65,7 @@ fun PreviewOrderScreen() {
                 ),
 
                 CartLine(
+                    productVariantID = ID(""),
                     id = ID(""),
                     Storefront.MoneyV2().setAmount("900.00")
                         .setCurrencyCode(Storefront.CurrencyCode.EGP),

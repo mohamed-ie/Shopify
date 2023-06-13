@@ -1,10 +1,17 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -21,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.theme.ShopifyTheme
 
 @Composable
@@ -46,12 +54,6 @@ fun PaymentMethodScreen() {
             selected = selectedOption == PaymentMethod.CreditCard,
             onClick = { selectedOption = PaymentMethod.CreditCard }
         )
-
-        RadioButtonOption(
-            text = "Cash on Delivery",
-            selected = selectedOption == PaymentMethod.CashOnDelivery,
-            onClick = { selectedOption = PaymentMethod.CashOnDelivery }
-        )
     }
 }
 
@@ -64,6 +66,10 @@ fun RadioButtonOption(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .border(
+                border = BorderStroke(1.dp, color = Color.LightGray),
+                shape = RoundedCornerShape(8.dp)
+            )
             .padding(vertical = 8.dp)
             .fillMaxWidth()
             .clickable { onClick() }
@@ -73,11 +79,23 @@ fun RadioButtonOption(
             onClick = { onClick() },
             colors = RadioButtonDefaults.colors(selectedColor = Color.Blue)
         )
-        Text(
-            text = text,
-            style = TextStyle(fontSize = 16.sp),
-            modifier = Modifier.padding(start = 8.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = text,
+                style = TextStyle(fontSize = 16.sp),
+                modifier = Modifier.padding(start = 8.dp),
+                fontWeight = FontWeight.Bold
+            )
+            Icon(
+                imageVector = Icons.Default.CreditCard,
+                contentDescription = ""
+            )
+        }
     }
 }
 

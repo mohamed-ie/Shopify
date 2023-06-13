@@ -267,6 +267,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                     vendor = product.vendor
                 )
                 CartLine(
+                    productVariantID = merchandise.id,
                     id = it.node.id,
                     price = merchandise.price,
                     quantity = it.node.quantity,

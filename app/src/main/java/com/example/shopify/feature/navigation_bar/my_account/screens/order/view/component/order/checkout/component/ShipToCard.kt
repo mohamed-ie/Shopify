@@ -1,12 +1,12 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
@@ -29,7 +29,6 @@ import com.example.shopify.theme.ShopifyTheme
 @Composable
 fun ShipToCard(
     address: String,
-    phoneNumber: String,
     onChangeClick: () -> Unit
 ) {
 
@@ -50,17 +49,13 @@ fun ShipToCard(
                     fontSize = 18.sp
                 )
             )
-            ClickableText(
+            Text(
                 text = AnnotatedString("Change"),
                 style = TextStyle(
                     color = Color.Blue,
                     fontWeight = FontWeight.Bold
                 ),
-                onClick = { offset ->
-                    if (offset == 0) {
-                        onChangeClick()
-                    }
-                }
+                modifier = Modifier.clickable { onChangeClick() }
             )
         }
         Card(
@@ -97,11 +92,6 @@ fun ShipToCard(
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier.padding(top = 8.dp)
                     )
-                    Text(
-                        text = phoneNumber,
-                        style = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
                 }
             }
 
@@ -115,9 +105,7 @@ fun PreviewShipToScreen() {
     ShopifyTheme {
         ShipToCard(
             address = "galal street - elhassan building - haram - giza - egypt ",
-            phoneNumber = "+201117513385"
-        ) {
-
-        }
+            onChangeClick = { }
+        )
     }
 }
