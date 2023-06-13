@@ -33,4 +33,5 @@ object Graph {
     const val LANDING = "LANDING_GRAPH"
     const val AUTH = "AUTH_GRAPH"
     const val HOME = "HOME_GRAPH"
+    const val CHECK_OUT = "CHECK_OUT"
 }

@@ -14,6 +14,8 @@ import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +28,17 @@ class OrderViewModel @Inject constructor(
 ) : BaseScreenViewModel() {
     val creditCardInfoState = creditCardInfoStateHandler.creditCardInfoState
     private var _checkoutId: ID? = null
+    private val _completeCheckOut = MutableSharedFlow<Boolean>()
+    val completeCheckOut = _completeCheckOut.asSharedFlow()
+    var cart: Cart? = null
+
+
+    init {
+        viewModelScope.launch(Dispatchers.Default) {
+            handleCartResource(repository.getCart())
+        }
+    }
+
     fun onCreditCardEvent(event: CreditCardInfoEvent) {
         when (event) {
             is CreditCardInfoEvent.FirstNameChanged ->
@@ -58,6 +71,7 @@ class OrderViewModel @Inject constructor(
                 when (it) {
                     is Resource.Success -> {
                         _checkoutId = it.data
+                        _completeCheckOut.emit(true)
                     }
 
                     is Resource.Error -> it.error
@@ -112,4 +126,16 @@ class OrderViewModel @Inject constructor(
 //            }
 //        }
     }
+
+    private fun handleCartResource(resource: Resource<Cart?>) =
+        when (resource) {
+            is Resource.Error -> toErrorScreenState()
+            is Resource.Success -> {
+                resource.data.run {
+                    cart = this
+                }
+                toStableScreenState()
+            }
+        }
+
 }
