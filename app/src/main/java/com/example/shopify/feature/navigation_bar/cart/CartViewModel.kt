@@ -12,6 +12,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponState
 import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
 import com.example.shopify.helpers.Resource
+import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +57,7 @@ class CartViewModel @Inject constructor(
     fun onCartItemEvent(event: CartItemEvent) {
         when (event) {
             is CartItemEvent.MoveToWishlist ->
-                _cartLinesState.update(event.index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
+                removeCartLineAndAddToWishList(index = event.index)
 
             is CartItemEvent.QuantityChanged ->
                 changeCartLineQuantity(event.index, event.quantity)
@@ -67,6 +68,12 @@ class CartViewModel @Inject constructor(
             is CartItemEvent.ToggleQuantitySelectorVisibility ->
                 _cartLinesState.update(event.index) { it.copy(isChooseQuantityOpen = it.isChooseQuantityOpen.not()) }
 
+        }
+    }
+
+    private fun addCartItemToWishList(productID:ID){
+        viewModelScope.launch {
+            repository.addProductWishListById(productID)
         }
     }
 
@@ -91,6 +98,18 @@ class CartViewModel @Inject constructor(
         when (val resource = repository.removeCartLines(cartLineId)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> handleCartResource(resource)
+        }
+    }
+
+    private fun removeCartLineAndAddToWishList(index: Int) = viewModelScope.launch(defaultDispatcher){
+        _cartLinesState.update(index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
+        val cartLineId = listOf(_state.value.lines[index].id)
+        when (val resource = repository.removeCartLines(cartLineId)) {
+            is Resource.Error -> toErrorScreenState()
+            is Resource.Success -> {
+                _state.value.lines[index].cartProduct.id.let {productId -> addCartItemToWishList(productId) }
+                handleCartResource(resource)
+            }
         }
     }
 

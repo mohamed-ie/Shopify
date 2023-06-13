@@ -8,6 +8,7 @@ data class AddToCardState (
     val isOpened:Boolean = false,
     val expandBottomSheet:Boolean = false,
     val isAdded:Boolean = false,
+    val isTotalPriceLoaded:Boolean = false,
     val availableQuantity:Int = 0,
     val totalCartPrice: Price = Price("",""),
     val sendSelectedQuantity:(Int) ->Unit,

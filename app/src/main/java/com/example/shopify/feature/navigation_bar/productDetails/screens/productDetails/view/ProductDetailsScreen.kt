@@ -14,6 +14,7 @@ import com.shopify.graphql.support.ID
 fun ProductDetailsScreen(
     viewModel: ProductDetailsViewModel,
     navigateToViewMoreReviews:(ID)->Unit,
+    navigateToCart:()->Unit,
     back:()->Unit
 ) {
     val product by viewModel.productState.collectAsState()
@@ -32,7 +33,7 @@ fun ProductDetailsScreen(
                 reviewsState = reviewsState,
                 viewReviewsMore = {navigateToViewMoreReviews(viewModel.productId)},
                 back = {back()},
-                viewCart = {},
+                viewCart = navigateToCart,
                 onFavouriteClick = {isFavourite -> viewModel.sendFavouriteAction(isFavourite)}
             )
         }

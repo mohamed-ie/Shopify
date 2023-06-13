@@ -4,8 +4,8 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.shopify.graphql.support.ID
 
 interface FireStoreManager {
-    suspend fun getReviewsByProductId(id: String, reviewsCount: Int? = null): List<Review>
-    suspend fun setProductReviewByProductId(productId: String, review: Review)
+    suspend fun getReviewsByProductId(id: ID, reviewsCount: Int? = null): List<Review>
+    suspend fun setProductReviewByProductId(productId: ID, review: Review)
     suspend fun updateCurrency(customerId: String, currency: String)
     suspend fun getCurrency(customerId: String): String
     suspend fun updateWishList(customerId: String, productId: ID)

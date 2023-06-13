@@ -1,7 +1,6 @@
 package com.example.shopify.feature.wishList.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,8 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.MoreHoriz
-import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,7 +51,9 @@ import com.shopify.graphql.support.ID
 @Composable
 fun WishListProductCardItem(
     product: Product,
+    isAddingToCard: Boolean,
     navigateToProductDetails: () -> Unit,
+    addToCart: () -> Unit,
     deleteProduct: () -> Unit,
 ) {
     Card(
@@ -99,6 +98,7 @@ fun WishListProductCardItem(
                 textAlign = TextAlign.Start,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
+                minLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -107,13 +107,13 @@ fun WishListProductCardItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, top = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Bottom,
+
             ) {
                 Text(
                     text = product.price.currencyCode,
                     color = Color.Gray,
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(top = 8.dp)
+                    style = MaterialTheme.typography.labelSmall
                 )
                 Text(
                     text = product.price.amount,
@@ -147,32 +147,29 @@ fun WishListProductCardItem(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                ShopifyOutlinedButton(
-                    onClick = { navigateToProductDetails() },
-                    modifier = Modifier.weight(0.9f),
-                    border = BorderStroke(
-                        width = .8.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    ),
-                    shape = RoundedCornerShape(5.dp)
+                Button(
+                    onClick = { addToCart() },
+                    modifier = Modifier.weight(0.9f).height(28.dp),
+                    shape = RoundedCornerShape(7.dp),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.view_options),
+                        text = stringResource(R.string.add_to_cart),
                         fontSize = 10.sp,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 2.dp)
+                        modifier = Modifier.shopifyLoading(isAddingToCard,Color.White)
                     )
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 ShopifyOutlinedButton(
+                    modifier = Modifier.height(28.dp),
                     onClick = { deleteProduct() },
                     border = BorderStroke(
                         width = .8.dp,
                         color = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(5.dp)
-
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
@@ -214,6 +211,8 @@ private fun WishListProductCardItemPreview() {
                 realPrice = "249.00",
                 percent = 30
             )
-        ), {}, {}
+        ),
+        isAddingToCard = false
+        , {}, {},{}
     )
 }

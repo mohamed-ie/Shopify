@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.AddressGraph
 import com.example.shopify.feature.common.component.RemoteErrorHeader
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
@@ -66,7 +67,7 @@ fun CartScreenContent(
             itemsCount = itemsCount,
             address = cart.address,
             navigateToWishlistScreen = {
-                //navigateTo()
+                navigateTo(Graph.WISH_LIST)
             },
             navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true")) }
         )

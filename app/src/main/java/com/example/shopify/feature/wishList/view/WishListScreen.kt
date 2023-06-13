@@ -28,6 +28,7 @@ fun WishListScreen(
     val productState by viewModel.productsState.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
     val dialogVisibilityState by viewModel.dialogVisibilityState.collectAsState()
+    val bottomSheetState by viewModel.wishedBottomSheetState.collectAsState()
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -46,10 +47,16 @@ fun WishListScreen(
         ScreenState.STABLE -> {
             WishListScreenContent(
                 productList = productState,
+                bottomSheetState = bottomSheetState,
+                continueShopping = {viewModel.sendContinueShopping()},
+                viewCart = {},
                 back = back,
                 navigateToProductDetails = navigateToProductDetails,
                 deleteProduct = {productId ->
                     viewModel.removeWishProduct(productId)
+                },
+                addToCart = {productId ->
+                    viewModel.addToCart(productId)
                 }
             )
         }
