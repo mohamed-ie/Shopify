@@ -35,7 +35,8 @@ fun NavGraphBuilder.categoryGraph(paddingValues: PaddingValues, navController: N
             ProductDetailsScreen(
                 viewModel = hiltViewModel(),
                 back = { navController.popBackStack() },
-                navigateToViewMoreReviews = { productId -> navController.navigate("${CategoryGraph.PRODUCT_REVIEW_DETAILS}/${productId.encodeProductId()}") }
+                navigateToViewMoreReviews = { productId -> navController.navigate("${CategoryGraph.PRODUCT_REVIEW_DETAILS}/${productId.encodeProductId()}") },
+                navigateToCart = {}
             )
         }
         composable(route = "${CategoryGraph.PRODUCT_REVIEW_DETAILS}/{${CategoryGraph.REVIEW_DETAILS_SAVE_ARGS_KEY}}") {
