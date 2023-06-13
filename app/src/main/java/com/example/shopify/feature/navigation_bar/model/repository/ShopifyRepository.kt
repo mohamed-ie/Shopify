@@ -28,7 +28,7 @@ interface ShopifyRepository {
     fun getProductDetailsByID(id: String): Flow<Resource<Product>>
     suspend fun getProductReviewById(productId: String, reviewsCount: Int? = null): List<Review>
     suspend fun setProductReview(productId: String, review: Review)
-    fun getCheckOutId(cart: Cart): Flow<Resource<ID?>>
+    suspend fun getCheckOutId(cart: Cart): Flow<Resource<ID?>>
     fun getProductsCategory(
         productType: String,
         productTag: String

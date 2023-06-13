@@ -4,6 +4,7 @@ import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 
 data class CartLine(
+    val productVariantID: ID, // for checkout
     val id: ID,
     val price: Storefront.MoneyV2,
     val quantity: Int,

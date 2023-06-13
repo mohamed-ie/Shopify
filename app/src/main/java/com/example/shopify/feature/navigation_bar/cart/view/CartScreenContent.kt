@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.address.AddressGraph
 import com.example.shopify.feature.common.component.RemoteErrorHeader
+import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.model.CartLine
 import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
@@ -163,6 +164,7 @@ fun CartScreenContent(
                 ?: stringResource(id = R.string.free),
             checkout = {
                 // navigate to place checkout
+                navigateTo(CartGraph.CHECK_OUT)
             }
         )
     }
@@ -213,6 +215,7 @@ fun PreviewCartScreenContent() {
         val cart = Cart(
             lines = listOf(
                 CartLine(
+                    productVariantID = ID(""),
                     id = ID(""),
                     Storefront.MoneyV2().setAmount("372.00")
                         .setCurrencyCode(Storefront.CurrencyCode.EGP),
@@ -226,6 +229,7 @@ fun PreviewCartScreenContent() {
                     )
                 ),
                 CartLine(
+                    productVariantID = ID(""),
                     id = ID(""),
                     Storefront.MoneyV2().setAmount("900.00")
                         .setCurrencyCode(Storefront.CurrencyCode.EGP),

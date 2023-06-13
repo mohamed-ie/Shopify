@@ -1,6 +1,5 @@
 package com.example.shopify.helpers.shopify.query_generator
 
-import com.example.shopify.BuildConfig
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
@@ -79,7 +78,6 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                                     .node { imageQuery ->
                                                         imageQuery.url()
                                                     }
-
                                             }
                                     }
                                     productNode.variants({ args -> args.first(5) }) { productVariant ->
@@ -105,9 +103,9 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateUserOrdersQuery(): QueryRootQuery =
+    override fun generateUserOrdersQuery(accessToken: String): QueryRootQuery =
         Storefront.query { root: QueryRootQuery ->
-            root.customer(BuildConfig.ACCESS_TOKEN) { customer: CustomerQuery ->
+            root.customer(accessToken) { customer: CustomerQuery ->
                 customer.orders({ arg: OrdersArguments -> arg.first(10) }
                 ) { connection: OrderConnectionQuery ->
                     connection.edges { edge: OrderEdgeQuery ->
@@ -154,15 +152,23 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun checkoutCreate(cart: Cart): MutationQuery {
+    override fun checkoutCreate(cart: Cart, email: String): MutationQuery {
         val lines = cart.lines.map {
-            CheckoutLineItemInput(it.quantity, it.id)
+            CheckoutLineItemInput(it.quantity, it.productVariantID)
         }
         val input = CheckoutCreateInput()
             .setLineItemsInput(Input.value(lines))
+            .setEmail(email)
         val query = Storefront.mutation { mutationQuery ->
             mutationQuery.checkoutCreate(input) { createPayloadQuery ->
-                createPayloadQuery.checkout {
+                createPayloadQuery.checkout { checkoutQuery ->
+                    checkoutQuery.ready()
+                    checkoutQuery.buyerIdentity {
+                        it.countryCode()
+                    }
+                    checkoutQuery.email()
+                }.checkoutUserErrors {
+                    it.message()
                 }
             }
         }
@@ -355,7 +361,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
         return Storefront.mutation { mutation ->
             mutation.cartCreate({ args -> args.input(input) }) { cartCreate ->
-                cartCreate.userErrors { it.message() }
+                cartCreate.cart {}.userErrors { it.message() }
             }
         }
     }
@@ -384,7 +390,18 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             query.customer(accessToken) { customer ->
                 customer.addresses({ args -> args.first(250) }) { addresses ->
                     addresses.edges { edges ->
-                        edges.node { it.queryAddress() }
+                        edges.node { node ->
+                            node.address1()
+                                .address2()
+                                .company()
+                                .country()
+                                .city()
+                                .province()
+                                .zip()
+                                .lastName()
+                                .firstName()
+                                .phone()
+                        }
                     }
                 }
             }
@@ -494,8 +511,6 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                 buyerIdentity.deliveryAddressPreferences { deliveryAddressPreferences ->
                     deliveryAddressPreferences
                         .onMailingAddress { it.queryAddress() }
-                }.customer {
-                    it.email()
                 }
             }
     }
