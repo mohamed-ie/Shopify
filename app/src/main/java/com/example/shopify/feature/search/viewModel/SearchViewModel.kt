@@ -30,30 +30,32 @@ class SearchViewModel @Inject constructor(
 
 
     fun getProductsBySearchKeys(key: String) {
-        _searchedProductsState.update { searchedProductsState ->
-            searchedProductsState.copy(
-                searchTextValue = key
-            )
-        }
         toLoadingScreenState()
-        viewModelScope.launch(Dispatchers.Default) {
-            when (val response =
-                repository.getProductsByQuery(Constants.ProductQueryType.TITLE, key)) {
-                is Resource.Error -> toErrorScreenState()
-                is Resource.Success -> {
-                    toStableScreenState()
-                    _searchedProductsState.update { searchedProductsState ->
-                        response.data?.data?.let { brandProducts ->
-                            searchedProductsState.copy(
-                                productList = brandProducts.toMutableStateList(),
-                                lastCursor = response.data.lastCursor,
-                                hasNext = response.data.hasNext
-                            )
-                        } ?: _searchedProductsState.value
+        if (key.isBlank() || key.isEmpty()){
+            _searchedProductsState.update { SearchedProductsState() }
+            toStableScreenState()
+        }else{
+            _searchedProductsState.update { searchedProductsState -> searchedProductsState.copy(searchTextValue = key) }
+            viewModelScope.launch(Dispatchers.Default) {
+                when (val response =
+                    repository.getProductsByQuery(Constants.ProductQueryType.TITLE, key)) {
+                    is Resource.Error -> toErrorScreenState()
+                    is Resource.Success -> {
+                        toStableScreenState()
+                        _searchedProductsState.update { searchedProductsState ->
+                            response.data?.data?.let { brandProducts ->
+                                searchedProductsState.copy(
+                                    productList = brandProducts.toMutableStateList(),
+                                    lastCursor = response.data.lastCursor,
+                                    hasNext = response.data.hasNext
+                                )
+                            } ?: _searchedProductsState.value
+                        }
                     }
                 }
             }
         }
+
     }
 
 
