@@ -140,5 +140,6 @@
     <string name="show_orders_from">show orders from</string>
     <string name="the_start">The start</string>
     <string name="price_range">Price Range</string>
+    <string name="results">Results:</string>
 
 </resources>

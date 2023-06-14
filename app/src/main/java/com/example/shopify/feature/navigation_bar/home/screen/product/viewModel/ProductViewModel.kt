@@ -47,7 +47,7 @@ class ProductViewModel @Inject constructor(
 
     private fun updateState() {
         val prices = brandProducts.map {
-            it.brandVariants.price.amount.toFloat()
+            it.price.amount.toFloat()
         }
         _productState.update { oldState ->
             oldState.copy(
@@ -58,7 +58,7 @@ class ProductViewModel @Inject constructor(
 
     fun updateSliderValue(newValue: Float) {
         val filterProducts = brandProducts.filter {
-            it.brandVariants.price.amount.toFloat() > newValue
+            it.price.amount.toFloat() > newValue
         }
         _productState.update {
             it.copy(sliderValue = newValue, brandProducts = filterProducts)

@@ -3,6 +3,7 @@ package com.example.shopify.helpers.shopify.query_generator
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.MailingAddressInput
 import com.shopify.graphql.support.ID
@@ -61,4 +62,5 @@ interface ShopifyQueryGenerator {
 
     fun generateApplyCouponQuery(cartId: ID, coupon: String): Storefront.MutationQuery
     fun generateUpdateCartAddress(accessToken: String,cartId: ID, addressId: ID): Storefront.MutationQuery
+    fun generateProductsByQuery(productQueryType: Constants.ProductQueryType, queryContent: String): Storefront.QueryRootQuery
 }

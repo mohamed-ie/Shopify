@@ -6,13 +6,12 @@ import com.shopify.graphql.support.ID
 data class BrandProduct(
     val id: ID,
     val title: String,
-    val description: String,
     val images: List<String>,
-    val brandVariants: BrandVariants,
+    val price: MoneyV2,
     val isFavourite: Boolean = false
 )
 
-data class BrandVariants(val availableForSale: Boolean, val price: MoneyV2)
+
 
 
 

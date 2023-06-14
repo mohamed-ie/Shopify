@@ -3,6 +3,7 @@ package com.example.shopify.helpers.shopify.query_generator
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.CartBuyerIdentityInput
 import com.shopify.buy3.Storefront.CartLineUpdateInput
@@ -79,20 +80,18 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                                         imageQuery.url()
                                                     }
                                             }
+                                    }.priceRange {
+                                        it.maxVariantPrice {price ->
+                                            price.amount()
+                                            price.currencyCode()
+                                        }
                                     }
                                     productNode.variants({ args -> args.first(5) }) { productVariant ->
                                         productVariant.edges { variantEdge ->
                                             variantEdge.node { variantNode ->
                                                 variantNode.availableForSale()
-                                                variantNode.price { price ->
-                                                    price.amount()
-                                                    price.currencyCode()
-                                                }
-
                                             }
-
                                         }
-
                                     }
                                 }
                             }
@@ -230,6 +229,37 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             rootQuery.productTypes(20) { productType ->
                 productType.edges {
                     it.node()
+                }
+            }
+        }
+
+    override fun generateProductsByQuery(productQueryType: Constants.ProductQueryType, queryContent:String): QueryRootQuery =
+        Storefront.query { rootQuery ->
+            rootQuery.products({ productArguments ->
+                when(productQueryType){
+                    Constants.ProductQueryType.TITLE -> {productArguments.query("${productQueryType.typeString}:$queryContent")}
+                    Constants.ProductQueryType.LAST_CURSOR -> {productArguments.after(queryContent)}
+                }.first(5)
+            }) { productConnectionQuery ->
+               productConnectionQuery.pageInfo {
+                   it.hasNextPage()
+               }.edges {productEdgeQuery ->
+                    productEdgeQuery.cursor()
+                    productEdgeQuery.node {productQuery ->
+                        productQuery.title()
+
+                            .images({ args -> args.first(5) }) { imageConnectionQuery ->
+                                imageConnectionQuery.nodes {imageQuery ->
+                                    imageQuery.url()
+                                }
+                            }
+                            .priceRange {productPriceRangeQuery ->
+                                productPriceRangeQuery.maxVariantPrice {moneyV2Query ->
+                                    moneyV2Query.amount()
+                                        .currencyCode()
+                                }
+                            }
+                    }
                 }
             }
         }

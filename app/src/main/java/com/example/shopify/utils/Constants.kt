@@ -27,4 +27,8 @@ class Constants private constructor() {
         const val MONTH_DAY_PATTERN = "dd MMM"
     }
 
+    enum class ProductQueryType(val typeString:String) {
+        TITLE("title"),LAST_CURSOR("lastCursor")
+    }
+
 }

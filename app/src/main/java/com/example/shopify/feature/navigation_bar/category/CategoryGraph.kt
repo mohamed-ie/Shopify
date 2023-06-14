@@ -31,21 +31,6 @@ fun NavGraphBuilder.categoryGraph(paddingValues: PaddingValues, navController: N
             )
         }
 
-        composable(route = "${CategoryGraph.PRODUCT_DETAILS}/{${CategoryGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY}}") {
-            ProductDetailsScreen(
-                viewModel = hiltViewModel(),
-                back = { navController.popBackStack() },
-                navigateToViewMoreReviews = { productId -> navController.navigate("${CategoryGraph.PRODUCT_REVIEW_DETAILS}/${productId.encodeProductId()}") },
-                navigateToCart = {}
-            )
-        }
-        composable(route = "${CategoryGraph.PRODUCT_REVIEW_DETAILS}/{${CategoryGraph.REVIEW_DETAILS_SAVE_ARGS_KEY}}") {
-            ReviewDetailsScreen(
-                viewModel = hiltViewModel(),
-                back = { navController.popBackStack() }
-            )
-        }
-
     }
 }
 
@@ -58,7 +43,4 @@ object CategoryGraph {
     )
 
     const val PRODUCT_DETAILS = "PRODUCT_DETAILS"
-    const val PRODUCT_REVIEW_DETAILS = "PRODUCT_REVIEW_DETAILS"
-    const val PRODUCT_DETAILS_SAVE_ARGS_KEY = "PRODUCT_DETAILS_SAVE_ARGS_KEY"
-    const val REVIEW_DETAILS_SAVE_ARGS_KEY = "REVIEW_DETAILS_SAVE_ARGS_KEY"
 }
