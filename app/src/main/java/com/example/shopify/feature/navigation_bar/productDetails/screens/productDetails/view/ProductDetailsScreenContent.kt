@@ -57,11 +57,17 @@ fun ProductDetailsScreenContent(
     reviewsState: ReviewsState,
     viewReviewsMore: () -> Unit,
     viewCart: () -> Unit,
-    onFavouriteClick:(Boolean) -> Unit,
+    onFavouriteClick: (Boolean) -> Unit,
     back: () -> Unit,
+    navigateToSearch:()->Unit
 ) {
     Scaffold(
-        topBar = { ProductTopBar { back() } },
+        topBar = {
+            ProductTopBar(
+                navigateToSearch = navigateToSearch,
+                back = back
+            )
+        },
     ) {
         Column(
             modifier = Modifier
@@ -233,7 +239,8 @@ private fun ProductDetailsScreenContentPreview() {
         viewReviewsMore = {},
         viewCart = {},
         back = {},
-        onFavouriteClick = {}
+        onFavouriteClick = {},
+        navigateToSearch = {}
     )
 }
 

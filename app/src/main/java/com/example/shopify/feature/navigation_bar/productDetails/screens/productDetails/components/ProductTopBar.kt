@@ -28,10 +28,13 @@ import com.example.shopify.feature.navigation_bar.common.HomeTopBar
 import com.example.shopify.theme.shopifyColors
 
 @Composable
-fun ProductTopBar(back:() -> Unit) {
+fun ProductTopBar(
+    navigateToSearch:() ->Unit,
+    back:() -> Unit
+) {
     HomeTopBar(back = back){
         Button(
-            onClick = { /*TODO*/ },
+            onClick = navigateToSearch,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
@@ -67,7 +70,8 @@ fun ProductTopBar(back:() -> Unit) {
 @Preview
 @Composable
 private fun ProductTopBarPreview() {
-    ProductTopBar {
-
-    }
+    ProductTopBar(
+        back = {},
+        navigateToSearch = {}
+    )
 }

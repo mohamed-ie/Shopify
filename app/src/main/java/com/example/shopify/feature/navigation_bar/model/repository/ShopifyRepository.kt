@@ -5,6 +5,7 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
+import com.example.shopify.feature.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
@@ -12,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
+import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 import kotlinx.coroutines.flow.Flow
@@ -49,4 +51,8 @@ interface ShopifyRepository {
     fun getShopifyProductsByWishListIDs(): Flow<Resource<Product?>>
     suspend fun addProductWishListById(productId: ID)
     suspend fun removeProductWishListById(productId: ID)
+    suspend fun getProductsByQuery(
+        productQueryType: Constants.ProductQueryType,
+        queryContent: String
+    ): Resource<Pageable<List<BrandProduct>>?>
 }

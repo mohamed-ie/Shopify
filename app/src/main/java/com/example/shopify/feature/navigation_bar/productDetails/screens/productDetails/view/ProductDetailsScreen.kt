@@ -15,7 +15,8 @@ fun ProductDetailsScreen(
     viewModel: ProductDetailsViewModel,
     navigateToViewMoreReviews:(ID)->Unit,
     navigateToCart:()->Unit,
-    back:()->Unit
+    back:()->Unit,
+    navigateToSearch: () -> Unit
 ) {
     val product by viewModel.productState.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
@@ -34,7 +35,8 @@ fun ProductDetailsScreen(
                 viewReviewsMore = {navigateToViewMoreReviews(viewModel.productId)},
                 back = {back()},
                 viewCart = navigateToCart,
-                onFavouriteClick = {isFavourite -> viewModel.sendFavouriteAction(isFavourite)}
+                onFavouriteClick = {isFavourite -> viewModel.sendFavouriteAction(isFavourite)},
+                navigateToSearch = navigateToSearch
             )
         }
         ScreenState.ERROR -> ErrorScreen {}

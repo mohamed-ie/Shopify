@@ -5,6 +5,7 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
+import com.example.shopify.feature.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
@@ -17,6 +18,7 @@ import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
+import com.example.shopify.utils.Constants
 import com.example.shopify.utils.mapResource
 import com.example.shopify.utils.mapSuspendResource
 import com.example.shopify.utils.shopify.enqueue
@@ -99,6 +101,19 @@ class ShopifyRepositoryImpl @Inject constructor(
                 }
             }
     }
+
+    override suspend fun getProductsByQuery(productQueryType:Constants.ProductQueryType, queryContent:String): Resource<Pageable<List<BrandProduct>>?> {
+        val query = queryGenerator.generateProductsByQuery(productQueryType, queryContent)
+        return query.enqueue1()
+            .mapSuspendResource {
+                mapper.mapToProductsByQueryResponse(it)?.let { page ->
+                    page.copy(data = page.data.map {brandProduct ->
+                        brandProduct.copy(isFavourite = isProductWishList(brandProduct.id))
+                    })
+                }
+            }
+    }
+
 
     override fun getProductDetailsByID(id: String): Flow<Resource<Product>> =
         queryGenerator.generateProductDetailsQuery(id)
@@ -253,7 +268,9 @@ class ShopifyRepositoryImpl @Inject constructor(
     }
 
     private suspend fun isProductWishList(productId: ID): Boolean =
-        getWishList(dataStoreManager.getEmail().first()).find { id -> id == productId } != null
+        getWishList(dataStoreManager.getEmail().first()).find {
+                id -> id == productId
+        } != null
 
     private fun Storefront.QueryRootQuery.enqueue() =
         graphClient.enqueue(this).map { result ->
@@ -330,6 +347,16 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     private fun <I, O> Resource<I>.mapResource(
         transform: (I) -> O
+    ): Resource<O> {
+        return run {
+            when (this) {
+                is Resource.Error -> this
+                is Resource.Success -> Resource.Success(transform(data))
+            }
+        }
+    }
+    private suspend fun <I, O> Resource<I>.mapSuspendResource(
+        transform: suspend (I) -> O
     ): Resource<O> {
         return run {
             when (this) {

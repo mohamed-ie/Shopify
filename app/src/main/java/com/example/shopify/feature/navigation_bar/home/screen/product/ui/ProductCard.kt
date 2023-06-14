@@ -36,9 +36,9 @@ fun ProductCard(
 ) {
     Card(
         modifier = Modifier
-            .padding(4.dp)
+            .padding(3.dp)
             .fillMaxWidth(),
-        shape = MaterialTheme.shapes.small,
+        shape = RoundedCornerShape(2.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = onProductItemClick
     ) {
@@ -68,12 +68,12 @@ fun ProductCard(
 
                 ) {
                 Text(
-                    text = product.brandVariants.price.currencyCode.toString(),
+                    text = product.price.currencyCode.toString(),
                     color = Color.Gray,
                     style = MaterialTheme.typography.labelSmall
                 )
                 Text(
-                    text = product.brandVariants.price.amount,
+                    text = product.price.amount,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
