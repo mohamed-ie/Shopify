@@ -3,7 +3,7 @@ package com.example.shopify.feature.navigation_bar.category.viewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.category.model.CategoryState
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

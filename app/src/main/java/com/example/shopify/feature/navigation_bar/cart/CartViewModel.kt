@@ -10,7 +10,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartLineState
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponState
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -61,4 +61,11 @@ class ShopifyDataStoreManagerImpl @Inject constructor(
     }
 
 
+    override suspend fun setCurrencyAmountPerOnePound(currencyAmount: Float) {
+        dataStore.edit { it[Constants.DataStoreKeys.CURRENCY_AMOUNT] = currencyAmount.toString() }
+    }
+
+
+    override fun getCurrencyAmountPerOnePound(): Flow<Float> =
+        dataStore.data.map { it[Constants.DataStoreKeys.CURRENCY_AMOUNT]?.toFloat() ?: 0f }
 }

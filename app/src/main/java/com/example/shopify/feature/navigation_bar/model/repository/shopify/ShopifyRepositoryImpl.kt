@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.model.repository
+package com.example.shopify.feature.navigation_bar.model.repository.shopify
 
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
@@ -10,7 +10,7 @@ import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
-import com.example.shopify.feature.navigation_bar.model.remote.FireStoreManager
+import com.example.shopify.feature.navigation_bar.model.remote.fireStore.FireStoreManager
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review

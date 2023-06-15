@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.shopify.R
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.validator.auth.UserInputValidator
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.auth.screens.common.AuthUIEvent
 import com.example.shopify.feature.auth.screens.common.ErrorAuthUiState
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo

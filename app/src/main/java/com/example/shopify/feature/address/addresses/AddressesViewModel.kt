@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.address.addresses.view.AddressesEvent
 import com.example.shopify.feature.address.addresses.view.AddressesState
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
