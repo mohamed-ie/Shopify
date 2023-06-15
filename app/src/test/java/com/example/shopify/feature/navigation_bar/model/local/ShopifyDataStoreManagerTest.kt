@@ -10,11 +10,8 @@ import com.example.shopify.utils.Constants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -58,6 +55,17 @@ class ShopifyDataStoreManagerTest {
 
         //Then
         val result = shopifyDataStoreManager.getUserInfo().first()
+        assertEquals(expected,result)
+    }
+
+    @Test
+    fun setCurrencyAmountPerOnePound_currencyAmount_savedCurrencyAmount() = coroutineScopeTest.runTest {
+        //Given
+        val expected = 10f
+        //When
+        shopifyDataStoreManager.setCurrencyAmountPerOnePound(expected)
+        //Then
+        val result = shopifyDataStoreManager.getCurrencyAmountPerOnePound().first()
         assertEquals(expected,result)
     }
 }

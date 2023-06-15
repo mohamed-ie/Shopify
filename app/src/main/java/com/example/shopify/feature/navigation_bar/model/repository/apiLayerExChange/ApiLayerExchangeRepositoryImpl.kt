@@ -4,6 +4,7 @@ import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreMa
 import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyDto
 import com.shopify.buy3.Storefront.CurrencyCode
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 
@@ -23,10 +24,15 @@ class ApiLayerExchangeRepositoryImpl @Inject constructor(
     }
 
     private suspend fun setCurrencyAmountPerPound(currencyCode: String){
+        val liveAmountPerOnePound = getLiveCurrencyExchange(currencyCode).first()
+        dataStoreManager.setCurrencyAmountPerOnePound(liveAmountPerOnePound)
+    }
+
+    override suspend fun getLiveCurrencyExchange(currencyCode: String) = flow {
         val liveAmountPerOnePound = currencyDto
             .getLiveCurrencyExChange(CurrencyCode.EGP.toString(),currencyCode).let {currency ->
                 currency.quotes?.get(CurrencyCode.EGP.toString() + currencyCode) ?: 0f
             }
-        dataStoreManager.setCurrencyAmountPerOnePound(liveAmountPerOnePound)
+        emit(liveAmountPerOnePound)
     }
 }
