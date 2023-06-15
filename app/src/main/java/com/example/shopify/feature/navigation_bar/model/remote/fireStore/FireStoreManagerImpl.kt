@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.model.remote
+package com.example.shopify.feature.navigation_bar.model.remote.fireStore
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper

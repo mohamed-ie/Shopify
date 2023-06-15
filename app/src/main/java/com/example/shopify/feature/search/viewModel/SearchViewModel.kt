@@ -3,7 +3,7 @@ package com.example.shopify.feature.search.viewModel
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.search.view.SearchedProductsState
 import com.example.shopify.helpers.Resource
 import com.example.shopify.utils.Constants

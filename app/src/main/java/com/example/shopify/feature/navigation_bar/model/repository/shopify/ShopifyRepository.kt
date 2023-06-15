@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.model.repository
+package com.example.shopify.feature.navigation_bar.model.repository.shopify
 
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo

@@ -17,10 +17,12 @@ class Constants private constructor() {
         val USER_EXPIRED_TOKEN_AT = stringPreferencesKey("USER_EXPIRED_TOKEN_AT_PREFERENCES")
         val CUSTOMER_ID = stringPreferencesKey("CUSTOMER_ID")
         val CURRENCY = stringPreferencesKey("CURRENCY")
+        val CURRENCY_AMOUNT = stringPreferencesKey("CURRENCY_AMOUNT")
     }
 
-    object Shopify{
-        const val PRODUCT_SLANDERED_ID_URL = "gid://shopify/Product/"
+    object ApiLayerCurrency{
+        const val BASE_URL = "https://api.apilayer.com/currency_data/"
+        const val API_KEY = "0uxDuSoR0i4382UVae3zEGwS2hvoM2R4"
     }
 
     object DateFormats{
