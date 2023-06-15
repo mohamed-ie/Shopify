@@ -12,4 +12,6 @@ interface ShopifyDataStoreManager {
     suspend fun setEmail(email: String)
     suspend fun clearAccessToken()
     suspend fun setCurrency(currency: String)
+    suspend fun setCurrencyAmountPerOnePound(currencyAmount: Float)
+    fun getCurrencyAmountPerOnePound(): Flow<Float>
 }

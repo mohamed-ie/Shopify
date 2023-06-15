@@ -2,7 +2,7 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.my_account
 
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.model.repository.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.MyAccountEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.MyAccountState
 import com.example.shopify.helpers.Resource
