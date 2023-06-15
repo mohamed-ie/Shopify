@@ -66,6 +66,8 @@ dependencies {
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'com.google.ar:core:1.30.0'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -110,4 +112,9 @@ dependencies {
     //Data store
     implementation "androidx.datastore:datastore-preferences:$data_store_version"
 
+    //robolectric
+    testImplementation "org.robolectric:robolectric:$robo_electric_version"
+
+    //coroutines test
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
 }

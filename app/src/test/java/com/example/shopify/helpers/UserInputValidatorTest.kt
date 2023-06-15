@@ -2,15 +2,9 @@ package com.example.shopify.helpers
 
 import com.example.shopify.helpers.validator.auth.UserInputValidator
 import com.example.shopify.helpers.validator.auth.UserInputValidatorImpl
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.robolectric.annotation.Config
-import javax.inject.Inject
 
 
 class UserInputValidatorTest {

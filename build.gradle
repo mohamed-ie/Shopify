@@ -12,6 +12,7 @@ buildscript {
         google_service_version = '4.3.15'
         firebase_bom_version = '32.1.0'
         play_service_coroutines = '1.7.1'
+        robo_electric_version = '4.8'
     }
 }
 
