@@ -14,4 +14,6 @@ interface ShopifyDataStoreManager {
     suspend fun setCurrency(currency: String)
     suspend fun setCurrencyAmountPerOnePound(currencyAmount: Float)
     fun getCurrencyAmountPerOnePound(): Flow<Float>
+    fun getCustomerId(): Flow<String>
+    suspend fun setCustomerId(customerId: String)
 }

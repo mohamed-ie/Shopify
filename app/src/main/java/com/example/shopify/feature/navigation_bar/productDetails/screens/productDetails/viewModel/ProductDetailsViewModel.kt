@@ -3,11 +3,9 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.produc
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.AddToCardState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -139,32 +137,33 @@ class ProductDetailsViewModel @Inject constructor(
         _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
         _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let {variantId ->
             viewModelScope.launch {
-                when(repository.addToCart(variantId,_addToCardState.value.selectedQuantity)){
-                    is Resource.Error -> {}
-                    is Resource.Success -> {
-                        _addToCardState.value = _addToCardState.value.copy(isAdded = true)
-                        sendTotalCart(repository.getCart())
-                    }
-                }
+                repository.addToCart(variantId.toString(),_addToCardState.value.selectedQuantity)
+//                when(repository.addToCart(variantId,_addToCardState.value.selectedQuantity)){
+//                    is Resource.Error -> {}
+//                    is Resource.Success -> {
+//                        _addToCardState.value = _addToCardState.value.copy(isAdded = true)
+//                        sendTotalCart(repository.getCart())
+//                    }
+//                }
             }
         }
     }
 
-    private fun sendTotalCart(response:Resource<Cart?>){
-        when(response){
-            is Resource.Error -> {}
-            is Resource.Success -> {
-                _addToCardState.value = _addToCardState.value.copy(
-                    isTotalPriceLoaded = true,
-                    totalCartPrice = Price(
-                        amount = response.data?.totalPrice?.amount ?: "",
-                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
-                    )
-                )
-
-            }
-        }
-    }
+//    private fun sendTotalCart(response:Resource<Cart?>){
+//        when(response){
+//            is Resource.Error -> {}
+//            is Resource.Success -> {
+//                _addToCardState.value = _addToCardState.value.copy(
+//                    isTotalPriceLoaded = true,
+//                    totalCartPrice = Price(
+//                        amount = response.data?.totalPrice?.amount ?: "",
+//                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
+//                    )
+//                )
+//
+//            }
+//        }
+//    }
 
     private fun sendSelectedVariant(variantIndex: Int) {
         _variantState.value = _variantState.value.copy(selectedVariant = variantIndex)

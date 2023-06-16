@@ -81,7 +81,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                                     }
                                             }
                                     }.priceRange {
-                                        it.maxVariantPrice {price ->
+                                        it.maxVariantPrice { price ->
                                             price.amount()
                                             price.currencyCode()
                                         }
@@ -238,28 +238,43 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateProductsByQuery(productQueryType: Constants.ProductQueryType, queryContent:String): QueryRootQuery =
+    override fun generateGetCustomerId(accessToken: String): QueryRootQuery =
+        Storefront.query { query ->
+            query.customer(accessToken) {
+                it.id()
+            }
+        }
+
+    override fun generateProductsByQuery(
+        productQueryType: Constants.ProductQueryType,
+        queryContent: String
+    ): QueryRootQuery =
         Storefront.query { rootQuery ->
             rootQuery.products({ productArguments ->
-                when(productQueryType){
-                    Constants.ProductQueryType.TITLE -> {productArguments.query("${productQueryType.typeString}:$queryContent")}
-                    Constants.ProductQueryType.LAST_CURSOR -> {productArguments.after(queryContent)}
+                when (productQueryType) {
+                    Constants.ProductQueryType.TITLE -> {
+                        productArguments.query("${productQueryType.typeString}:$queryContent")
+                    }
+
+                    Constants.ProductQueryType.LAST_CURSOR -> {
+                        productArguments.after(queryContent)
+                    }
                 }.first(5)
             }) { productConnectionQuery ->
-               productConnectionQuery.pageInfo {
-                   it.hasNextPage()
-               }.edges {productEdgeQuery ->
+                productConnectionQuery.pageInfo {
+                    it.hasNextPage()
+                }.edges { productEdgeQuery ->
                     productEdgeQuery.cursor()
-                    productEdgeQuery.node {productQuery ->
+                    productEdgeQuery.node { productQuery ->
                         productQuery.title()
 
                             .images({ args -> args.first(5) }) { imageConnectionQuery ->
-                                imageConnectionQuery.nodes {imageQuery ->
+                                imageConnectionQuery.nodes { imageQuery ->
                                     imageQuery.url()
                                 }
                             }
-                            .priceRange {productPriceRangeQuery ->
-                                productPriceRangeQuery.maxVariantPrice {moneyV2Query ->
+                            .priceRange { productPriceRangeQuery ->
+                                productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
                                     moneyV2Query.amount()
                                         .currencyCode()
                                 }

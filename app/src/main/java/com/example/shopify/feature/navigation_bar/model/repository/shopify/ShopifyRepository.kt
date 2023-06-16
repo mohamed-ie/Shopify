@@ -43,9 +43,7 @@ interface ShopifyRepository {
     suspend fun updateCurrency(currency: String)
     suspend fun signOut()
     suspend fun getAddresses(): Resource<List<MyAccountMinAddress>>
-    suspend fun addToCart(productVariantId: ID, quantity: Int): Resource<String?>
-    suspend fun removeCartLines(linesId: List<ID>): Resource<Cart?>
-    suspend fun changeCartLineQuantity(merchandiseId: ID, quantity: Int): Resource<Cart?>
+    suspend fun addToCart(productVariantId: String, quantity: Int): Resource<String?>
     suspend fun applyCouponToCart(coupon: String): Resource<Cart?>
     suspend fun updateCartAddress(addressId: ID): Resource<String?>
     fun getShopifyProductsByWishListIDs(): Flow<Resource<Product?>>
@@ -55,4 +53,6 @@ interface ShopifyRepository {
         productQueryType: Constants.ProductQueryType,
         queryContent: String
     ): Resource<Pageable<List<BrandProduct>>?>
+    suspend fun removeCartLines(productVariantId: String): Resource<Cart?>
+    suspend fun changeCartLineQuantity(merchandiseId: String, quantity: Int): Resource<Cart?>
 }

@@ -27,17 +27,12 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.cart.model.CartLine
-import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.theme.Gray
-import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
-import com.shopify.buy3.Storefront
-import com.shopify.graphql.support.ID
 
 @Composable
 fun OrderItemScreen(
@@ -100,7 +95,7 @@ fun OrderItemScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = cartLine.price.run { "$currencyCode $amount" },
+                    text = cartLine.price?:"",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -121,27 +116,27 @@ fun OrderItemScreen(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewItemScreen() {
-    ShopifyTheme {
-        OrderItemScreen(
-                    CartLine(
-                        productVariantID = ID(""),
-                        id = ID(""),
-                        Storefront.MoneyV2().setAmount("900.00")
-                            .setCurrencyCode(Storefront.CurrencyCode.EGP),
-                        quantity = 1,
-                        availableQuantity = 20,
-                        cartProduct = CartProduct(
-                            name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
-                            collection = "Electronics",
-                            thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
-                            vendor = "Amazon"
-                        )
-                    )
-
-        )
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewItemScreen() {
+//    ShopifyTheme {
+//        OrderItemScreen(
+//                    CartLine(
+//                        productVariantID = ID(""),
+//                        id = ID(""),
+//                        Storefront.MoneyV2().setAmount("900.00")
+//                            .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//                        quantity = 1,
+//                        availableQuantity = 20,
+//                        cartProduct = CartProduct(
+//                            name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
+//                            collection = "Electronics",
+//                            thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
+//                            vendor = "Amazon"
+//                        )
+//                    )
+//
+//        )
+//    }
+//}
