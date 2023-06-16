@@ -13,5 +13,6 @@ interface FireStoreManager {
     suspend fun createCustomer(customerId: String)
     suspend fun removeAWishListProduct(customerId: String, productId: ID)
     suspend fun getCurrentCartId(email: String): String?
-    suspend fun setCurrentCartId(customerId: String, cartId: String)
+    suspend fun setCurrentCartId(email: String, cartId: String)
+    suspend fun clearDraftOrderId(email: String)
 }

@@ -24,7 +24,7 @@ fun NavGraphBuilder.cartNavigation(navController: NavController) {
         composable(route = CartGraph.Cart.route) {
             CartScreen(
                 viewModel = hiltViewModel(),
-                navigateTo = navController::navigate
+                navigateTo = navController::navigate,
             )
         }
 

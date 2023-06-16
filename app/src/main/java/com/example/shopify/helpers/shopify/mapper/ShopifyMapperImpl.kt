@@ -1,5 +1,8 @@
 package com.example.shopify.helpers.shopify.mapper
 
+import com.apollographql.apollo3.api.ApolloResponse
+import com.example.shopify.DraftOrderQuery
+import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
@@ -53,7 +56,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             customerAccessToken?.accessToken ?: "",
             customerAccessToken?.expiresAt?.toDate()?.time.toString().takeIf { it != "null" },
             response.data?.customerAccessTokenCreate?.customerUserErrors?.getOrNull(0)?.message
-                ?: ""
+                ?: "",
         )
     }
 
@@ -99,8 +102,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return res
     }
 
-    override fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?  =
-        response.data?.products?.let {productConnection ->
+    override fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>? =
+        response.data?.products?.let { productConnection ->
             val productsBrand = mapProductConnectionToProductsBrand(productConnection)
             Pageable(
                 hasNext = productConnection.pageInfo.hasNextPage ?: false,
@@ -109,9 +112,11 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
+    override fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart =
+        response.data?.draftOrder.toCart()
 
-    private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection):List<BrandProduct>  =
-        productConnection.edges.map {productEdge ->
+    private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection): List<BrandProduct> =
+        productConnection.edges.map { productEdge ->
             productEdge.node.run {
                 BrandProduct(
                     id = id,
@@ -121,11 +126,6 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 )
             }
         }
-
-
-
-
-
 
 
     override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
@@ -267,67 +267,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         )
     }
 
-    override fun mapToCart(graphResponse: GraphResponse<Storefront.QueryRoot>): Cart? =
-        graphResponse.data?.cart?.toCart()
-
-
-    override fun mapToRemoveCartLines(response: GraphResponse<Storefront.Mutation>): Cart? =
-        response.data?.cartLinesRemove?.run { cart.toCart(userErrors?.getOrNull(0)?.message) }
-
-    override fun mapToChangeCartLineQuantity(response: GraphResponse<Storefront.Mutation>): Cart? =
-        response.data?.cartLinesUpdate?.run { cart.toCart(userErrors?.getOrNull(0)?.message) }
-
-    override fun mapToApplyCouponToCart(response: GraphResponse<Storefront.Mutation>): Cart? =
-        response.data?.cartDiscountCodesUpdate?.run {
-            cart.toCart(couponError = userErrors.getOrNull(0)?.message)
-        }
-
-    private fun Storefront.Cart.toCart(error: String? = null, couponError: String? = null): Cart =
-        run {
-            val lines = lines?.edges?.map {
-                val merchandise = it.node.merchandise as Storefront.ProductVariant
-                val product = merchandise.product
-
-                val cartProduct = CartProduct(
-                    id = product.id,
-                    name = product.title,
-                    thumbnail = merchandise.image.url,
-                    collection = product.productType,
-                    vendor = product.vendor
-                )
-                CartLine(
-                    productVariantID = merchandise.id,
-                    id = it.node.id,
-                    price = merchandise.price,
-                    quantity = it.node.quantity,
-                    availableQuantity = merchandise.quantityAvailable,
-                    cartProduct = cartProduct
-                )
-            }
-            val cost = cost
-            val coupons = discountAllocations
-                ?.takeIf { it is Storefront.CartCodeDiscountAllocation }
-                ?.map { it as Storefront.CartCodeDiscountAllocation }
-                ?.associate { it.code to it.discountedAmount }
-                ?: emptyMap()
-
-            val mailingAddress = buyerIdentity.deliveryAddressPreferences.getOrNull(0) as? Storefront.MailingAddress?
-
-            Cart(
-                lines = lines ?: emptyList(),
-                taxes = cost?.totalTaxAmount,
-                subTotalsPrice = cost?.subtotalAmount,
-                shippingFee = cost?.totalDutyAmount,
-                checkoutPrice = cost?.checkoutChargeAmount,
-                totalPrice = cost?.totalAmount,
-                discounts = cost?.totalAmount - cost?.totalTaxAmount - cost?.checkoutChargeAmount,
-                coupons = coupons,
-                address = mailingAddress?.toAddressString()?:"",
-                couponError = couponError,
-                error = error,
-                hasNextPage = this.lines?.pageInfo?.hasNextPage ?: false
-            )
-        }
+    override fun mapMutationToCart(data: DraftOrderUpdateMutation.Data): Cart? =
+        data.draftOrderUpdate?.run { draftOrder.toCart(userErrors.getOrNull(0)?.message) }
 
     override fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String? =
         response.data?.cartBuyerIdentityUpdate?.userErrors?.getOrNull(0)?.message
@@ -339,4 +280,90 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return Storefront.MoneyV2().setAmount(newAmount.toString())
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
+}
+
+private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
+    val lines = this?.lineItems?.nodes?.map {
+        val product = it.product
+
+        val cartProduct = CartProduct(
+            id = ID(product?.id),
+            name = it.name,
+            thumbnail = it.image?.url as String,
+            collection = product?.productType ?: "",
+            vendor = it.vendor ?: ""
+        )
+        CartLine(
+            id = ID(it.id),
+            productVariantID = ID(it.variant?.id),
+            price = it.variant?.price.run { "$currencyCode ${this ?: "0.00"}" },
+            quantity = it.quantity,
+            availableQuantity = it.variant?.inventoryQuantity!!,
+            cartProduct = cartProduct
+        )
+    }
+
+    val taxes = "${this?.currencyCode} ${this?.totalTax ?: "0.00"}"
+    val subTotalPrice = "${this?.currencyCode} ${this?.subtotalPrice ?: "0.00"}"
+    val shippingFee = if (this?.totalShippingPrice?.toString() == "0.00") "FREE"
+    else "${this?.currencyCode} ${this?.totalShippingPrice ?: "0.00"}"
+    val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
+    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
+        ?.run { "$currencyCode $amount" }
+
+    return Cart(
+        lines = lines ?: emptyList(),
+        taxes = taxes,
+        subTotalsPrice = subTotalPrice,
+        shippingFee = shippingFee,
+        totalPrice = totalPrice,
+        discounts = discounts,
+        address = this?.shippingAddress?.formattedArea ?: "",
+        hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
+        error = error,
+        endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
+    )
+}
+
+private fun DraftOrderQuery.DraftOrder?.toCart(error: String? = null): Cart {
+    val lines = this?.lineItems?.nodes?.map {
+        val product = it.product
+
+        val cartProduct = CartProduct(
+            id = ID(product?.id),
+            name = it.name,
+            thumbnail = it.image?.url as String,
+            collection = product?.productType ?: "",
+            vendor = it.vendor ?: ""
+        )
+        CartLine(
+            id = ID(it.id),
+            productVariantID = ID(it.variant?.id),
+            price = it.variant?.price.run { "$currencyCode ${this ?: "0.00"}" },
+            quantity = it.quantity,
+            availableQuantity = it.variant?.inventoryQuantity!!,
+            cartProduct = cartProduct
+        )
+    }
+
+    val taxes = "${this?.currencyCode} ${this?.totalTax ?: "0.00"}"
+    val subTotalPrice = "${this?.currencyCode} ${this?.subtotalPrice ?: "0.00"}"
+    val shippingFee = if (this?.totalShippingPrice?.toString() == "0.00") "FREE"
+    else "${this?.currencyCode} ${this?.totalShippingPrice ?: "0.00"}"
+    val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
+    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
+        ?.run { "$currencyCode $amount" }
+
+    return Cart(
+        lines = lines ?: emptyList(),
+        taxes = taxes,
+        subTotalsPrice = subTotalPrice,
+        shippingFee = shippingFee,
+        totalPrice = totalPrice,
+        discounts = discounts,
+        address = this?.shippingAddress?.formattedArea ?: "",
+        hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
+        error = error,
+        endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
+    )
 }

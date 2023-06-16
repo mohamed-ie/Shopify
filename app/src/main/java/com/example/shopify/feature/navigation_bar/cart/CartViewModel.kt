@@ -85,7 +85,7 @@ class CartViewModel @Inject constructor(
                     isChooseQuantityOpen = false
                 )
             }
-            val cartLineId = _state.value.lines[index].id
+            val cartLineId = _state.value.lines[index].productVariantID.toString()
             when (val resource = repository.changeCartLineQuantity(cartLineId, quantity)) {
                 is Resource.Error -> toErrorScreenState()
                 is Resource.Success -> handleCartResource(resource)
@@ -94,7 +94,7 @@ class CartViewModel @Inject constructor(
 
     private fun removeCartLine(index: Int) = viewModelScope.launch(defaultDispatcher) {
         _cartLinesState.update(index) { it.copy(isRemoving = it.isRemoving.not()) }
-        val cartLineId = listOf(_state.value.lines[index].id)
+        val cartLineId = _state.value.lines[index].productVariantID.toString()
         when (val resource = repository.removeCartLines(cartLineId)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> handleCartResource(resource)
@@ -103,7 +103,7 @@ class CartViewModel @Inject constructor(
 
     private fun removeCartLineAndAddToWishList(index: Int) = viewModelScope.launch(defaultDispatcher){
         _cartLinesState.update(index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
-        val cartLineId = listOf(_state.value.lines[index].id)
+        val cartLineId = _state.value.lines[index].id.toString()
         when (val resource = repository.removeCartLines(cartLineId)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {

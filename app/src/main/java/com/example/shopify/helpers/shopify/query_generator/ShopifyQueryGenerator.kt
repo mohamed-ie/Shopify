@@ -61,6 +61,16 @@ interface ShopifyQueryGenerator {
     ): Storefront.MutationQuery
 
     fun generateApplyCouponQuery(cartId: ID, coupon: String): Storefront.MutationQuery
-    fun generateUpdateCartAddress(accessToken: String,cartId: ID, addressId: ID): Storefront.MutationQuery
-    fun generateProductsByQuery(productQueryType: Constants.ProductQueryType, queryContent: String): Storefront.QueryRootQuery
+    fun generateUpdateCartAddress(
+        accessToken: String,
+        cartId: ID,
+        addressId: ID
+    ): Storefront.MutationQuery
+
+    fun generateProductsByQuery(
+        productQueryType: Constants.ProductQueryType,
+        queryContent: String
+    ): Storefront.QueryRootQuery
+
+    fun generateGetCustomerId(accessToken: String): Storefront.QueryRootQuery
 }

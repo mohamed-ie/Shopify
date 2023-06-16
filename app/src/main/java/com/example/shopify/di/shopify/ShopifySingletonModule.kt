@@ -19,7 +19,7 @@ object ShopifySingletonModule {
         GraphClient.build(
             context,
             BuildConfig.DOMAIN,
-            BuildConfig.ACCESS_TOKEN
+            BuildConfig.STORE_FRONT_ACCESS_TOKEN
         )
 
 }
