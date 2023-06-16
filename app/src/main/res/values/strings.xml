@@ -141,5 +141,6 @@
     <string name="the_start">The start</string>
     <string name="price_range">Price Range</string>
     <string name="results">Results:</string>
+    <string name="sign_in">Sign in</string>
 
 </resources>

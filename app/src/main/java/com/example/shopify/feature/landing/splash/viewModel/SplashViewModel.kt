@@ -8,9 +8,9 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 
-@HiltViewModel
-class SplashViewModel @Inject constructor(
-    repository: ShopifyRepository
-):ViewModel() {
-    val isLoggedIn:Boolean = runBlocking { repository.isLoggedIn().first()}
-}
+//@HiltViewModel
+//class SplashViewModel @Inject constructor(
+//    repository: ShopifyRepository
+//):ViewModel() {
+//    val isLoggedIn:Boolean = runBlocking { repository.isLoggedIn().first()}
+//}

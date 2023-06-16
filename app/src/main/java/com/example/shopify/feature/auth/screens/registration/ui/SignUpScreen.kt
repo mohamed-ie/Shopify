@@ -48,7 +48,8 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun SignUpScreen(
     viewModel: RegistrationViewModel,
-    navigateToSignIn:()->Unit
+    navigateToSignIn:()->Unit,
+    onCloseScreen:()->Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val errorUiState by viewModel.uiErrorState.collectAsState()
@@ -75,7 +76,8 @@ fun SignUpScreen(
         onEmailTextChange = viewModel::sendEmailValue,
         onPhoneTextChange = viewModel::sendPhoneValue,
         onPasswordTextChange = viewModel::sendPasswordValue,
-        onSignUp = viewModel::signUp
+        onSignUp = viewModel::signUp,
+        onCloseScreen = onCloseScreen
     )
 }
 
@@ -90,7 +92,8 @@ private fun SignUpScreenContent(
     onEmailTextChange:(String) -> Unit,
     onPhoneTextChange:(String) -> Unit,
     onPasswordTextChange:(String) -> Unit,
-    onSignUp:() ->Unit
+    onSignUp:() ->Unit,
+    onCloseScreen:()->Unit
 ){
     Column {
         AnimatedVisibility(
@@ -111,7 +114,7 @@ private fun SignUpScreenContent(
                     .padding(vertical = 10.dp)
             )
 
-            AuthHeader()
+            AuthHeader(onCloseScreen)
 
             Spacer(modifier = Modifier.padding(vertical = 15.dp))
 
@@ -244,5 +247,5 @@ private fun SignUpScreenContent(
 @Preview
 @Composable
 private fun PreviewSignUpScreen() {
-    SignUpScreen(hiltViewModel()){}
+    SignUpScreen(hiltViewModel(),{}){}
 }
