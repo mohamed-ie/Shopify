@@ -1,6 +1,5 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.apollographql.apollo3.api.ApolloResponse
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
@@ -112,8 +111,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
-    override fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart =
-        response.data?.draftOrder.toCart()
+    override fun mapQueryToCart(data: DraftOrderQuery.Data): Cart =
+        data.draftOrder.toCart()
 
     private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection): List<BrandProduct> =
         productConnection.edges.map { productEdge ->

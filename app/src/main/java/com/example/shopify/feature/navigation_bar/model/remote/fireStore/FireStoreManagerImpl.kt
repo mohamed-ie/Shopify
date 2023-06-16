@@ -1,8 +1,12 @@
 package com.example.shopify.feature.navigation_bar.model.remote.fireStore
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
+import com.example.shopify.helpers.mapResource
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
@@ -75,26 +79,27 @@ class FireStoreManagerImpl @Inject constructor(
             .get(Customer.Fields.CURRENCY) as String
     }
 
-    override suspend fun setCurrentCartId(email: String, cartId: String) {
-        fireStore.collection(Customer.PATH)
+    override suspend fun setCurrentCartId(email: String, cartId: String): Resource<Void> {
+        return fireStore.collection(Customer.PATH)
             .document(email)
-            .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
-            .await()
+            .update(Customer.Fields.CURRENT_CART_ID, cartId)
+            .awaitResource()
+
     }
 
-    override suspend fun clearDraftOrderId(email: String) {
-        fireStore.collection(Customer.PATH)
+    override suspend fun clearDraftOrderId(email: String): Resource<Void> {
+        return fireStore.collection(Customer.PATH)
             .document(email)
-            .update(Customer.Fields.CURRENT_CART_ID,null)
-            .await()
+            .update(Customer.Fields.CURRENT_CART_ID, null)
+            .awaitResource()
     }
 
-    override suspend fun getCurrentCartId(email: String): String? {
+    override suspend fun getCurrentCartId(email: String): Resource<String?> {
         return fireStore.collection(Customer.PATH)
             .document(email)
             .get()
-            .await()
-            .get(Customer.Fields.CURRENT_CART_ID) as String?
+            .awaitResource()
+            .mapResource { it.get(Customer.Fields.CURRENT_CART_ID) as String? }
     }
 
 
@@ -134,5 +139,35 @@ class FireStoreManagerImpl @Inject constructor(
             .get(Customer.Fields.WISH_LIST) as? List<*>)
             ?.map { it as String }
             ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+    }
+
+    private suspend fun <T> Task<T>.awaitResource(): Resource<T> {
+        return try {
+            Resource.Success(await())
+        }
+//        catch (e:FirebaseFirestoreException){
+//            when(e.code){
+//                FirebaseFirestoreException.Code.OK -> TODO()
+//                FirebaseFirestoreException.Code.CANCELLED -> TODO()
+//                FirebaseFirestoreException.Code.UNKNOWN -> TODO()
+//                FirebaseFirestoreException.Code.INVALID_ARGUMENT -> TODO()
+//                FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> TODO()
+//                FirebaseFirestoreException.Code.NOT_FOUND -> TODO()
+//                FirebaseFirestoreException.Code.ALREADY_EXISTS -> TODO()
+//                FirebaseFirestoreException.Code.PERMISSION_DENIED -> TODO()
+//                FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED -> TODO()
+//                FirebaseFirestoreException.Code.FAILED_PRECONDITION -> TODO()
+//                FirebaseFirestoreException.Code.ABORTED -> TODO()
+//                FirebaseFirestoreException.Code.OUT_OF_RANGE -> TODO()
+//                FirebaseFirestoreException.Code.UNIMPLEMENTED -> TODO()
+//                FirebaseFirestoreException.Code.INTERNAL -> TODO()
+//                FirebaseFirestoreException.Code.UNAVAILABLE -> TODO()
+//                FirebaseFirestoreException.Code.DATA_LOSS -> TODO()
+//                FirebaseFirestoreException.Code.UNAUTHENTICATED -> TODO()
+//            }
+//        }
+        catch (e: Exception) {
+            Resource.Error(UIError.Unexpected)
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.shopify.feature.navigation_bar.model.remote.fireStore
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 
 interface FireStoreManager {
@@ -12,7 +13,7 @@ interface FireStoreManager {
     suspend fun getWishList(customerId: String): List<ID>
     suspend fun createCustomer(customerId: String)
     suspend fun removeAWishListProduct(customerId: String, productId: ID)
-    suspend fun getCurrentCartId(email: String): String?
-    suspend fun setCurrentCartId(email: String, cartId: String)
-    suspend fun clearDraftOrderId(email: String)
+    suspend fun getCurrentCartId(email: String): Resource<String?>
+    suspend fun setCurrentCartId(email: String, cartId: String): Resource<Void>
+    suspend fun clearDraftOrderId(email: String): Resource<Void>
 }
