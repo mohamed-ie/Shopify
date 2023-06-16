@@ -35,7 +35,7 @@ class OrderViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            handleCartResource(repository.getCart())
+//            handleCartResource(repository.getCart())
         }
     }
 

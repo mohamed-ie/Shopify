@@ -75,10 +75,17 @@ class FireStoreManagerImpl @Inject constructor(
             .get(Customer.Fields.CURRENCY) as String
     }
 
-    override suspend fun setCurrentCartId(customerId: String, cartId: String) {
+    override suspend fun setCurrentCartId(email: String, cartId: String) {
         fireStore.collection(Customer.PATH)
-            .document(customerId)
+            .document(email)
             .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
+            .await()
+    }
+
+    override suspend fun clearDraftOrderId(email: String) {
+        fireStore.collection(Customer.PATH)
+            .document(email)
+            .update(Customer.Fields.CURRENT_CART_ID,null)
             .await()
     }
 

@@ -32,7 +32,6 @@ fun TotalCostCard(
     itemsCount: Int,
     subTotalsPrice: String,
     shippingFee: String,
-    checkout: String,
     taxes: String,
     totalPrice: String,
     discounts: String?
@@ -62,8 +61,6 @@ fun TotalCostCard(
             )
 
             TotalCostItem(title = stringResource(id = R.string.shipping_fee), value = shippingFee)
-
-            TotalCostItem(title = stringResource(id = R.string.checkout), value = checkout)
 
             TotalCostItem(title = stringResource(id = R.string.taxes), value = taxes)
             discounts?.let {
@@ -156,7 +153,6 @@ fun PreviewTotalCostCard() {
             "EGP 100.50",
             "EGP 1035.50",
             "EGP 1035.50",
-            null
         )
     }
 }
@@ -165,6 +161,6 @@ fun PreviewTotalCostCard() {
 @Composable
 fun PreviewTotalCostCardFreeShippingFee() {
     ShopifyTheme {
-        TotalCostCard(5, "EGP 915.00", "FREE", "EGP 100.50", "EGP 100.50", "EGP 1015.50", null)
+        TotalCostCard(5, "EGP 915.00", "FREE", "EGP 100.50", "EGP 100.50", "EGP 1015.50")
     }
 }

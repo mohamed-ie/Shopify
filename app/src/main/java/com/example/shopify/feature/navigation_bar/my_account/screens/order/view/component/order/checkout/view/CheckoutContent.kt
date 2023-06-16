@@ -47,12 +47,12 @@ fun CheckoutContent(
             }
             item {
                 OrderSummaryScreen(itemsCount = cart!!.lines.size,
-                    discount = cart.discounts?.run { "${currencyCode.name} $amount" } ?: "0",
-                    shippingFees = cart.shippingFee?.run { "${currencyCode.name} $amount" }
+                    discount = cart.discounts ?: "0",
+                    shippingFees = cart.shippingFee
                         ?: "Free",
-                    subtotal = cart.subTotalsPrice?.run { "${currencyCode.name} $amount" } ?: "",
-                    taxes = cart.taxes?.run { "${currencyCode.name} $amount" } ?: "EGP0 0",
-                    total = cart.totalPrice?.run { "${currencyCode.name} $amount" } ?: "")
+                    subtotal = cart.subTotalsPrice?: "",
+                    taxes = cart.taxes?: "EGP0 0",
+                    total = cart.totalPrice ?: "")
             }
             item {
                 Text(
@@ -69,7 +69,7 @@ fun CheckoutContent(
             }
         }
         CheckoutFooterScreen(totalItems = cart?.lines?.size ?: 0,
-            totalPrice = cart?.totalPrice?.run { "${currencyCode.name} $amount" } ?: "",
+            totalPrice = cart?.totalPrice ?: "",
             onPlaceOrderClick = {
                 onPlaceOrder(cart!!)
             })
