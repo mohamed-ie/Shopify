@@ -79,7 +79,7 @@ fun MyAccountSignedInHeader(
                 MyHeaderListItem(
                     name = stringResource(id = R.string.orders),
                     icon = Icons.Outlined.Ballot,
-                    onClick = {/*navigateTo()*/ }
+                    onClick = { navigateTo(Graph.ORDERS) }
                 )
 
                 MyHeaderListItem(

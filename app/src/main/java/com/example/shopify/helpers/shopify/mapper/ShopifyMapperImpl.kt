@@ -11,6 +11,7 @@ import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
@@ -131,8 +132,15 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
         return response.data?.customer?.orders?.edges?.map {
             Order(
-                it.node.orderNumber, it.node.billingAddress,
-                it.node.cancelReason, it.node.processedAt, it.node.totalPrice, it.node.lineItems
+                orderNumber = it.node.orderNumber,
+                processedAt = it.node.processedAt,
+                subTotalPrice = it.node.subtotalPrice,
+                totalShippingPrice = it.node.totalShippingPrice,
+                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations.get(0)),
+                totalTax = it.node.totalTax,
+                totalPrice = it.node.totalPrice,
+                billingAddress = it.node.billingAddress,
+                lineItems = mapToLinesItemResponse(it.node.lineItems)
             )
         } ?: listOf()
     }
@@ -339,4 +347,19 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return Storefront.MoneyV2().setAmount(newAmount.toString())
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
+
+    private fun mapToDiscount(response: Storefront.DiscountAllocation): Storefront.MoneyV2 =
+        response.allocatedAmount
+
+    private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection): List<LineItems> =
+        response.edges.map {
+            LineItems(
+                id = it.node.variant.product.id,
+                name = it.node.variant.product.title,
+                thumbnail = it.node.variant.product.featuredImage.url,
+                collection = it.node.variant.product.productType,
+                vendor = it.node.variant.product.vendor,
+                description = it.node.variant.product.description
+            )
+        }
 }

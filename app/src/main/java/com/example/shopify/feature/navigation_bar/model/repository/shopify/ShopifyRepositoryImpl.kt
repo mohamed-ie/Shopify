@@ -12,6 +12,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.remote.fireStore.FireStoreManager
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
@@ -251,14 +252,19 @@ class ShopifyRepositoryImpl @Inject constructor(
     override suspend fun removeProductWishListById(productId: ID) =
         fireStoreManager.removeAWishListProduct(dataStoreManager.getEmail().first(), productId)
 
+    override suspend fun getOrders(): Flow<Resource<List<Order>>> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        return queryGenerator.generateUserOrdersQuery(accessToken).enqueue()
+            .mapResource(mapper::mapToOrderResponse)
+    }
+
     private suspend fun getWishList(customerId: String): List<ID> =
         fireStoreManager.getWishList(customerId)
 
 
-
     override fun getShopifyProductsByWishListIDs() = flow {
         getWishList(dataStoreManager.getEmail().first())
-            .also {productList ->
+            .also { productList ->
                 productList.ifEmpty {
                     emit(Resource.Success(null))
                 }

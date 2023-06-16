@@ -12,11 +12,8 @@ import com.shopify.buy3.Storefront.CheckoutCreateInput
 import com.shopify.buy3.Storefront.CheckoutLineItemInput
 import com.shopify.buy3.Storefront.CreditCardPaymentInputV2
 import com.shopify.buy3.Storefront.CustomerAddressCreatePayloadQuery
-import com.shopify.buy3.Storefront.CustomerQuery
-import com.shopify.buy3.Storefront.CustomerQuery.OrdersArguments
 import com.shopify.buy3.Storefront.MailingAddressQuery
 import com.shopify.buy3.Storefront.MutationQuery
-import com.shopify.buy3.Storefront.OrderConnectionQuery
 import com.shopify.buy3.Storefront.OrderEdgeQuery
 import com.shopify.buy3.Storefront.OrderQuery
 import com.shopify.buy3.Storefront.QueryRootQuery
@@ -81,7 +78,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                                     }
                                             }
                                     }.priceRange {
-                                        it.maxVariantPrice {price ->
+                                        it.maxVariantPrice { price ->
                                             price.amount()
                                             price.currencyCode()
                                         }
@@ -104,36 +101,57 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     override fun generateUserOrdersQuery(accessToken: String): QueryRootQuery =
         Storefront.query { root: QueryRootQuery ->
-            root.customer(accessToken) { customer: CustomerQuery ->
-                customer.orders({ arg: OrdersArguments -> arg.first(10) }
-                ) { connection: OrderConnectionQuery ->
-                    connection.edges { edge: OrderEdgeQuery ->
-                        edge.node { node: OrderQuery ->
+            root.customer(accessToken) { customer ->
+                customer.orders({ arg -> arg.first(10) }) { connection ->
+                    connection.edges() { edge: OrderEdgeQuery ->
+                        edge.node() { node: OrderQuery ->
                             node.orderNumber()
-                            node.billingAddress {
-                                it.address1()
-                                it.address1()
-                                it.name()
-                                it.phone()
-                            }
-                            node.cancelReason()
                             node.processedAt()
-                            node.totalPrice { price ->
-                                price.amount()
-                                price.currencyCode()
+                            node.subtotalPrice {
+                                it.amount()
+                                it.currencyCode()
                             }
-                            node.lineItems { items ->
+                            node.totalShippingPrice {
+                                it.amount()
+                                it.currencyCode()
+                            }
+                            node.shippingDiscountAllocations { discount ->
+                                discount.allocatedAmount {
+                                    it.amount()
+                                    it.currencyCode()
+                                }
+                            }
+                            node.totalTax {
+                                it.amount()
+                                it.currencyCode()
+                            }
+                            node.totalPrice {
+                                it.amount()
+                                it.currencyCode()
+                            }
+                            node.billingAddress {
+                                it.phone()
+                                    .address1()
+                                    .address2()
+                                    .company()
+                                    .country()
+                                    .city()
+                                    .province()
+                                    .zip()
+                                    .lastName()
+                                    .firstName()
+                            }
+                            node.lineItems({ args -> args.first(10) }) { items ->
                                 items.edges { itemsEdge ->
                                     itemsEdge.node { itemsNode ->
                                         itemsNode.variant { variant ->
                                             variant.product { product ->
                                                 product.title()
-                                                product.images { productImage ->
-                                                    productImage.edges { imgEdge ->
-                                                        imgEdge.node { imgNode ->
-                                                            imgNode.url()
-                                                        }
-                                                    }
+                                                product.description()
+                                                product.vendor()
+                                                product.productType()
+                                                product.featuredImage {
+                                                    it.url()
                                                 }
 
                                             }
@@ -155,9 +173,13 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
         val lines = cart.lines.map {
             CheckoutLineItemInput(it.quantity, it.productVariantID)
         }
+        val address = Storefront.MailingAddressInput()
+            .setAddress1(cart.address)
         val input = CheckoutCreateInput()
             .setLineItemsInput(Input.value(lines))
             .setEmail(email)
+            .setShippingAddress(address)
+
         val query = Storefront.mutation { mutationQuery ->
             mutationQuery.checkoutCreate(input) { createPayloadQuery ->
                 createPayloadQuery.checkout { checkoutQuery ->
@@ -233,28 +255,36 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateProductsByQuery(productQueryType: Constants.ProductQueryType, queryContent:String): QueryRootQuery =
+    override fun generateProductsByQuery(
+        productQueryType: Constants.ProductQueryType,
+        queryContent: String
+    ): QueryRootQuery =
         Storefront.query { rootQuery ->
             rootQuery.products({ productArguments ->
-                when(productQueryType){
-                    Constants.ProductQueryType.TITLE -> {productArguments.query("${productQueryType.typeString}:$queryContent")}
-                    Constants.ProductQueryType.LAST_CURSOR -> {productArguments.after(queryContent)}
+                when (productQueryType) {
+                    Constants.ProductQueryType.TITLE -> {
+                        productArguments.query("${productQueryType.typeString}:$queryContent")
+                    }
+
+                    Constants.ProductQueryType.LAST_CURSOR -> {
+                        productArguments.after(queryContent)
+                    }
                 }.first(5)
             }) { productConnectionQuery ->
-               productConnectionQuery.pageInfo {
-                   it.hasNextPage()
-               }.edges {productEdgeQuery ->
+                productConnectionQuery.pageInfo {
+                    it.hasNextPage()
+                }.edges { productEdgeQuery ->
                     productEdgeQuery.cursor()
-                    productEdgeQuery.node {productQuery ->
+                    productEdgeQuery.node { productQuery ->
                         productQuery.title()
 
                             .images({ args -> args.first(5) }) { imageConnectionQuery ->
-                                imageConnectionQuery.nodes {imageQuery ->
+                                imageConnectionQuery.nodes { imageQuery ->
                                     imageQuery.url()
                                 }
                             }
-                            .priceRange {productPriceRangeQuery ->
-                                productPriceRangeQuery.maxVariantPrice {moneyV2Query ->
+                            .priceRange { productPriceRangeQuery ->
+                                productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
                                     moneyV2Query.amount()
                                         .currencyCode()
                                 }
