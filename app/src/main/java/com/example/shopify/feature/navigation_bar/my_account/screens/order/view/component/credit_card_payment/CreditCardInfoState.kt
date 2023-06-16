@@ -1,6 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment
 
-import com.example.shopify.feature.common.state.TextFieldState
+import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
 
 data class CreditCardInfoState(
     val firstNameState: TextFieldState = TextFieldState(),

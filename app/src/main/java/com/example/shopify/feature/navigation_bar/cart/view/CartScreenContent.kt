@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.AddressGraph
-import com.example.shopify.feature.common.component.RemoteErrorHeader
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemCard
@@ -41,6 +40,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.footer.CartFooter
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.header.CartHeader
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
+import com.example.shopify.feature.navigation_bar.common.component.RemoteErrorHeader
 import com.example.shopify.theme.Green170
 
 val cartElevation = 2.dp

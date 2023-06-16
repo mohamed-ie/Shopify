@@ -21,10 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.shopify.R
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.NamedTopAppBar
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.common.SearchHeader
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.ProductsState
 import com.example.shopify.feature.navigation_bar.home.screen.product.viewModel.ProductViewModel
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
@@ -36,7 +36,8 @@ import com.shopify.graphql.support.ID
 fun ProductScreen(
     viewModel: ProductViewModel,
     back: () -> Unit,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     val state by viewModel.productList.collectAsState()
     when (viewModel.screenState.collectAsState().value) {
@@ -46,7 +47,8 @@ fun ProductScreen(
             navigateToHome = back,
             navigateToProductDetails = { navigateTo("${ProductDetailsGraph.PRODUCT_DETAILS}/${it.encodeProductId()}") },
             updateSliderValue = viewModel::updateSliderValue,
-            onFavourite = viewModel::onFavourite
+            onFavourite = viewModel::onFavourite,
+            navigateToSearch = navigateToSearch
 
         )
 
@@ -66,13 +68,12 @@ fun ProductScreenContent(
     navigateToHome: () -> Unit,
     navigateToProductDetails: (ID) -> Unit,
     updateSliderValue: (Float) -> Unit,
-    onFavourite: (ID, Boolean) -> Unit
+    onFavourite: (ID, Boolean) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     Column() {
         NamedTopAppBar("", navigateToHome)
-        SearchHeader {
-            // search
-        }
+        SearchHeader(onClick = navigateToSearch)
         Slider(
             minValue = productsState.minPrice,
             maxValue = productsState.maxPrice,

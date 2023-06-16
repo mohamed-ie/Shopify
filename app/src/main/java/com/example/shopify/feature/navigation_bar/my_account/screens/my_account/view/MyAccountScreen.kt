@@ -6,10 +6,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import com.example.shopify.R
-import com.example.shopify.feature.common.ConfirmationDialog
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.RadioGroupModalBottomSheet
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.ConfirmationDialog
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.RadioGroupModalBottomSheet
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.MyAccountViewModel
 import com.shopify.buy3.Storefront.CurrencyCode

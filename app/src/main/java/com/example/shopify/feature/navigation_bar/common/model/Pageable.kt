@@ -1,4 +1,4 @@
-package com.example.shopify.feature.common.model
+package com.example.shopify.feature.navigation_bar.common.model
 
 
 data class Pageable<D>(
