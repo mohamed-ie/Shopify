@@ -32,8 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
-import com.example.shopify.feature.common.component.ShopifyOutlinedButtonState
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButtonState
 import com.example.shopify.theme.shopifyColors
 import com.example.shopify.utils.shopifyLoading
 

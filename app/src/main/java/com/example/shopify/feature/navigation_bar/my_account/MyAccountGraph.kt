@@ -10,9 +10,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.shopify.R
 import com.example.shopify.feature.address.addressGraph
-import com.example.shopify.feature.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.MyAccountScreen
 
 

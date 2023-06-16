@@ -1,4 +1,4 @@
-package com.example.shopify.feature.common.component
+package com.example.shopify.feature.navigation_bar.common.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row

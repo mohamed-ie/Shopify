@@ -195,6 +195,12 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                         }
 
                                 }
+                        }.priceRange { productPriceRangeQuery ->
+                            productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
+                                moneyV2Query
+                                    .amount()
+                                    .currencyCode()
+                            }
                         }
                         productNode.variants({ args -> args.first(5) }) { productVariant ->
                             productVariant.edges { variantEdge ->
