@@ -70,7 +70,7 @@ class WishListViewModel @Inject constructor(
         _productsState.value[productIndex].also {wishedProduct ->
             viewModelScope.launch {
                 _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = true)
-//                wishedProduct.product.variants[0].id?.let {variantId ->
+//                wishedProduct.product.variants[0].index?.let {variantId ->
 //                    when(repository.addToCart(variantId,1)){
 //                        is Resource.Error -> {}
 //                        is Resource.Success -> {

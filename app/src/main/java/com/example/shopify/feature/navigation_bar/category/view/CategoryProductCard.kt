@@ -4,26 +4,32 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shopify.feature.navigation_bar.home.screen.home.ImageFromUrl
+import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.theme.ShopifyTheme
-import com.example.shopify.theme.shopifyColors
+import com.example.shopify.utils.shopifyLoading
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 
@@ -36,15 +42,33 @@ fun CategoryProductCard(product: BrandProduct, onItemClick: (ID) -> Unit) {
         shape = RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
+        Column(
+            modifier = Modifier.background(Color.White),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            SubcomposeAsyncImage(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .background(MaterialTheme.shopifyColors.LightServer)
-                    .padding(20.dp),
-            ) {
-                ImageFromUrl(url = product.images[0])
-            }
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1.5f),
+                model = product.images[0],
+                contentScale = ContentScale.Fit,
+                contentDescription = null,
+                loading = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shopifyLoading()
+                    )
+                },
+                error = {
+                    Icon(
+                        modifier = Modifier.fillMaxSize(),
+                        imageVector = Icons.Rounded.BrokenImage,
+                        tint = Color.Gray,
+                        contentDescription = null
+                    )
+                })
             Text(
                 product.title,
                 textAlign = TextAlign.Center,

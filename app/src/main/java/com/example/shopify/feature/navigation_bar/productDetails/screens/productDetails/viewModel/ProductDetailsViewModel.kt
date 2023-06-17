@@ -7,7 +7,6 @@ import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.AddToCardState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -15,7 +14,6 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.VariantsState
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.firestore.mapper.decodeProductId
-import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -176,7 +174,7 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun sendSelectedVariant(variantIndex: Int) {
         _variantState.value = _variantState.value.copy(selectedVariant = variantIndex)
-        //getProduct(_variantState.value.variants[variantIndex - 1].id ?: "")
+        //getProduct(_variantState.value.variants[variantIndex - 1].index ?: "")
     }
 
     private fun dismissBottomSheet() {

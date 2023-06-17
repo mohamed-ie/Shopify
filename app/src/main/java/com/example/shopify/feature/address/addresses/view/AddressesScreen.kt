@@ -19,7 +19,8 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun AddressesScreen(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    allowPick: Boolean = false,
+    pickShipping: Boolean = false,
+    pickBilling: Boolean = false,
     viewModel: AddressesViewModel,
     back: () -> Unit,
     navigateTo: (String) -> Unit
@@ -40,7 +41,7 @@ fun AddressesScreen(
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> AddressesScreenContent(
             navigateTo = navigateTo,
-            allowPick = allowPick,
+            allowPick = pickShipping||pickBilling,
             back = back,
             onEvent = viewModel::onEvent,
             addresses = state.addresses
