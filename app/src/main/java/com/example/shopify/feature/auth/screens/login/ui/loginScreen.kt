@@ -149,12 +149,13 @@ fun LoginScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 5.dp)
-                    .height(50.dp)
-                    .shopifyLoading(loadingUiState),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+                    .height(50.dp),
                 shape = RoundedCornerShape(5.dp),
             ){
-                Text(text = stringResource(R.string.signin))
+                Text(
+                    text = stringResource(R.string.signin),
+                    modifier = Modifier.shopifyLoading(loadingUiState, Color.White)
+                )
             }
 
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
@@ -167,7 +168,7 @@ fun LoginScreenContent(
                 )
 
                 Text(
-                    text = stringResource(R.string.sign_in),
+                    text = stringResource(R.string.sign_up),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.Black,
                     modifier = Modifier

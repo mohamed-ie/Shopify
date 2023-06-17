@@ -29,9 +29,7 @@ import com.example.shopify.R
 fun AuthHeader(
     onCloseScreen:()->Unit
 ) {
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White)){
+    Row (modifier = Modifier.fillMaxWidth()){
         Image(painter = painterResource(id = R.drawable.shopfity_logo),
             colorFilter = ColorFilter.tint(Color.DarkGray),
             contentDescription = stringResource(id = R.string.app_name),

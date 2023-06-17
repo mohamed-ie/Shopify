@@ -213,12 +213,13 @@ private fun SignUpScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 5.dp)
-                        .height(50.dp)
-                        .shopifyLoading(loadingUiState),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+                        .height(50.dp),
                     shape = RoundedCornerShape(5.dp)
                 ) {
-                    Text(text = stringResource(R.string.signin))
+                    Text(
+                        text = stringResource(R.string.sign_up),
+                        modifier = Modifier.shopifyLoading(loadingUiState, Color.White)
+                    )
                 }
 
                 Spacer(modifier = Modifier.padding(vertical = 12.dp))

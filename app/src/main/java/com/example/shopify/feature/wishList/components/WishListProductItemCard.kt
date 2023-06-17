@@ -72,7 +72,7 @@ fun WishListProductCardItem(
                     .aspectRatio(1f, false)
                     .padding(15.dp),
                 contentScale = ContentScale.Inside,
-                model = product.images,
+                model = product.images[0],
                 contentDescription = null,
                 loading = {
                     Box(

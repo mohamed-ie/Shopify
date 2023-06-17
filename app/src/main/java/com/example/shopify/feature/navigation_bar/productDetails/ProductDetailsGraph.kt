@@ -35,7 +35,9 @@ fun NavGraphBuilder.productDetailsGraph(navController: NavController) {
                     navController.navigate("${ProductDetailsGraph.PRODUCT_REVIEW_DETAILS}/${productId.encodeProductId()}")
                 },
                 navigateToCart = {
-                    navController.navigate(CartGraph.Cart.route)
+                    navController.navigate(CartGraph.Cart.route){
+                        popUpTo(Graph.PRODUCT_DETAILS){inclusive = true}
+                    }
                 },
                 navigateToSearch = {
                     navController.navigate(NavigationBarGraph.SEARCH)

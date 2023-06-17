@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val repository: ShopifyRepository,
+    private val repository: ShopifyRepository
 ) : BaseScreenViewModel() {
 
     private val _searchedProductsState = MutableStateFlow(SearchedProductsState())
@@ -50,7 +50,6 @@ class SearchViewModel @Inject constructor(
                     repository.getProductsByQuery(Constants.ProductQueryType.TITLE, key)) {
                     is Resource.Error -> toErrorScreenState()
                     is Resource.Success -> {
-                        toStableScreenState()
                         _searchedProductsState.update { searchedProductsState ->
                             response.data?.data?.let { brandProducts ->
                                 searchedProductsState.copy(
@@ -60,6 +59,7 @@ class SearchViewModel @Inject constructor(
                                 )
                             } ?: _searchedProductsState.value
                         }
+                        toStableScreenState()
                     }
                 }
             }
@@ -68,7 +68,7 @@ class SearchViewModel @Inject constructor(
 
     fun getProductsByLastCursor() {
         if (_searchedProductsState.value.hasNext)
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.Default) {
                 when (
                     val response = repository.getProductsByQuery(
                         Constants.ProductQueryType.LAST_CURSOR,
@@ -80,10 +80,13 @@ class SearchViewModel @Inject constructor(
                         toStableScreenState()
                         _searchedProductsState.update { searchedProductsState ->
                             response.data?.data?.let { brandProducts ->
+                                val result = searchedProductsState.productList
+                                brandProducts.onEach {brandProduct ->
+                                   if (result.find { it.id ==  brandProduct.id} == null)
+                                       result.add(brandProduct)
+                                }
                                 searchedProductsState.copy(
-                                    productList = searchedProductsState.productList.plus(
-                                        brandProducts
-                                    ).toMutableStateList(),
+                                    productList = result,
                                     lastCursor = response.data.lastCursor,
                                     hasNext = response.data.hasNext
                                 )

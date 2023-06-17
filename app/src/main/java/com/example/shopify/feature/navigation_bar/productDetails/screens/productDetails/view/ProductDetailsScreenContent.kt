@@ -161,7 +161,7 @@ fun ProductDetailsScreenContent(
                 openQuantity = { addToCardState.openQuantity() },
                 closeQuantity = { addToCardState.closeQuantity() },
                 addToCard = {
-                    if (product.isFavourite)
+                    if (product.isLogged)
                         addToCardState.addToCard()
                     else
                         navigateToAuth()

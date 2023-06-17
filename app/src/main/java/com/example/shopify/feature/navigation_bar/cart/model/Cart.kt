@@ -15,5 +15,6 @@ data class Cart(
     val error: String? = null,
     val couponError: String? = null,
     val hasNextPage: Boolean = false,
-    val endCursor: String = ""
+    val endCursor: String = "",
+    val isLoggedIn:Boolean = false
 )
