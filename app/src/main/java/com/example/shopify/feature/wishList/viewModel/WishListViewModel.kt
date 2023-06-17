@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.wishList.view.WishedBottomSheetState
 import com.example.shopify.feature.wishList.view.WishedProductState
 import com.example.shopify.helpers.Resource
@@ -71,20 +70,20 @@ class WishListViewModel @Inject constructor(
         _productsState.value[productIndex].also {wishedProduct ->
             viewModelScope.launch {
                 _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = true)
-                wishedProduct.product.variants[0].id?.let {variantId ->
-                    when(repository.addToCart(variantId,1)){
-                        is Resource.Error -> {}
-                        is Resource.Success -> {
-                            _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = false)
-                            _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
-                                isAdded = true,
-                                expandBottomSheet = true,
-                                productTitle = wishedProduct.product.title
-                            )
-                            sendTotalCart(repository.getCart())
-                        }
-                    }
-                }
+//                wishedProduct.product.variants[0].id?.let {variantId ->
+//                    when(repository.addToCart(variantId,1)){
+//                        is Resource.Error -> {}
+//                        is Resource.Success -> {
+//                            _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = false)
+//                            _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
+//                                isAdded = true,
+//                                expandBottomSheet = true,
+//                                productTitle = wishedProduct.product.title
+//                            )
+//                            sendTotalCart(repository.getCart())
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -93,18 +92,18 @@ class WishListViewModel @Inject constructor(
         _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(expandBottomSheet = false)
     }
     private fun sendTotalCart(response:Resource<Cart?>){
-        when(response){
-            is Resource.Error -> {}
-            is Resource.Success -> {
-                _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
-                    isTotalPriceLoaded = true,
-                    totalCartPrice = Price(
-                        amount = response.data?.totalPrice?.amount ?: "",
-                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
-                    )
-                )
-
-            }
-        }
+//        when(response){
+//            is Resource.Error -> {}
+//            is Resource.Success -> {
+//                _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
+//                    isTotalPriceLoaded = true,
+//                    totalCartPrice = Price(
+//                        amount = response.data?.totalPrice?.amount ?: "",
+//                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
+//                    )
+//                )
+//
+//            }
+//        }
     }
 }

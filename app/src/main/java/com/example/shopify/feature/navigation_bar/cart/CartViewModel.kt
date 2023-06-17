@@ -17,6 +17,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +41,7 @@ class CartViewModel @Inject constructor(
     fun loadCart() = viewModelScope.launch(defaultDispatcher) {
         toLoadingScreenState()
         handleCartResource(repository.getCart())
+        checkIsLoggedIn()
     }
 
     private fun handleCartResource(resource: Resource<Cart?>) =
@@ -53,6 +57,11 @@ class CartViewModel @Inject constructor(
             }
         }
 
+    private fun checkIsLoggedIn(){
+        repository.isLoggedIn()
+            .onEach { _state.update { cart -> cart.copy(isLoggedIn = it) } }
+            .launchIn(viewModelScope)
+    }
 
     fun onCartItemEvent(event: CartItemEvent) {
         when (event) {
@@ -85,7 +94,7 @@ class CartViewModel @Inject constructor(
                     isChooseQuantityOpen = false
                 )
             }
-            val cartLineId = _state.value.lines[index].id
+            val cartLineId = _state.value.lines[index].productVariantID.toString()
             when (val resource = repository.changeCartLineQuantity(cartLineId, quantity)) {
                 is Resource.Error -> toErrorScreenState()
                 is Resource.Success -> handleCartResource(resource)
@@ -94,7 +103,7 @@ class CartViewModel @Inject constructor(
 
     private fun removeCartLine(index: Int) = viewModelScope.launch(defaultDispatcher) {
         _cartLinesState.update(index) { it.copy(isRemoving = it.isRemoving.not()) }
-        val cartLineId = listOf(_state.value.lines[index].id)
+        val cartLineId = _state.value.lines[index].productVariantID.toString()
         when (val resource = repository.removeCartLines(cartLineId)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> handleCartResource(resource)
@@ -103,7 +112,7 @@ class CartViewModel @Inject constructor(
 
     private fun removeCartLineAndAddToWishList(index: Int) = viewModelScope.launch(defaultDispatcher){
         _cartLinesState.update(index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
-        val cartLineId = listOf(_state.value.lines[index].id)
+        val cartLineId = _state.value.lines[index].id.toString()
         when (val resource = repository.removeCartLines(cartLineId)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {

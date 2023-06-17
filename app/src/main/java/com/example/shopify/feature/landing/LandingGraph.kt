@@ -15,12 +15,7 @@ fun NavGraphBuilder.landingGraph(navController: NavController){
         startDestination = Landing.SPLASH
     ){
         composable(route = Landing.SPLASH){
-            SplashScreen(
-                viewModel = hiltViewModel(),
-                navigateToHome = { navController.navigate(Graph.HOME) })
-            {
-               navController.navigate(Graph.AUTH)
-            }
+            SplashScreen(navigateToHome = { navController.navigate(Graph.HOME) })
         }
     }
 }

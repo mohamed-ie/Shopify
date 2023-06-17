@@ -54,10 +54,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
-import com.example.shopify.feature.common.ErrorScreen
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.SearchHeader
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.home.viewModel.BrandViewModel
@@ -70,13 +70,17 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(
     viewModel: BrandViewModel,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    navigateToSearch: () -> Unit
+
 ) {
     when (viewModel.screenState.collectAsState().value) {
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> HomeScreenContent(
             brandList = viewModel.brandList.collectAsState(initial = emptyList()).value,
-            navigateToProduct = { navigateTo("${HomeGraph.PRODUCTS}/$it") })
+            navigateToProduct = { navigateTo("${HomeGraph.PRODUCTS}/$it") },
+            navigateToSearch = navigateToSearch
+        )
 
         ScreenState.ERROR -> ErrorScreen {
 
@@ -198,12 +202,11 @@ fun SalesCard() {
 @Composable
 fun HomeScreenContent(
     brandList: List<Brand>,
-    navigateToProduct: (String) -> Unit
+    navigateToProduct: (String) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     Scaffold(topBar = {
-        SearchHeader {
-            //onclick
-        }
+        SearchHeader(onClick = navigateToSearch)
     }, modifier = Modifier.padding(top = 16.dp)) {
         Column(
             modifier = Modifier

@@ -5,8 +5,8 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
@@ -44,9 +44,7 @@ interface ShopifyRepository {
     suspend fun updateCurrency(currency: String)
     suspend fun signOut()
     suspend fun getAddresses(): Resource<List<MyAccountMinAddress>>
-    suspend fun addToCart(productVariantId: ID, quantity: Int): Resource<String?>
-    suspend fun removeCartLines(linesId: List<ID>): Resource<Cart?>
-    suspend fun changeCartLineQuantity(merchandiseId: ID, quantity: Int): Resource<Cart?>
+    suspend fun addToCart(productVariantId: String, quantity: Int): Resource<String?>
     suspend fun applyCouponToCart(coupon: String): Resource<Cart?>
     suspend fun updateCartAddress(addressId: ID): Resource<String?>
     fun getShopifyProductsByWishListIDs(): Flow<Resource<Product?>>
@@ -59,4 +57,6 @@ interface ShopifyRepository {
 
     suspend fun getOrders(): Flow<Resource<List<Order>>>
 
+    suspend fun removeCartLines(productVariantId: String): Resource<Cart?>
+    suspend fun changeCartLineQuantity(merchandiseId: String, quantity: Int): Resource<Cart?>
 }

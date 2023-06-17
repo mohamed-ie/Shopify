@@ -10,23 +10,33 @@ import com.example.shopify.feature.auth.screens.login.ui.LoginScreen
 import com.example.shopify.feature.auth.screens.registration.ui.SignUpScreen
 
 
-fun NavGraphBuilder.authGraph(navController:NavController) {
+fun NavGraphBuilder.authGraph(navController: NavController) {
     navigation(
         route = Graph.AUTH,
         startDestination = Auth.SIGN_IN
-    ){
-        composable(route = Auth.SIGN_IN){
+    ) {
+        composable(route = Auth.SIGN_IN) {
             LoginScreen(
                 viewModel = hiltViewModel(),
-                navigateToSignUp = { navController.navigate(Auth.SIGN_UP) },
-                navigateToHome = { navController.navigate(Graph.HOME){ popUpTo(Graph.ROOT) } }
+                navigateToSignUp = {
+                    navController.navigate(Auth.SIGN_UP) {
+                        popUpTo(Graph.AUTH)
+                    }
+                },
+                navigateToHome = { navController.navigate(Graph.HOME) { popUpTo(Graph.ROOT) } },
+                onCloseScreen = { navController.popBackStack() }
             )
         }
 
-        composable(route = Auth.SIGN_UP){
+        composable(route = Auth.SIGN_UP) {
             SignUpScreen(
                 viewModel = hiltViewModel(),
-                navigateToSignIn = {navController.navigate(Auth.SIGN_IN)}
+                navigateToSignIn = {
+                    navController.navigate(Auth.SIGN_IN) {
+                        popUpTo(Graph.AUTH)
+                    }
+                },
+                onCloseScreen = { navController.popBackStack() }
             )
         }
     }

@@ -3,9 +3,9 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.review
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.shopify.feature.common.ErrorScreen
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.reviews.viewModel.ReviewsDetailsViewModel
 
 

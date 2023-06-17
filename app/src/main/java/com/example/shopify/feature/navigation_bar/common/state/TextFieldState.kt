@@ -1,4 +1,4 @@
-package com.example.shopify.feature.common.state
+package com.example.shopify.feature.navigation_bar.common.state
 
 import com.example.shopify.helpers.UIText
 

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.example.shopify.feature.Graph
+import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ProductDetailsScreen
@@ -34,11 +35,14 @@ fun NavGraphBuilder.productDetailsGraph(navController: NavController) {
                     navController.navigate("${ProductDetailsGraph.PRODUCT_REVIEW_DETAILS}/${productId.encodeProductId()}")
                 },
                 navigateToCart = {
-                    navController.navigate(CartGraph.Cart.route)
+                    navController.navigate(CartGraph.Cart.route){
+                        popUpTo(Graph.PRODUCT_DETAILS){inclusive = true}
+                    }
                 },
                 navigateToSearch = {
                     navController.navigate(NavigationBarGraph.SEARCH)
-                }
+                },
+                navigateToAuth = {navController.navigate(Auth.SIGN_IN)}
             )
         }
 

@@ -1,0 +1,14 @@
+query DraftOrderLineItems($id: ID!,$after: String){
+    draftOrder(id: $id) {
+        lineItems(first: 250,after: $after){
+            nodes {
+                variant {id}
+                quantity
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+        }
+    }
+}

@@ -217,6 +217,11 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                         }
 
                                 }
+                        }.priceRange { productPriceRangeQuery ->
+                            productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
+                                moneyV2Query.amount()
+                                    .currencyCode()
+                            }
                         }
                         productNode.variants({ args -> args.first(5) }) { productVariant ->
                             productVariant.edges { variantEdge ->
@@ -252,6 +257,17 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                 productType.edges {
                     it.node()
                 }
+            }
+        }
+
+    override fun generateProductsByQuery(
+        productQueryType: Constants.ProductQueryType,
+        queryContent: String
+    ): QueryRootQuery =
+    override fun generateGetCustomerId(accessToken: String): QueryRootQuery =
+        Storefront.query { query ->
+            query.customer(accessToken) {
+                it.id()
             }
         }
 

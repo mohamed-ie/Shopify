@@ -1,4 +1,4 @@
-package com.example.shopify.feature.common.component
+package com.example.shopify.feature.navigation_bar.common.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource

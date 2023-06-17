@@ -28,9 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.ErrorScreen
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ProductCard
 import com.example.shopify.feature.search.components.SearchTopBar
@@ -41,9 +41,9 @@ import com.shopify.graphql.support.ID
 @Composable
 fun SearchScreenContent(
     searchedProductsState:SearchedProductsState,
-    searchSectionState:ScreenState,
+    searchSectionState: ScreenState,
     navigateToProductDetails: (ID) -> Unit,
-    onFavourite: (ID, Boolean) -> Unit,
+    onFavourite: (Int) -> Unit,
     back:()->Unit,
     onValueChange:(String) -> Unit,
     onScrollDown:() -> Unit
@@ -87,12 +87,14 @@ fun SearchScreenContent(
                         .weight(1f)
                         .padding(vertical = 5.dp)
                 ) {
-                    items(searchedProductsState.productList) {product ->
-                        ProductCard(
-                            product = product,
-                            onProductItemClick = { navigateToProductDetails(product.id) },
-                            onFavouriteClick = { onFavourite(product.id, product.isFavourite) }
-                        )
+                    items(searchedProductsState.productList.count()) {productIndex ->
+                        searchedProductsState.productList[productIndex].run {
+                            ProductCard(
+                                product = this,
+                                onProductItemClick = { navigateToProductDetails(this.id) },
+                                onFavouriteClick = { onFavourite(productIndex) }
+                            )
+                        }
                     }
                 }
             }
@@ -120,7 +122,7 @@ private fun SearchScreenContentPreview() {
         ),
         searchSectionState = ScreenState.LOADING,
         navigateToProductDetails = {},
-        onFavourite = {_,_ ->},
+        onFavourite = {},
         back = {},
         onValueChange = {},
         onScrollDown = {}

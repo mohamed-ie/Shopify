@@ -147,5 +147,6 @@
     <string name="review_seller">Review Seller</string>
     <string name="review_delivery">Review Delivery</string>
     <string name="review_product">Review Product</string>
+    <string name="sign_in">Sign in</string>
 
 </resources>

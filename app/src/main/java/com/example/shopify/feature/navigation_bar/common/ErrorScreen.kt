@@ -1,4 +1,4 @@
-package com.example.shopify.feature.common
+package com.example.shopify.feature.navigation_bar.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
