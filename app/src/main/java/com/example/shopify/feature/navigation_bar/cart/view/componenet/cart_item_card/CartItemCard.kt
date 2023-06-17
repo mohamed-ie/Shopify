@@ -279,7 +279,7 @@ private fun QuantitySelector(
 //            CartLineState(),
 //            CartLine(
 //                productVariantID = ID(""),
-//                id = ID(""),
+//                index = ID(""),
 //                Storefront.MoneyV2().setAmount("372.00")
 //                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                quantity = 1,
@@ -307,7 +307,7 @@ private fun QuantitySelector(
 //            CartLineState(true, ),
 //            CartLine(
 //                productVariantID = ID(""),
-//                id = ID(""),
+//                index = ID(""),
 //                Storefront.MoneyV2().setAmount("372.00")
 //                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                quantity = 5,

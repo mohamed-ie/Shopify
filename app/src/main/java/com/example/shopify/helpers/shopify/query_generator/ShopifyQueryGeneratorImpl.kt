@@ -479,6 +479,8 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                 .lastName()
                                 .firstName()
                                 .phone()
+                                .formattedArea()
+                                .formatted()
                         }
                     }
                 }

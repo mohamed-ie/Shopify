@@ -19,7 +19,10 @@ fun NavGraphBuilder.addressGraph(navController: NavController) {
             arguments = AddressGraph.Addresses.args
         ) { backStackEntry ->
             AddressesScreen(
-                allowPick = backStackEntry.arguments?.getBoolean(AddressGraph.Addresses.args[0].name) ?: false,
+                pickShipping = backStackEntry.arguments?.getBoolean(AddressGraph.Addresses.args[0].name)
+                    ?: false,
+                pickBilling = backStackEntry.arguments?.getBoolean(AddressGraph.Addresses.args[1].name)
+                    ?: false,
                 viewModel = hiltViewModel(),
                 back = { navController.popBackStack() },
                 navigateTo = { navController.navigate(it) }
@@ -36,9 +39,12 @@ fun NavGraphBuilder.addressGraph(navController: NavController) {
 object AddressGraph {
     val Addresses = GraphRouteWithArgs(
         route = "ADDRESSES",
-        routeWithArgs = "ADDRESSES?allowPick={allowPick}",
-        routeToBeFormatted= "ADDRESSES?allowPick=%s",
-        args = listOf(navArgument("allowPick") {
+        routeWithArgs = "ADDRESSES?pickShipping={pickShipping}&pickBilling={pickBilling}",
+        routeToBeFormatted = "ADDRESSES?pickShipping=%s&pickBilling=%s",
+        args = listOf(navArgument("pickShipping") {
+            type = NavType.BoolType
+            defaultValue = false
+        }, navArgument("pickBilling") {
             type = NavType.BoolType
             defaultValue = false
         })

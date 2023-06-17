@@ -29,19 +29,18 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
-import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.theme.shopifyColors
-import com.shopify.graphql.support.ID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAccountAddressCard(
-    address: MyAccountMinAddress,
+    phone: String,
+    address: String,
+    name: String,
+    isDefault: Boolean = false,
     clickable: Boolean,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
@@ -52,7 +51,7 @@ fun MyAccountAddressCard(
         elevation = CardDefaults.elevatedCardElevation(cartElevation),
         shape = RectangleShape,
         colors = CardDefaults.cardColors(Color.White),
-        onClick =  if(clickable) onClick else ({ })
+        onClick = if (clickable) onClick else ({ })
     ) {
         Column(
             modifier = Modifier
@@ -90,7 +89,7 @@ fun MyAccountAddressCard(
                 }
 
 
-                if (!address.isDefault) {
+                if (isDefault) {
                     Divider(
                         modifier = Modifier
                             .height(16.dp)
@@ -119,9 +118,9 @@ fun MyAccountAddressCard(
 
             }
             Divider(Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
-            TitledText(title = stringResource(id = R.string.name), text = address.name)
-            TitledText(title = stringResource(id = R.string.address), text = address.address)
-            TitledText(title = stringResource(id = R.string.phone), text = address.phone)
+            TitledText(title = stringResource(id = R.string.name), text = name)
+            TitledText(title = stringResource(id = R.string.address), text = address)
+            TitledText(title = stringResource(id = R.string.phone), text = phone)
         }
     }
 }
@@ -152,21 +151,21 @@ private fun TitledText(title: String, text: String) {
 
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewMyAccountAddressCard() {
-    ShopifyTheme {
-        MyAccountAddressCard(
-            MyAccountMinAddress(
-                ID(""),
-                "mohamed ibrahim",
-                "kafr fagr",
-                "+201120060103",
-                false
-            ),false, {}, {}
-        ) {
-
-        }
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewMyAccountAddressCard() {
+//    ShopifyTheme {
+//        MyAccountAddressCard(
+//            MyAccountMinAddress(
+//                ID(""),
+//                "mohamed ibrahim",
+//                "kafr fagr",
+//                "+201120060103",
+//                false
+//            ),false, {}, {}
+//        ) {
+//
+//        }
+//    }
+//}

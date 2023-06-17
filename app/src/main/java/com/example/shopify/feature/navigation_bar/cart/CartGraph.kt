@@ -40,7 +40,7 @@ fun NavGraphBuilder.cartNavigation(navController: NavController) {
                 back = { navController.popBackStack() }
             )
         }
-        composable(route = CartGraph.CREDIT_CARD) {
+        composable(route = CartGraph.CREDIT_CARD_INFO) {
             val parentEntry = remember(it) {
                 navController.getBackStackEntry(CartGraph.CHECK_OUT)
             }
@@ -59,7 +59,7 @@ fun NavGraphBuilder.cartNavigation(navController: NavController) {
 object CartGraph {
     const val ERROR = "ERROR"
     const val CHECK_OUT = "CHECK_OUT"
-    const val CREDIT_CARD = "CREDIT_CARD"
+    const val CREDIT_CARD_INFO = "CREDIT_CARD"
 
     object Cart :
         NavigationBarScreen(route = "CART", name = R.string.cart, icon = Icons.Rounded.ShoppingCart)

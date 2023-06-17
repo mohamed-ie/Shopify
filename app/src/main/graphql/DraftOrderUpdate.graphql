@@ -7,7 +7,7 @@ mutation draftOrderUpdate($id: ID!, $input: DraftOrderInput!,$after: String) {
             totalShippingPrice
             totalTax
             currencyCode
-            lineItems(first: 246,after: $after){
+            lineItems(first: 200,after: $after){
                 nodes {
                     id
                     image{url}
@@ -39,6 +39,9 @@ mutation draftOrderUpdate($id: ID!, $input: DraftOrderInput!,$after: String) {
             }
 
             shippingAddress {
+                firstName
+                lastName
+                phone
                 formattedArea
             }
 

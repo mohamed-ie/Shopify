@@ -4,12 +4,13 @@ import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
 import com.apollographql.apollo3.api.Optional
+import com.example.shopify.DraftOrderCompleteMutation
 import com.example.shopify.DraftOrderCreateMutation
 import com.example.shopify.DraftOrderDeleteMutation
+import com.example.shopify.DraftOrderInvoiceSendMutation
 import com.example.shopify.DraftOrderLineItemsQuery
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
-import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
@@ -31,6 +32,7 @@ import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
 import com.example.shopify.type.DraftOrderDeleteInput
 import com.example.shopify.type.DraftOrderInput
 import com.example.shopify.type.DraftOrderLineItemInput
+import com.example.shopify.type.MailingAddressInput
 import com.example.shopify.utils.Constants
 import com.example.shopify.utils.mapResource
 import com.example.shopify.utils.mapSuspendResource
@@ -206,7 +208,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         dataStoreManager.clearAccessToken()
     }
 
-    override suspend fun getAddresses(): Resource<List<MyAccountMinAddress>> {
+    override suspend fun getAddresses(): Resource<List<Storefront.MailingAddress>> {
         val accessToken = dataStoreManager.getAccessToken().first()
         return queryGenerator.generateAddressesQuery(accessToken)
             .enqueue1()
@@ -228,8 +230,8 @@ class ShopifyRepositoryImpl @Inject constructor(
         //otherwise create cart with new line
         adminManager.createDraftOrder(customerId, productVariantId, quantity)
             .mapSuspendResource { pair ->
-                //also save cart id
-                 pair?.first?.let { fireStoreManager.setCurrentCartId(email, it) }
+                //also save cart index
+                pair?.first?.let { fireStoreManager.setCurrentCartId(email, it) }
                 joinAll()
                 //return server error message
                 pair?.second
@@ -249,6 +251,22 @@ class ShopifyRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun completeOrder(paymentPending: Boolean): Resource<String?> {
+        val email = dataStoreManager.getEmail().first()
+        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+        return adminManager.completeDraftOrder(cartId, paymentPending)
+            .mapSuspendResource {
+                fireStoreManager.clearDraftOrderId(email)
+                joinAll()
+                it
+            }
+    }
+
+    override suspend fun sendCompletePayment(): Resource<Pair<String?, String?>?> {
+        val email = dataStoreManager.getEmail().first()
+        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+        return adminManager.sendInvoice(cartId)
+    }
 
     override suspend fun changeCartLineQuantity(
         merchandiseId: String,
@@ -270,14 +288,11 @@ class ShopifyRepositoryImpl @Inject constructor(
 //            .mapResource(mapper::mapToApplyCouponToCart)
     }
 
-    override suspend fun updateCartAddress(addressId: ID): Resource<String?> {
-        val accessToken = dataStoreManager.getAccessToken().first()
+    override suspend fun updateCartShippingAddress(address: Storefront.MailingAddress): Resource<String?> {
         val email = dataStoreManager.getEmail().first()
         val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
 
-        return queryGenerator.generateUpdateCartAddress(accessToken, ID(cartId), addressId)
-            .enqueue1()
-            .mapResource(mapper::mapToUpdateCartAddress)
+        return adminManager.updateShippingAddress(cartId, address)
     }
 
     private suspend fun getCartId(email: String) =
@@ -524,6 +539,50 @@ class ShopifyRepositoryImpl @Inject constructor(
             return updateDraftOrder(updateInput)
         }
 
+        suspend fun completeDraftOrder(
+            draftOrderId: String,
+            paymentPending: Boolean
+        ): Resource<String?> {
+            return apolloClient.mutation(DraftOrderCompleteMutation(draftOrderId, paymentPending))
+                .execute()
+                .mapToResource { it.draftOrderComplete?.userErrors?.getOrNull(0)?.message }
+        }
+
+        suspend fun sendInvoice(cartId: String): Resource<Pair<String?, String?>?> {
+            return apolloClient.mutation(DraftOrderInvoiceSendMutation(cartId))
+                .execute()
+                .mapToResource {
+                    it.draftOrderInvoiceSend?.run {
+                        Pair(
+                            draftOrder?.invoiceUrl.toString(),
+                            userErrors.getOrNull(0)?.message
+                        )
+                    }
+                }
+        }
+
+        suspend fun updateShippingAddress(
+            draftOrderId: String,
+            address: Storefront.MailingAddress
+        ): Resource<String?> {
+            val addressInput = MailingAddressInput(
+                address1 = address.address1.present(),
+                address2 = address.address2.present(),
+                city = address.city.present(),
+                company = address.company.present(),
+                country = address.country.present(),
+                firstName = address.firstName.present(),
+                lastName = address.lastName.present(),
+                phone = address.phone.present(),
+                zip = address.zip.present(),
+                province = address.province.present()
+            )
+            val input = DraftOrderInput(shippingAddress = addressInput.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input)
+            return updateDraftOrder(updateInput)
+                .mapResource { it?.error }
+        }
+
         private suspend fun getDraftOrderLineItems(
             draftOrderId: String
         ): MutableList<DraftOrderLineItemInput>? {
@@ -542,6 +601,7 @@ class ShopifyRepositoryImpl @Inject constructor(
                 ?.toMutableList()
         }
 
+
         private fun <I : Operation.Data, O> ApolloResponse<I>.mapToResource(
             transform: (I) -> O
         ): Resource<O> {
@@ -555,7 +615,6 @@ class ShopifyRepositoryImpl @Inject constructor(
 
         @JvmName("null_present")
         private fun <T : Any> T.present(): Optional<T> = Optional.present(this)
-
 
     }
 }

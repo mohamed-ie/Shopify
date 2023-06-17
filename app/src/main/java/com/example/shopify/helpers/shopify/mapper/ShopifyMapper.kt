@@ -3,7 +3,6 @@ package com.example.shopify.helpers.shopify.mapper
 import com.apollographql.apollo3.api.ApolloResponse
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
-import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
@@ -20,6 +19,7 @@ import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.MailingAddress
 import com.shopify.graphql.support.ID
 
 interface ShopifyMapper {
@@ -43,7 +43,7 @@ interface ShopifyMapper {
     fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
     fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
     fun mapToProductsTagsResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
-    fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress>
+    fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MailingAddress>
     fun mapToCartId(response: GraphResponse<Storefront.Mutation>): Pair<String?, String?>?
     fun mapToAddCartLine(response: GraphResponse<Storefront.Mutation>): String?
     fun mapMutationToCart(data: DraftOrderUpdateMutation.Data): Cart?

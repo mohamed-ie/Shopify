@@ -60,7 +60,7 @@ fun CartScreenContent(
         RemoteErrorHeader(error = cart.error)
         CartHeader(
             itemsCount = itemsCount,
-            address = cart.address,
+            address = cart.address.address.asString(),
             navigateToWishlistScreen = {
                 if (cart.isLoggedIn)
                     navigateTo(Graph.WISH_LIST)
@@ -207,7 +207,7 @@ private fun EmptyCart() {
 //            lines = listOf(
 //                CartLine(
 //                    productVariantID = ID(""),
-//                    id = ID(""),
+//                    index = ID(""),
 //                    Storefront.MoneyV2().setAmount("372.00")
 //                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                    quantity = 1,
@@ -221,7 +221,7 @@ private fun EmptyCart() {
 //                ),
 //                CartLine(
 //                    productVariantID = ID(""),
-//                    id = ID(""),
+//                    index = ID(""),
 //                    Storefront.MoneyV2().setAmount("900.00")
 //                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                    quantity = 1,
