@@ -14,13 +14,20 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
+import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.common.LoadingScreen
 import com.example.shopify.feature.common.NamedTopAppBar
 import com.example.shopify.feature.common.state.ScreenState
@@ -34,10 +41,24 @@ import com.shopify.graphql.support.ID
 
 @Composable
 fun ProductScreen(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     viewModel: ProductViewModel,
     back: () -> Unit,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
 ) {
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                viewModel.getProduct()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     val state by viewModel.productList.collectAsState()
     when (viewModel.screenState.collectAsState().value) {
         ScreenState.LOADING -> LoadingScreen()
@@ -46,12 +67,16 @@ fun ProductScreen(
             navigateToHome = back,
             navigateToProductDetails = { navigateTo("${ProductDetailsGraph.PRODUCT_DETAILS}/${it.encodeProductId()}") },
             updateSliderValue = viewModel::updateSliderValue,
-            onFavourite = viewModel::onFavourite
-
+            onFavourite = {index ->
+                if (state.isLoggedIn)
+                    viewModel.onFavourite(index)
+                else
+                    navigateTo(Auth.SIGN_IN)
+            }
         )
-
         ScreenState.ERROR -> {}
     }
+
     PriceSliderDialog(
         productsState = state,
         updateSliderValue = viewModel::updateSliderValue,
@@ -66,7 +91,7 @@ fun ProductScreenContent(
     navigateToHome: () -> Unit,
     navigateToProductDetails: (ID) -> Unit,
     updateSliderValue: (Float) -> Unit,
-    onFavourite: (ID, Boolean) -> Unit
+    onFavourite: (Int) -> Unit
 ) {
     Column() {
         NamedTopAppBar("", navigateToHome)
@@ -80,11 +105,11 @@ fun ProductScreenContent(
             onValueChange = updateSliderValue
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
-            items(productsState.brandProducts) {
+            items(productsState.brandProducts.count()) {
                 ProductCard(
-                    product = it,
-                    onProductItemClick = { navigateToProductDetails(it.id) },
-                    onFavouriteClick = { onFavourite(it.id, it.isFavourite) }
+                    product = productsState.brandProducts[it],
+                    onProductItemClick = { navigateToProductDetails(productsState.brandProducts[it].id) },
+                    onFavouriteClick = { onFavourite(it) }
                 )
             }
         }

@@ -82,7 +82,7 @@ fun ColumnScope.ImageCardScrollHorizontally(
             )
         }
         IconButton(
-            onClick = { },
+            onClick = addToFavourite,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top = 16.dp, end = 16.dp)
