@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -28,10 +27,10 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
 import com.example.shopify.feature.auth.Auth
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.NamedTopAppBar
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.common.SearchHeader
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.ProductsState
 import com.example.shopify.feature.navigation_bar.home.screen.product.viewModel.ProductViewModel
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
@@ -45,6 +44,7 @@ fun ProductScreen(
     viewModel: ProductViewModel,
     back: () -> Unit,
     navigateTo: (String) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
 
     DisposableEffect(lifecycleOwner) {
@@ -72,7 +72,8 @@ fun ProductScreen(
                     viewModel.onFavourite(index)
                 else
                     navigateTo(Auth.SIGN_IN)
-            }
+            },
+            navigateToSearch = navigateToSearch
         )
 
         ScreenState.ERROR -> {}
@@ -92,13 +93,12 @@ fun ProductScreenContent(
     navigateToHome: () -> Unit,
     navigateToProductDetails: (ID) -> Unit,
     updateSliderValue: (Float) -> Unit,
-    onFavourite: (ID, Boolean) -> Unit
+    onFavourite: (Int) -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     Column() {
         NamedTopAppBar("", navigateToHome)
-        SearchHeader {
-            // search
-        }
+        SearchHeader {navigateToSearch()}
         Slider(
             minValue = productsState.minPrice,
             maxValue = productsState.maxPrice,
@@ -106,12 +106,14 @@ fun ProductScreenContent(
             onValueChange = updateSliderValue
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
-            items(productsState.brandProducts) {
-                ProductCard(
-                    product = it,
-                    onProductItemClick = { navigateToProductDetails(it.id) },
-                    onFavouriteClick = { onFavourite(it.id, it.isFavourite) }
-                )
+            items(productsState.brandProducts.count()) {index ->
+                productsState.brandProducts[index].run {
+                    ProductCard(
+                        product = this,
+                        onProductItemClick = { navigateToProductDetails(this.id) },
+                        onFavouriteClick = { onFavourite(index) }
+                    )
+                }
             }
         }
     }

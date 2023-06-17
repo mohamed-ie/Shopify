@@ -30,7 +30,6 @@ import com.example.shopify.R
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.AddressGraph
 import com.example.shopify.feature.auth.Auth
-import com.example.shopify.feature.common.component.RemoteErrorHeader
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemCard
