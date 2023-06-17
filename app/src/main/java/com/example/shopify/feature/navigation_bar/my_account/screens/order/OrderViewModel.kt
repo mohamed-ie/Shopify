@@ -5,6 +5,7 @@ import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
@@ -12,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.helpers.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -32,6 +34,13 @@ class OrderViewModel @Inject constructor(
 
     private val _checkoutState = MutableStateFlow(CheckoutState(Cart()))
     val checkoutState = _checkoutState.asStateFlow()
+    private var _orderList = MutableStateFlow<List<Order>>(emptyList())
+    val orderList = _orderList.asStateFlow()
+    var orderIndex: Int = 0
+
+    init {
+        getOrders()
+    }
 
     fun loadOrderDetails() = viewModelScope.launch(defaultDispatcher) {
         handleCartResource(repository.getCart())
@@ -62,6 +71,7 @@ class OrderViewModel @Inject constructor(
 //                    processPayment()
         }
     }
+
     fun onCheckoutEvent(event: CheckoutEvent) {
         when (event) {
             is CheckoutEvent.PaymentMethodChanged ->
@@ -78,7 +88,12 @@ class OrderViewModel @Inject constructor(
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {
                 if (resource.data != null)
-                    _checkoutState.update { it.copy(cart = resource.data, remoteError = resource.data.error) }
+                    _checkoutState.update {
+                        it.copy(
+                            cart = resource.data,
+                            remoteError = resource.data.error
+                        )
+                    }
                 toStableScreenState()
             }
         }
@@ -118,4 +133,18 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    private fun getOrders() {
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.getOrders().collect {
+                when (it) {
+                    is Resource.Success -> {
+                        _orderList.emit(it.data)
+                        toStableScreenState()
+                    }
+
+                    is Resource.Error -> toErrorScreenState()
+                }
+            }
+        }
+    }
 }

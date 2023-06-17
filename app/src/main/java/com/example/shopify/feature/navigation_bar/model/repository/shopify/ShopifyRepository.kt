@@ -9,6 +9,7 @@ import com.example.shopify.feature.navigation_bar.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
@@ -53,6 +54,9 @@ interface ShopifyRepository {
         productQueryType: Constants.ProductQueryType,
         queryContent: String
     ): Resource<Pageable<List<BrandProduct>>?>
+
+    suspend fun getOrders(): Flow<Resource<List<Order>>>
+
     suspend fun removeCartLines(productVariantId: String): Resource<Cart?>
     suspend fun changeCartLineQuantity(merchandiseId: String, quantity: Int): Resource<Cart?>
     suspend fun completeOrder(paymentPending: Boolean) :Resource<String?>
