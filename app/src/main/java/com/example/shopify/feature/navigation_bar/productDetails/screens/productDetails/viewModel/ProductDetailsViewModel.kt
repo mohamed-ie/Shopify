@@ -3,9 +3,11 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.produc
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.AddToCardState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
@@ -13,12 +15,14 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.VariantsState
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.firestore.mapper.decodeProductId
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductDetailsViewModel @Inject constructor(
     private val repository: ShopifyRepository,
-    state: SavedStateHandle
+    state: SavedStateHandle,
 ) : BaseScreenViewModel() {
 
     private val _productState = MutableStateFlow(Product())
@@ -50,25 +54,32 @@ class ProductDetailsViewModel @Inject constructor(
     private val _reviewState = MutableStateFlow(ReviewsState())
     val reviewState = _reviewState.asStateFlow()
 
-    val productId:ID
+    val productId: ID
 
     init {
-        productId = state.get<String>(ProductDetailsGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)?.let { productId ->
-            productId.decodeProductId().apply {
-                getProduct(this.toString())
-                getProductReview(this)
-            }
-        } ?: ID("")
+        productId = state.get<String>(ProductDetailsGraph.PRODUCT_DETAILS_SAVE_ARGS_KEY)
+            ?.decodeProductId() ?: ID("")
     }
 
 
-     fun sendFavouriteAction(isFavourite:Boolean) {
-        if(isFavourite)
-            viewModelScope.launch { repository.removeProductWishListById(productId) }
+    fun loadProductDetails() {
+        getProduct(productId.toString())
+    }
+
+
+    fun sendFavouriteAction(isFavourite: Boolean) = viewModelScope.launch {
+        if (isFavourite)
+            repository.removeProductWishListById(productId)
         else
-            viewModelScope.launch { repository.addProductWishListById(productId) }
+            repository.addProductWishListById(productId)
 
         _productState.value = _productState.value.copy(isFavourite = !isFavourite)
+    }
+
+    private fun checkIsLoggedIn(){
+        repository.isLoggedIn()
+            .onEach {isLoggedIn -> _productState.update { it.copy(isLogged = isLoggedIn) } }
+            .launchIn(viewModelScope)
     }
 
     private fun getProduct(id: String) {
@@ -80,7 +91,6 @@ class ProductDetailsViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        toStableScreenState()
                         _addToCardState.value = _addToCardState.value.copy(
                             availableQuantity = if (resource.data.totalInventory in 2..5) resource.data.totalInventory else resource.data.totalInventory
                         )
@@ -92,6 +102,9 @@ class ProductDetailsViewModel @Inject constructor(
                             discount = calDiscount(resource.data.price.amount),
                             variants = listOf()
                         )
+                        getProductReview(productId)
+                        checkIsLoggedIn()
+                        toStableScreenState()
                     }
                 }
             }
@@ -135,35 +148,31 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun addProductToCart() {
         _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
-        _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let {variantId ->
+        _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let { variantId ->
             viewModelScope.launch {
-                repository.addToCart(variantId.toString(),_addToCardState.value.selectedQuantity)
-//                when(repository.addToCart(variantId,_addToCardState.value.selectedQuantity)){
-//                    is Resource.Error -> {}
-//                    is Resource.Success -> {
-//                        _addToCardState.value = _addToCardState.value.copy(isAdded = true)
-//                        sendTotalCart(repository.getCart())
-//                    }
-//                }
+                when (repository.addToCart(variantId.toString(), _addToCardState.value.selectedQuantity)) {
+                    is Resource.Error -> {}
+                    is Resource.Success -> {
+                        _addToCardState.value = _addToCardState.value.copy(isAdded = true)
+                        sendTotalCart(repository.getCart())
+                    }
+                }
             }
         }
     }
 
-//    private fun sendTotalCart(response:Resource<Cart?>){
-//        when(response){
-//            is Resource.Error -> {}
-//            is Resource.Success -> {
-//                _addToCardState.value = _addToCardState.value.copy(
-//                    isTotalPriceLoaded = true,
-//                    totalCartPrice = Price(
-//                        amount = response.data?.totalPrice?.amount ?: "",
-//                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
-//                    )
-//                )
-//
-//            }
-//        }
-//    }
+    private fun sendTotalCart(response: Resource<Cart?>) {
+        when (response) {
+            is Resource.Error -> {}
+            is Resource.Success -> {
+                _addToCardState.value = _addToCardState.value.copy(
+                    isTotalPriceLoaded = true,
+                    totalCartPrice = response.data?.totalPrice ?: ""
+                )
+
+            }
+        }
+    }
 
     private fun sendSelectedVariant(variantIndex: Int) {
         _variantState.value = _variantState.value.copy(selectedVariant = variantIndex)

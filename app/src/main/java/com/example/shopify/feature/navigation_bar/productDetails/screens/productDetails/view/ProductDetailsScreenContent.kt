@@ -57,6 +57,7 @@ fun ProductDetailsScreenContent(
     reviewsState: ReviewsState,
     viewReviewsMore: () -> Unit,
     viewCart: () -> Unit,
+    navigateToAuth: () -> Unit,
     onFavouriteClick: (Boolean) -> Unit,
     back: () -> Unit,
     navigateToSearch:()->Unit
@@ -83,7 +84,7 @@ fun ProductDetailsScreenContent(
                 ProductDetailsCard(
                     vendor = product.vendor,
                     title = product.title,
-                    thumbnail = product.image,
+                    thumbnails = product.images,
                     currencyCode = product.price.currencyCode,
                     price = product.price.amount,
                     realPrice = product.discount.realPrice,
@@ -159,7 +160,12 @@ fun ProductDetailsScreenContent(
                 },
                 openQuantity = { addToCardState.openQuantity() },
                 closeQuantity = { addToCardState.closeQuantity() },
-                addToCard = { addToCardState.addToCard() }
+                addToCard = {
+                    if (product.isLogged)
+                        addToCardState.addToCard()
+                    else
+                        navigateToAuth()
+                }
             )
         }
         if (addToCardState.expandBottomSheet) {
@@ -179,7 +185,7 @@ fun ProductDetailsScreenContent(
                     isAdded = addToCardState.isAdded,
                     isTotalPriceAdded = addToCardState.isTotalPriceLoaded,
                     continueShopping = { addToCardState.continueShopping() },
-                    viewCart = { viewCart() }
+                    viewCart = {viewCart()}
                 )
             }
         }
@@ -193,7 +199,7 @@ fun ProductDetailsScreenContent(
 private fun ProductDetailsScreenContentPreview() {
     ProductDetailsScreenContent(
         Product(
-            image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
+            images = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
             description = "The Stan Smith owned the tennis court in the '70s." +
                     " Today it runs the streets with the same clean," +
                     " classic style." +
@@ -240,7 +246,8 @@ private fun ProductDetailsScreenContentPreview() {
         viewCart = {},
         back = {},
         onFavouriteClick = {},
-        navigateToSearch = {}
+        navigateToSearch = {},
+        navigateToAuth = {}
     )
 }
 

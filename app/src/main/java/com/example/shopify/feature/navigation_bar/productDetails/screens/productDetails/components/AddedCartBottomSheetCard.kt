@@ -36,7 +36,7 @@ import com.example.shopify.utils.shopifyLoading
 @Composable
 fun AddedCartBottomSheetCard(
     productTitle:String,
-    productPrice: Price,
+    productPrice: String,
     isAdded:Boolean,
     isTotalPriceAdded:Boolean,
     continueShopping:()->Unit,
@@ -95,7 +95,7 @@ fun AddedCartBottomSheetCard(
                 color = Color.DarkGray
             )
             Text(
-                text =  productPrice.currencyCode + " " + productPrice.amount,
+                text =  productPrice,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.DarkGray,
@@ -140,7 +140,7 @@ fun AddedCartBottomSheetCard(
 fun AddedCartBottomSheetPreview() {
     AddedCartBottomSheetCard(
         productTitle = "iPhone 14 Pro 256GB Deep Purple 5G Wit",
-        Price("4,199.00","AED"),
+       "4 AED",
         isAdded = false,
         continueShopping = {},
         viewCart = {},

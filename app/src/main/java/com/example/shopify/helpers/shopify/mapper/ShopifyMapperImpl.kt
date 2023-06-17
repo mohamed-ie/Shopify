@@ -47,7 +47,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
     override fun mapToSignInResponse(
         response: GraphResponse<Storefront.Mutation>,
-        signInUserInfo: SignInUserInfo
+        signInUserInfo: SignInUserInfo,
     ): SignInUserInfoResult {
         val customerAccessToken = response.data?.customerAccessTokenCreate?.customerAccessToken
         return SignInUserInfoResult(
@@ -68,7 +68,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 description = storefrontProduct.description ?: "",
                 totalInventory = storefrontProduct.totalInventory ?: 0,
                 vendor = storefrontProduct.vendor ?: "",
-                image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
+                images = storefrontProduct.images.nodes.map { it.url },
                 variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
                     productVariantNode.node.let { productVariant ->
                         VariantItem(

@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.home.screen.product.viewModel
 
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
@@ -12,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,21 +21,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val repository: ShopifyRepository, state: SavedStateHandle
+    private val repository: ShopifyRepository,
+    private val state: SavedStateHandle,
 ) : BaseScreenViewModel() {
     private var _productState = MutableStateFlow(ProductsState())
     val productList = _productState.asStateFlow()
     private var brandProducts: List<BrandProduct> = listOf()
 
     init {
-        state.get<String>("brandName")?.let {
-            getProduct(it)
-        }
+        setProductBrandId()
+        isLoggedIn()
     }
 
-    private fun getProduct(brandName: String) = viewModelScope.launch(Dispatchers.Default) {
-
-        when (val it = repository.getProductsByBrandName(brandName)) {
+    fun getProduct() = viewModelScope.launch(Dispatchers.Default) {
+        when (val it = repository.getProductsByBrandName(_productState.value.brandProductId)) {
             is Resource.Success -> {
                 brandProducts = it.data
                 updateState()
@@ -45,13 +46,32 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    private fun isLoggedIn() {
+        viewModelScope.launch(Dispatchers.Default) {
+            _productState.update { productsState ->
+                productsState.copy(isLoggedIn = repository.isLoggedIn().first())
+            }
+
+        }
+    }
+
+    private fun setProductBrandId() {
+        state.get<String>("brandName")?.also {
+            _productState.update { productsState ->
+                productsState.copy(brandProductId = it)
+            }
+        }
+    }
+
     private fun updateState() {
         val prices = brandProducts.map {
             it.price.amount.toFloat()
         }
         _productState.update { oldState ->
             oldState.copy(
-                minPrice = prices.min(), maxPrice = prices.max(), brandProducts = brandProducts
+                minPrice = prices.min(),
+                maxPrice = prices.max(),
+                brandProducts = brandProducts.toMutableStateList()
             )
         }
     }
@@ -61,13 +81,25 @@ class ProductViewModel @Inject constructor(
             it.price.amount.toFloat() > newValue
         }
         _productState.update {
-            it.copy(sliderValue = newValue, brandProducts = filterProducts)
+            it.copy(sliderValue = newValue, brandProducts = filterProducts.toMutableStateList())
         }
     }
 
-    fun onFavourite(id: ID, favourite: Boolean) {
-        if (favourite) viewModelScope.launch { repository.removeProductWishListById(id) }
-        else viewModelScope.launch { repository.addProductWishListById(id) }
+    fun onFavourite(index: Int) {
+        viewModelScope.launch {
+            _productState.value.brandProducts[index].also { brandProduct ->
+                if (brandProduct.isFavourite) {
+                    repository.removeProductWishListById(brandProduct.id)
+                } else
+                    repository.addProductWishListById(brandProduct.id)
+
+                _productState.update { productState ->
+                    productState.brandProducts[index] =
+                        productState.brandProducts[index].copy(isFavourite = !brandProduct.isFavourite)
+                    productState.copy(brandProducts = productState.brandProducts)
+                }
+            }
+        }
     }
 
     fun hideDialog() {

@@ -1,8 +1,10 @@
 package com.example.shopify.feature.search.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,10 +12,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,13 +40,13 @@ import com.shopify.graphql.support.ID
 
 @Composable
 fun SearchScreenContent(
-    searchedProductsState: SearchedProductsState,
+    searchedProductsState:SearchedProductsState,
     searchSectionState: ScreenState,
     navigateToProductDetails: (ID) -> Unit,
-    onFavourite: (ID, Boolean) -> Unit,
-    back: () -> Unit,
-    onValueChange: (String) -> Unit,
-    onScrollDown: () -> Unit
+    onFavourite: (Int) -> Unit,
+    back:()->Unit,
+    onValueChange:(String) -> Unit,
+    onScrollDown:() -> Unit
 ) {
     Column {
         SearchTopBar(
@@ -82,12 +87,14 @@ fun SearchScreenContent(
                         .weight(1f)
                         .padding(vertical = 5.dp)
                 ) {
-                    items(searchedProductsState.productList) {product ->
-                        ProductCard(
-                            product = product,
-                            onProductItemClick = { navigateToProductDetails(product.id) },
-                            onFavouriteClick = { onFavourite(product.id, product.isFavourite) }
-                        )
+                    items(searchedProductsState.productList.count()) {productIndex ->
+                        searchedProductsState.productList[productIndex].run {
+                            ProductCard(
+                                product = this,
+                                onProductItemClick = { navigateToProductDetails(this.id) },
+                                onFavouriteClick = { onFavourite(productIndex) }
+                            )
+                        }
                     }
                 }
             }
@@ -115,7 +122,7 @@ private fun SearchScreenContentPreview() {
         ),
         searchSectionState = ScreenState.LOADING,
         navigateToProductDetails = {},
-        onFavourite = {_,_ ->},
+        onFavourite = {},
         back = {},
         onValueChange = {},
         onScrollDown = {}
