@@ -2,8 +2,8 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.order.mode
 
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.shopify.input_creator.ShopifyInputCreator
-import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
+import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
 import com.example.shopify.utils.shopify.enqueue
 import com.shopify.buy3.CardClient
 import com.shopify.buy3.CardVaultResult

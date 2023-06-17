@@ -22,7 +22,7 @@ fun CartScreen(
 ) {
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
+            if (event == Lifecycle.Event.ON_RESUME) {
                 viewModel.loadCart()
             }
         }

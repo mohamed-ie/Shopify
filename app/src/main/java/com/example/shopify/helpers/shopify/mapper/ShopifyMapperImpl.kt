@@ -21,6 +21,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.helpers.UIError
+import com.example.shopify.helpers.UIText
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
@@ -177,16 +178,9 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         } ?: MinCustomerInfo()
     }
 
-    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress> {
+    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<Storefront.MailingAddress> {
         return response.data?.customer?.addresses?.edges?.map {
-            it.node.run {
-                MyAccountMinAddress(
-                    id = id,
-                    name = "$firstName $lastName",
-                    address = toAddressString(),
-                    phone = phone
-                )
-            }
+            it.node
         } ?: emptyList()
     }
 
@@ -311,14 +305,24 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
     val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
         ?.run { "$currencyCode $amount" }
 
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
+
     return Cart(
         lines = lines ?: emptyList(),
         taxes = taxes,
         subTotalsPrice = subTotalPrice,
         shippingFee = shippingFee,
         totalPrice = totalPrice,
+        address = shippingAddress?:MyAccountMinAddress(),
         discounts = discounts,
-        address = this?.shippingAddress?.formattedArea ?: "",
+//        address = this?.shippingAddress?.formattedArea ?: "",
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
         endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
@@ -332,7 +336,7 @@ private fun DraftOrderQuery.DraftOrder?.toCart(error: String? = null): Cart {
         val cartProduct = CartProduct(
             id = ID(product?.id),
             name = it.name,
-            thumbnail = it.image?.url as String,
+            thumbnail = it.image?.url as String?,
             collection = product?.productType ?: "",
             vendor = it.vendor ?: ""
         )
@@ -354,6 +358,14 @@ private fun DraftOrderQuery.DraftOrder?.toCart(error: String? = null): Cart {
     val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
         ?.run { "$currencyCode $amount" }
 
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
     return Cart(
         lines = lines ?: emptyList(),
         taxes = taxes,
@@ -361,7 +373,7 @@ private fun DraftOrderQuery.DraftOrder?.toCart(error: String? = null): Cart {
         shippingFee = shippingFee,
         totalPrice = totalPrice,
         discounts = discounts,
-        address = this?.shippingAddress?.formattedArea ?: "",
+        address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
         endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",

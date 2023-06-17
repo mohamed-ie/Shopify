@@ -141,6 +141,11 @@
     <string name="the_start">The start</string>
     <string name="price_range">Price Range</string>
     <string name="results">Results:</string>
+    <string name="credit_card">Credit Card</string>
+    <string name="cash_on_delivery">Cash on Delivery</string>
     <string name="sign_in">Sign in</string>
+    <string name="complete_your_purchase">Complete your purchase</string>
+    <string name="order_summery">Order Summery</string>
+    <string name="not_selected">Not selected yet</string>
 
 </resources>
