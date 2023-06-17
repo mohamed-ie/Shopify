@@ -43,11 +43,12 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.model
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.ui.screen.order.component.OrdersFilledTonalButton
+import com.shopify.buy3.Storefront.OrderFulfillmentStatus
 import org.joda.time.DateTime
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun OrderCard(order: Order, viewDetails: () -> Unit) {
+fun OrderCard(order: Order, viewDetails: (String) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RectangleShape,
@@ -63,20 +64,26 @@ fun OrderCard(order: Order, viewDetails: () -> Unit) {
             Column {
                 //order id
                 Text(
-                    text = stringResource(id = R.string.order_id, order.orderNumber),
+                    text = "${stringResource(id = R.string.order_id)}  ${
+                        order.orderNumber.toString()
+                    }",
                     style = MaterialTheme.typography.labelLarge
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 //order date
                 Text(
-                    text = stringResource(id = R.string.placed_on_date, order.processedAt),
+                    text = "${stringResource(id = R.string.placed_on_date)}  ${
+                        order.processedAt.toString(
+                            "MMMM dd, yyyy"
+                        )
+                    }",
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.Gray,
                     fontWeight = FontWeight.Normal
                 )
             }
             //view details
-            TextButton(onClick = viewDetails) {
+            TextButton(onClick = { viewDetails("$order") }) {
                 Text(text = stringResource(id = R.string.view_details))
                 Icon(
                     modifier = Modifier.size(18.dp),
@@ -90,7 +97,7 @@ fun OrderCard(order: Order, viewDetails: () -> Unit) {
 
         LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
             items(order.lineItems) { orderItem ->
-                OrderItemContent(orderItem = orderItem)
+                OrderItemContent(orderItem = orderItem, order.fulfillment)
             }
         }
 
@@ -100,15 +107,6 @@ fun OrderCard(order: Order, viewDetails: () -> Unit) {
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            OrdersFilledTonalButton(
-                text = stringResource(id = R.string.review_seller),
-                onClick = { /*TODO*/ }
-            )
-            OrdersFilledTonalButton(
-                text = stringResource(id = R.string.review_delivery),
-                onClick = { /*TODO*/ }
-            )
-
             OrdersFilledTonalButton(
                 text = stringResource(id = R.string.review_product),
                 onClick = { /*TODO*/ }
@@ -121,11 +119,11 @@ fun OrderCard(order: Order, viewDetails: () -> Unit) {
 
 @Composable
 private fun OrderItemContent(
-    orderItem: LineItems
+    orderItem: LineItems, fulfillmentStatus: OrderFulfillmentStatus
 ) {
     Row(
         modifier = Modifier
-            .padding(start = 24.dp)
+            .padding(start = 24.dp, top = 16.dp)
             .padding(vertical = 8.dp)
             .width(300.dp)
     ) {
@@ -165,16 +163,16 @@ private fun OrderItemContent(
             Text(
                 text = orderItem.description,
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             //status
-//            Text(
-//                text = stringResource(id = orderItem.status.textResource),
-//                style = MaterialTheme.typography.labelMedium,
-//                color = orderItem.status.color
-//            )
+            Text(
+                text = fulfillmentStatus.name,
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.Green
+            )
         }
     }
 }

@@ -1,19 +1,26 @@
-package com.example.shopify.ui.screen.order
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.view
 
 import androidx.compose.runtime.Composable
-import com.example.shopify.feature.common.ErrorScreen
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.state.ScreenState
+import androidx.compose.runtime.collectAsState
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.OrderViewModel
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderGraph
+import com.example.shopify.ui.screen.order.OrdersScreenContent
 
 @Composable
-fun OrdersScreen() {
-    val state = OrderState()
-    when (state.screenState) {
+fun OrdersScreen(
+    viewModel: OrderViewModel,
+    navigateTo: (String) -> Unit,
+    back: () -> Unit
+) {
+    when (viewModel.screenState.collectAsState().value) {
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> OrdersScreenContent(
-            orders = state.orders,
-            back = {},
-            viewOrderDetails = {}
+            orders = viewModel.brandList.collectAsState().value,
+            back = back,
+            viewOrderDetails = { navigateTo("${OrderGraph.ORDER_DETAILS}/$it") }
         )
 
         ScreenState.ERROR -> ErrorScreen {

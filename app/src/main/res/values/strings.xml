@@ -148,5 +148,10 @@
     <string name="review_delivery">Review Delivery</string>
     <string name="review_product">Review Product</string>
     <string name="sign_in">Sign in</string>
+    <string name="ship_address">Shipping Address</string>
+    <string name="cash_on_delivary">Cash On Delivery</string>
+    <string name="credit_card">Credit Card</string>
+    <string name="payment_Method">Payment Method</string>
+    <string name="order_summary">Order Summary</string>
 
 </resources>

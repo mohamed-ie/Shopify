@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order
 
+import com.shopify.buy3.Storefront.MoneyV2
 import com.shopify.graphql.support.ID
 
 data class LineItems(
@@ -8,5 +9,6 @@ data class LineItems(
     val thumbnail: String = "",
     val collection: String = "",
     val vendor: String = "",
-    val description: String = ""
+    val description: String = "",
+    val price: MoneyV2 = MoneyV2()
 )

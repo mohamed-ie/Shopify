@@ -132,11 +132,13 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
         return response.data?.customer?.orders?.edges?.map {
             Order(
+                financialStatus = it.node.financialStatus,
+                fulfillment = it.node.fulfillmentStatus,
                 orderNumber = it.node.orderNumber,
                 processedAt = it.node.processedAt,
                 subTotalPrice = it.node.subtotalPrice,
                 totalShippingPrice = it.node.totalShippingPrice,
-                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations.get(0)),
+//                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations[0]),
                 totalTax = it.node.totalTax,
                 totalPrice = it.node.totalPrice,
                 billingAddress = it.node.billingAddress,
@@ -300,7 +302,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 thumbnail = it.node.variant.product.featuredImage.url,
                 collection = it.node.variant.product.productType,
                 vendor = it.node.variant.product.vendor,
-                description = it.node.variant.product.description
+                description = it.node.variant.product.description,
+                price = it.node.variant.price
             )
         }
 }

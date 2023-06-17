@@ -1,6 +1,5 @@
 package com.example.shopify.feature.navigation_bar.home.screen.home.viewModel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
@@ -22,7 +21,6 @@ class BrandViewModel @Inject constructor(
 
     init {
         getBrandList()
-        getOrders()
     }
 
     fun getBrandList() {
@@ -38,21 +36,5 @@ class BrandViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun getOrders() {
-        viewModelScope.launch(Dispatchers.Default) {
-            repository.getOrders().collect {
-                when (it) {
-                    is Resource.Success -> {
-                        Log.i("TAG", "getOrders: " + it.data)
-                        toStableScreenState()
-                    }
-
-                    is Resource.Error -> toErrorScreenState()
-                }
-            }
-        }
-
     }
 }

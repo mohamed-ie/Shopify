@@ -5,6 +5,7 @@ import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.PaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
@@ -15,7 +16,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,12 +34,11 @@ class OrderViewModel @Inject constructor(
     private val _completeCheckOut = MutableSharedFlow<Boolean>()
     val completeCheckOut = _completeCheckOut.asSharedFlow()
     var cart: Cart? = null
-
+    private var _orderList = MutableStateFlow<List<Order>>(emptyList())
+    val brandList = _orderList.asStateFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-//            handleCartResource(repository.getCart())
-        }
+        getOrders()
     }
 
     fun onCreditCardEvent(event: CreditCardInfoEvent) {
@@ -138,4 +140,18 @@ class OrderViewModel @Inject constructor(
             }
         }
 
+    private fun getOrders() {
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.getOrders().collect {
+                when (it) {
+                    is Resource.Success -> {
+                        _orderList.emit(it.data)
+                        toStableScreenState()
+                    }
+
+                    is Resource.Error -> toErrorScreenState()
+                }
+            }
+        }
+    }
 }

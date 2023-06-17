@@ -38,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.NamedTopAppBar
+import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.component.OrderCard
@@ -50,7 +50,7 @@ import org.joda.time.DateTime
 fun OrdersScreenContent(
     orders: List<Order>?,
     back: () -> Unit,
-    viewOrderDetails: () -> Unit
+    viewOrderDetails: (String) -> Unit
 ) {
     Scaffold(topBar = { NamedTopAppBar(back = back) }) { innerPadding ->
         if (orders == null)

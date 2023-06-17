@@ -105,6 +105,8 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                 customer.orders({ arg -> arg.first(10) }) { connection ->
                     connection.edges() { edge: OrderEdgeQuery ->
                         edge.node() { node: OrderQuery ->
+                            node.financialStatus()
+                            node.fulfillmentStatus()
                             node.orderNumber()
                             node.processedAt()
                             node.subtotalPrice {
@@ -145,6 +147,10 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                 items.edges { itemsEdge ->
                                     itemsEdge.node { itemsNode ->
                                         itemsNode.variant { variant ->
+                                            variant.price {
+                                                it.amount()
+                                                it.currencyCode()
+                                            }
                                             variant.product { product ->
                                                 product.title()
                                                 product.description()
@@ -260,10 +266,6 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             }
         }
 
-    override fun generateProductsByQuery(
-        productQueryType: Constants.ProductQueryType,
-        queryContent: String
-    ): QueryRootQuery =
     override fun generateGetCustomerId(accessToken: String): QueryRootQuery =
         Storefront.query { query ->
             query.customer(accessToken) {
