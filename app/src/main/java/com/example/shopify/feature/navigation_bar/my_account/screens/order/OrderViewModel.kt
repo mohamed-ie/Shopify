@@ -6,8 +6,6 @@ import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.PaymentStrategy
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
@@ -15,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.helpers.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -35,6 +34,13 @@ class OrderViewModel @Inject constructor(
 
     private val _checkoutState = MutableStateFlow(CheckoutState(Cart()))
     val checkoutState = _checkoutState.asStateFlow()
+    private var _orderList = MutableStateFlow<List<Order>>(emptyList())
+    val orderList = _orderList.asStateFlow()
+    var orderIndex: Int = 0
+
+    init {
+        getOrders()
+    }
 
     fun loadOrderDetails() = viewModelScope.launch(defaultDispatcher) {
         handleCartResource(repository.getCart())

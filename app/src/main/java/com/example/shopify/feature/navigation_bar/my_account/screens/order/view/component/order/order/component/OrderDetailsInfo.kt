@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material3.Card
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,8 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shopify.R
+import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.getFullAddress
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.theme.shopifyColors
 import com.shopify.buy3.Storefront
@@ -37,7 +43,12 @@ import org.joda.time.DateTime
 
 @Composable
 fun OrderDetailsInfoCard(order: Order) {
-    Card() {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.elevatedCardElevation(cartElevation),
+        shape = MaterialTheme.shapes.small,
+        colors = CardDefaults.cardColors(Color.White)
+    ) {
         Column {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -97,7 +108,7 @@ fun OrderDetailsInfoCard(order: Order) {
                             ),
                         )
                         Text(
-                            text = order.billingAddress?.address1.toString(),
+                            text = order.billingAddress?.getFullAddress() ?: "",
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(top = 8.dp)
                         )
@@ -111,17 +122,17 @@ fun OrderDetailsInfoCard(order: Order) {
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
-                Row() {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = order.billingAddress?.phone.toString(),
                         style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(top = 8.dp)
                     )
-                    Spacer(modifier = Modifier.padding(start = 3.dp, top = 16.dp))
+                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                     Icon(
                         imageVector = Icons.Default.Verified,
                         contentDescription = "verify",
-                        tint = MaterialTheme.shopifyColors.DarkGreenColor
+                        tint = MaterialTheme.shopifyColors.DarkGreenColor,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 

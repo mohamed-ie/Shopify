@@ -139,10 +139,10 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 processedAt = it.node.processedAt,
                 subTotalPrice = it.node.subtotalPrice,
                 totalShippingPrice = it.node.totalShippingPrice,
-//                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations[0]),
+                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations),
                 totalTax = it.node.totalTax,
                 totalPrice = it.node.totalPrice,
-                billingAddress = it.node.billingAddress,
+                billingAddress = it.node.shippingAddress,
                 lineItems = mapToLinesItemResponse(it.node.lineItems)
             )
         } ?: listOf()
@@ -285,22 +285,27 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
 
-    private fun mapToDiscount(response: Storefront.DiscountAllocation): Storefront.MoneyV2 =
-        response.allocatedAmount
-
-    private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection): List<LineItems> =
-        response.edges.map {
-            LineItems(
-                id = it.node.variant.product.id,
-                name = it.node.variant.product.title,
-                thumbnail = it.node.variant.product.featuredImage.url,
-                collection = it.node.variant.product.productType,
-                vendor = it.node.variant.product.vendor,
-                description = it.node.variant.product.description,
-                price = it.node.variant.price
-            )
-        }
+    private fun mapToDiscount(response: MutableList<Storefront.DiscountAllocation>): Storefront.MoneyV2 {
+        return if (!response.isEmpty()) {
+            response[0].allocatedAmount
+        } else
+            Storefront.MoneyV2()
+    }
 }
+
+private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection): List<LineItems> =
+    response.edges.map {
+        LineItems(
+            id = it.node.variant.product.id,
+            name = it.node.variant.product.title,
+            thumbnail = it.node.variant.product.featuredImage.url,
+            collection = it.node.variant.product.productType,
+            vendor = it.node.variant.product.vendor,
+            description = it.node.variant.product.description,
+            price = it.node.variant.price
+        )
+    }
+
 
 private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
     val lines = this?.lineItems?.nodes?.map {
@@ -346,7 +351,7 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
         subTotalsPrice = subTotalPrice,
         shippingFee = shippingFee,
         totalPrice = totalPrice,
-        address = shippingAddress?:MyAccountMinAddress(),
+        address = shippingAddress ?: MyAccountMinAddress(),
         discounts = discounts,
 //        address = this?.shippingAddress?.formattedArea ?: "",
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,

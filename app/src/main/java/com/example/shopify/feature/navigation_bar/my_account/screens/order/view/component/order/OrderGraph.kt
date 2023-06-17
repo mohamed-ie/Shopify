@@ -1,14 +1,12 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order
 
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import androidx.navigation.navArgument
 import com.example.shopify.feature.Graph
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.view.OrderDetails
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.view.OrdersScreen
 
@@ -23,13 +21,12 @@ fun NavGraphBuilder.orderGraph(navController: NavController) {
                 back = { navController.popBackStack() })
         }
         composable(
-            "${OrderGraph.ORDER_DETAILS}/{order}",
-            arguments = listOf(navArgument("order") {
-                type = NavType.SerializableType(Order::class.java)
-            })
-        ) { backStackEntry ->
-            val order = backStackEntry.arguments?.getSerializable("order") as Order
-            OrderDetails(order = order, back = { navController.popBackStack() })
+            route = OrderGraph.ORDER_DETAILS
+        ) {
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry(OrderGraph.ORDER)
+            }
+            OrderDetails(hiltViewModel(parentEntry), back = { navController.popBackStack() })
         }
     }
 }

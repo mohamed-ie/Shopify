@@ -18,10 +18,14 @@ fun OrdersScreen(
     when (viewModel.screenState.collectAsState().value) {
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> OrdersScreenContent(
-            orders = viewModel.brandList.collectAsState().value,
+            orders = viewModel.orderList.collectAsState().value,
             back = back,
-            viewOrderDetails = { navigateTo("${OrderGraph.ORDER_DETAILS}/$it") }
-        )
+            viewOrderDetails = {
+                viewModel.orderIndex = it
+                navigateTo(OrderGraph.ORDER_DETAILS)
+            },
+
+            )
 
         ScreenState.ERROR -> ErrorScreen {
 

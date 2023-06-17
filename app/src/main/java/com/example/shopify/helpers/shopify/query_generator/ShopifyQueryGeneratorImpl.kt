@@ -131,7 +131,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                 it.amount()
                                 it.currencyCode()
                             }
-                            node.billingAddress {
+                            node.shippingAddress {
                                 it.phone()
                                     .address1()
                                     .address2()
@@ -180,7 +180,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             CheckoutLineItemInput(it.quantity, it.productVariantID)
         }
         val address = Storefront.MailingAddressInput()
-            .setAddress1(cart.address)
+            .setAddress1(cart.address.name.toString())
         val input = CheckoutCreateInput()
             .setLineItemsInput(Input.value(lines))
             .setEmail(email)

@@ -48,7 +48,7 @@ import org.joda.time.DateTime
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun OrderCard(order: Order, viewDetails: (String) -> Unit) {
+fun OrderCard(order: Order, viewDetails: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RectangleShape,
@@ -83,7 +83,7 @@ fun OrderCard(order: Order, viewDetails: (String) -> Unit) {
                 )
             }
             //view details
-            TextButton(onClick = { viewDetails("$order") }) {
+            TextButton(onClick = viewDetails) {
                 Text(text = stringResource(id = R.string.view_details))
                 Icon(
                     modifier = Modifier.size(18.dp),
