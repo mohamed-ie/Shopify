@@ -14,8 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shopify.feature.address.AddressGraph
-import com.example.shopify.feature.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component.CheckoutFooterScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component.OrderItemScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component.OrderSummaryScreen

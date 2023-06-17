@@ -74,6 +74,7 @@ fun ProductScreen(
                     navigateTo(Auth.SIGN_IN)
             }
         )
+
         ScreenState.ERROR -> {}
     }
 
@@ -91,7 +92,7 @@ fun ProductScreenContent(
     navigateToHome: () -> Unit,
     navigateToProductDetails: (ID) -> Unit,
     updateSliderValue: (Float) -> Unit,
-    onFavourite: (Int) -> Unit
+    onFavourite: (ID, Boolean) -> Unit
 ) {
     Column() {
         NamedTopAppBar("", navigateToHome)
@@ -105,11 +106,11 @@ fun ProductScreenContent(
             onValueChange = updateSliderValue
         )
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
-            items(productsState.brandProducts.count()) {
+            items(productsState.brandProducts) {
                 ProductCard(
-                    product = productsState.brandProducts[it],
-                    onProductItemClick = { navigateToProductDetails(productsState.brandProducts[it].id) },
-                    onFavouriteClick = { onFavourite(it) }
+                    product = it,
+                    onProductItemClick = { navigateToProductDetails(it.id) },
+                    onFavouriteClick = { onFavourite(it.id, it.isFavourite) }
                 )
             }
         }

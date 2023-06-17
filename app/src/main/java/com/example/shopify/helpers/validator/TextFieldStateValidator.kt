@@ -1,7 +1,7 @@
 package com.example.shopify.helpers.validator
 
 import com.example.shopify.R
-import com.example.shopify.feature.common.state.TextFieldState
+import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
 import com.example.shopify.helpers.UIText
 
 interface TextFieldStateValidator {

@@ -68,7 +68,6 @@ fun ProductDetailsScreen(
                 navigateToAuth = navigateToAuth
             )
         }
-
         ScreenState.ERROR -> ErrorScreen {}
     }
 

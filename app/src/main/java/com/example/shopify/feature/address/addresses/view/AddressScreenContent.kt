@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.address.addresses.view.component.MyAccountAddressCard
-import com.example.shopify.feature.common.NamedTopAppBar
+import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.shopify.graphql.support.ID
 

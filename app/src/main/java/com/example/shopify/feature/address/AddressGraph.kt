@@ -10,7 +10,7 @@ import androidx.navigation.navigation
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.add_address.view.AddAddressScreen
 import com.example.shopify.feature.address.addresses.view.AddressesScreen
-import com.example.shopify.feature.common.GraphRouteWithArgs
+import com.example.shopify.feature.navigation_bar.common.GraphRouteWithArgs
 
 fun NavGraphBuilder.addressGraph(navController: NavController) {
     navigation(route = Graph.ADDRESS, startDestination = AddressGraph.Addresses.routeWithArgs) {

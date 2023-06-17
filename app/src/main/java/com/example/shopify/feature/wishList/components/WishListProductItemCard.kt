@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
@@ -149,7 +149,9 @@ fun WishListProductCardItem(
             ) {
                 Button(
                     onClick = { addToCart() },
-                    modifier = Modifier.weight(0.9f).height(28.dp),
+                    modifier = Modifier
+                        .weight(0.9f)
+                        .height(28.dp),
                     shape = RoundedCornerShape(7.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {

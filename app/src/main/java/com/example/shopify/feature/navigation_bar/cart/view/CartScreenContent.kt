@@ -42,6 +42,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.footer.CartFooter
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.header.CartHeader
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
+import com.example.shopify.feature.navigation_bar.common.component.RemoteErrorHeader
 import com.example.shopify.theme.Green170
 
 val cartElevation = 2.dp
