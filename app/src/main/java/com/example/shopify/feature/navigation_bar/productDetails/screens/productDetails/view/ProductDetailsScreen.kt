@@ -13,10 +13,11 @@ import com.shopify.graphql.support.ID
 @Composable
 fun ProductDetailsScreen(
     viewModel: ProductDetailsViewModel,
-    navigateToViewMoreReviews:(ID)->Unit,
-    navigateToCart:()->Unit,
-    back:()->Unit,
-    navigateToSearch: () -> Unit
+    navigateToViewMoreReviews: (ID) -> Unit,
+    navigateToCart: () -> Unit,
+    back: () -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateToAuth: () -> Unit
 ) {
     val product by viewModel.productState.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
@@ -24,7 +25,7 @@ fun ProductDetailsScreen(
     val variantsState by viewModel.variantState.collectAsState()
     val reviewsState by viewModel.reviewState.collectAsState()
 
-    when(screenState){
+    when (screenState) {
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> {
             ProductDetailsScreenContent(
@@ -32,13 +33,21 @@ fun ProductDetailsScreen(
                 addToCardState = addToCardState,
                 variantsState = variantsState,
                 reviewsState = reviewsState,
-                viewReviewsMore = {navigateToViewMoreReviews(viewModel.productId)},
-                back = {back()},
+                viewReviewsMore = { navigateToViewMoreReviews(viewModel.productId) },
+                back = { back() },
                 viewCart = navigateToCart,
-                onFavouriteClick = {isFavourite -> viewModel.sendFavouriteAction(isFavourite)},
-                navigateToSearch = navigateToSearch
+                onFavouriteClick = { isFavourite ->
+                    if (product.isLogged)
+                        viewModel.sendFavouriteAction(isFavourite)
+                    else
+                        navigateToAuth()
+
+                },
+                navigateToSearch = navigateToSearch,
+                navigateToAuth = navigateToAuth
             )
         }
+
         ScreenState.ERROR -> ErrorScreen {}
     }
 

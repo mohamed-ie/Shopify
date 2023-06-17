@@ -48,7 +48,7 @@ class ReviewsDetailsViewModel @Inject constructor(
                     is Resource.Success -> {
                         toStableScreenState()
                         resource.data.apply {
-                            _productState.value = _productState.value.copy(title = this.title, vendor = this.vendor, image = this.image)
+                            _productState.value = _productState.value.copy(title = this.title, vendor = this.vendor, images = this.images)
                         }
                     }
                 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,7 +43,7 @@ import com.example.shopify.utils.shopifyLoading
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ColumnScope.ImageCardScrollHorizontally(
+fun ImageCardScrollHorizontally(
     images: List<String>,
     isFavourite: Boolean,
     addToFavourite: () -> Unit
@@ -52,69 +53,73 @@ fun ColumnScope.ImageCardScrollHorizontally(
     ) {
         images.size
     }
-    Box() {
-
-        HorizontalPager(
-            state = pagerState, modifier = Modifier.fillMaxWidth()
-        ) { page ->
-            SubcomposeAsyncImage(
-                modifier = Modifier
-                    .aspectRatio(1f, false)
-                    .padding(15.dp),
-                contentScale = ContentScale.Inside,
-                model = images[page],
-                contentDescription = null,
-                loading = {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .shopifyLoading()
-                    )
-                },
-                error = {
-                    Icon(
-                        modifier = Modifier.fillMaxSize(),
-                        imageVector = Icons.Rounded.BrokenImage,
-                        tint = Color.Gray,
-                        contentDescription = null
-                    )
-                }
-            )
-        }
-        IconButton(
-            onClick = addToFavourite,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-                .shadow(1.dp, shape = CircleShape, spotColor = Color.Black)
-                .clip(CircleShape)
-                .size(35.dp)
-                .background(Color.White)
-
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            contentAlignment = Alignment.Center
         ) {
-            if (isFavourite) {
-                Icon(
-                    imageVector = Icons.Rounded.Favorite,
+            HorizontalPager(
+                state = pagerState, modifier = Modifier.fillMaxWidth()
+            ) { page ->
+                SubcomposeAsyncImage(
+                    modifier = Modifier
+                        .aspectRatio(1f, false)
+                        .padding(15.dp),
+                    contentScale = ContentScale.Inside,
+                    model = images[page],
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = Color.Gray
+                    loading = {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .shopifyLoading()
+                        )
+                    },
+                    error = {
+                        Icon(
+                            modifier = Modifier.fillMaxSize(),
+                            imageVector = Icons.Rounded.BrokenImage,
+                            tint = Color.Gray,
+                            contentDescription = null
+                        )
+                    }
                 )
             }
+            IconButton(
+                onClick = addToFavourite,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 8.dp, end = 12.dp)
+                    .shadow(1.dp, shape = CircleShape, spotColor = Color.Black)
+                    .clip(CircleShape)
+                    .size(35.dp)
+                    .background(Color.White)
 
+            ) {
+                if (isFavourite) {
+                    Icon(
+                        imageVector = Icons.Rounded.Favorite,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Gray
+                    )
+                }
+
+            }
         }
+        DotIndicator(
+            pageCount = images.size, currentPage = pagerState.currentPage
+        )
     }
-    Spacer(modifier = Modifier.height(8.dp))
-    DotIndicator(
-        pageCount = images.size, currentPage = pagerState.currentPage
-    )
-//    }
+
 }
 
 @Composable

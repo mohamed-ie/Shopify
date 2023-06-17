@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,16 +27,24 @@ class SearchViewModel @Inject constructor(
 
     init {
         toStableScreenState()
+        viewModelScope.launch {
+            _searchedProductsState.update {
+                it.copy(isLogged = repository.isLoggedIn().first())
+            }
+        }
     }
-
 
     fun getProductsBySearchKeys(key: String) {
         toLoadingScreenState()
-        if (key.isBlank() || key.isEmpty()){
+        if (key.isBlank() || key.isEmpty()) {
             _searchedProductsState.update { SearchedProductsState() }
             toStableScreenState()
-        }else{
-            _searchedProductsState.update { searchedProductsState -> searchedProductsState.copy(searchTextValue = key) }
+        } else {
+            _searchedProductsState.update { searchedProductsState ->
+                searchedProductsState.copy(
+                    searchTextValue = key
+                )
+            }
             viewModelScope.launch(Dispatchers.Default) {
                 when (val response =
                     repository.getProductsByQuery(Constants.ProductQueryType.TITLE, key)) {
@@ -55,9 +64,7 @@ class SearchViewModel @Inject constructor(
                 }
             }
         }
-
     }
-
 
     fun getProductsByLastCursor() {
         if (_searchedProductsState.value.hasNext)
@@ -87,5 +94,20 @@ class SearchViewModel @Inject constructor(
             }
     }
 
+    fun onFavourite(index: Int) {
+        viewModelScope.launch {
+            _searchedProductsState.value.productList[index].also { brandProduct ->
+                if (brandProduct.isFavourite) {
+                    repository.removeProductWishListById(brandProduct.id)
+                } else
+                    repository.addProductWishListById(brandProduct.id)
 
+                _searchedProductsState.update { productState ->
+                    productState.productList[index] =
+                        productState.productList[index].copy(isFavourite = !brandProduct.isFavourite)
+                    productState.copy(productList = productState.productList)
+                }
+            }
+        }
+    }
 }

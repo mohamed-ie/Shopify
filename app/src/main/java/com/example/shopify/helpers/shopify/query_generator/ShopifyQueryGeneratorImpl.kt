@@ -195,8 +195,8 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                         }
 
                                 }
-                        }.priceRange {productPriceRangeQuery ->
-                            productPriceRangeQuery.maxVariantPrice {moneyV2Query ->
+                        }.priceRange { productPriceRangeQuery ->
+                            productPriceRangeQuery.maxVariantPrice { moneyV2Query ->
                                 moneyV2Query.amount()
                                     .currencyCode()
                             }
@@ -247,7 +247,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     override fun generateProductsByQuery(
         productQueryType: Constants.ProductQueryType,
-        queryContent: String
+        queryContent: String,
     ): QueryRootQuery =
         Storefront.query { rootQuery ->
             rootQuery.products({ productArguments ->
@@ -329,7 +329,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     override fun generatePaymentCompletionAvailabilityQuery(
         checkoutId: ID,
-        input: CreditCardPaymentInputV2
+        input: CreditCardPaymentInputV2,
     ): MutationQuery =
         Storefront.mutation { mutationQuery: MutationQuery ->
             mutationQuery.checkoutCompleteWithCreditCardV2(checkoutId, input) { payloadQuery ->
@@ -366,7 +366,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
 
     override fun generateCreateAddress(
         accessToken: String,
-        address: Storefront.MailingAddressInput
+        address: Storefront.MailingAddressInput,
     ): MutationQuery =
         Storefront.mutation { mutation: MutationQuery ->
             mutation.customerAddressCreate(
@@ -397,7 +397,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateCreateCustomerCartQuery(
         accessToken: String,
         productVariantId: ID,
-        quantity: Int
+        quantity: Int,
     ): MutationQuery {
         val input = Storefront.CartInput().apply {
             //set buyer access token
@@ -419,7 +419,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateAddCartLineQuery(
         cartId: ID,
         productVariantId: ID,
-        quantity: Int
+        quantity: Int,
     ): MutationQuery = Storefront.mutation { mutation ->
         val line = Storefront.CartLineInput(productVariantId)
             .setQuantity(quantity)
@@ -469,7 +469,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateChangeCartLineQuantityQuery(
         cartId: ID,
         merchandiseId: ID,
-        quantity: Int
+        quantity: Int,
     ): MutationQuery =
         Storefront.mutation { mutation ->
             val lineUpdate = CartLineUpdateInput(merchandiseId)
@@ -494,7 +494,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateUpdateCartAddress(
         accessToken: String,
         cartId: ID,
-        addressId: ID
+        addressId: ID,
     ): MutationQuery =
         Storefront.mutation { mutation ->
             val deliveryAddress = Storefront.DeliveryAddressInput()

@@ -43,7 +43,7 @@ fun SearchScreenContent(
     searchedProductsState:SearchedProductsState,
     searchSectionState:ScreenState,
     navigateToProductDetails: (ID) -> Unit,
-    onFavourite: (ID, Boolean) -> Unit,
+    onFavourite: (Int) -> Unit,
     back:()->Unit,
     onValueChange:(String) -> Unit,
     onScrollDown:() -> Unit
@@ -87,12 +87,14 @@ fun SearchScreenContent(
                         .weight(1f)
                         .padding(vertical = 5.dp)
                 ) {
-                    items(searchedProductsState.productList) {product ->
-                        ProductCard(
-                            product = product,
-                            onProductItemClick = { navigateToProductDetails(product.id) },
-                            onFavouriteClick = { onFavourite(product.id, product.isFavourite) }
-                        )
+                    items(searchedProductsState.productList.count()) {productIndex ->
+                        searchedProductsState.productList[productIndex].run {
+                            ProductCard(
+                                product = this,
+                                onProductItemClick = { navigateToProductDetails(this.id) },
+                                onFavouriteClick = { onFavourite(productIndex) }
+                            )
+                        }
                     }
                 }
             }
@@ -120,7 +122,7 @@ private fun SearchScreenContentPreview() {
         ),
         searchSectionState = ScreenState.LOADING,
         navigateToProductDetails = {},
-        onFavourite = {_,_ ->},
+        onFavourite = {},
         back = {},
         onValueChange = {},
         onScrollDown = {}
