@@ -2,12 +2,16 @@ package com.example.shopify.feature.search.view
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -35,6 +39,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ProductCard
 import com.example.shopify.feature.search.components.SearchTopBar
 import com.example.shopify.theme.shopifyColors
+import com.example.shopify.utils.shopifyLoading
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 
@@ -54,19 +59,28 @@ fun SearchScreenContent(
             back = back,
             onValueChange = onValueChange
         )
-        Box(
+        Row(
             modifier = Modifier
                 .height(40.dp)
                 .background(Color.White)
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
-            contentAlignment = Alignment.CenterStart
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ){
             Text(
                 text = stringResource(R.string.results),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.DarkGray,
                 fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                text = searchedProductsState.productList.count().toString(),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.DarkGray,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.shopifyLoading(searchedProductsState.isLoadingHasNext)
             )
         }
         val lazyListState = rememberLazyGridState()

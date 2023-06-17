@@ -75,7 +75,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                             image = productVariant.image.url,
                             id = productVariant.id,
                             price = productVariant.price.amount,
-                            title = productVariant.title
+                            title = productVariant.title,
+                            availableQuantity = productVariant.quantityAvailable
                         )
                     }
                 },
@@ -221,7 +222,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
 
     override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand> {
-        return response.data?.collections?.edges?.drop(1)?.map {
+        return response.data?.collections?.edges?.drop(1)?.dropLast(4)?.map {
             Brand(title = it.node.title, url = it.node.image?.url)
         } ?: listOf()
     }

@@ -91,9 +91,6 @@ class ProductDetailsViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        _addToCardState.value = _addToCardState.value.copy(
-                            availableQuantity = if (resource.data.totalInventory in 2..5) resource.data.totalInventory else resource.data.totalInventory
-                        )
                         _variantState.value = _variantState.value.copy(
                             variants = resource.data.variants,
                             isLowStock = resource.data.totalInventory <= 5
@@ -102,6 +99,18 @@ class ProductDetailsViewModel @Inject constructor(
                             discount = calDiscount(resource.data.price.amount),
                             variants = listOf()
                         )
+                        _addToCardState.update {addToCardState ->
+                            _variantState.value.let {variantsState ->
+                                addToCardState.copy(
+                                    availableQuantity =
+                                    if (variantsState.variants[variantsState.selectedVariant - 1].availableQuantity in 2..5)
+                                        variantsState.variants[variantsState.selectedVariant - 1].availableQuantity - 1
+                                    else
+                                        variantsState.variants[variantsState.selectedVariant - 1].availableQuantity
+                                )
+                            }
+
+                        }
                         getProductReview(productId)
                         checkIsLoggedIn()
                         toStableScreenState()
@@ -175,8 +184,19 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun sendSelectedVariant(variantIndex: Int) {
-        _variantState.value = _variantState.value.copy(selectedVariant = variantIndex)
-        //getProduct(_variantState.value.variants[variantIndex - 1].id ?: "")
+        _addToCardState.update {addToCardState ->
+            _variantState.value.let {variantsState ->
+                _variantState.value = variantsState.copy(selectedVariant = variantIndex)
+                addToCardState.copy(
+                    availableQuantity =
+                    if (variantsState.variants[variantIndex - 1].availableQuantity in 2..5)
+                        variantsState.variants[variantIndex - 1].availableQuantity - 1
+                    else
+                        variantsState.variants[variantIndex - 1].availableQuantity
+                )
+            }
+
+        }
     }
 
     private fun dismissBottomSheet() {

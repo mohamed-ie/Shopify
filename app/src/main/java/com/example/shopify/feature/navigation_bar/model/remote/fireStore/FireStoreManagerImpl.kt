@@ -78,7 +78,7 @@ class FireStoreManagerImpl @Inject constructor(
     override suspend fun setCurrentCartId(email: String, cartId: String) {
         fireStore.collection(Customer.PATH)
             .document(email)
-            .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
+            .update(Customer.Fields.CURRENT_CART_ID, cartId)
             .await()
     }
 
