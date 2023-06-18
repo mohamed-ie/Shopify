@@ -7,15 +7,14 @@ import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.AddToCardState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ReviewsState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.VariantsState
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.firestore.mapper.decodeProductId
-import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,14 +91,20 @@ class ProductDetailsViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         _variantState.value = _variantState.value.copy(
-                            variants = resource.data.variants,
+                            variants = mapAnyNegativeQuantity(resource.data.variants),
                             isLowStock = resource.data.totalInventory <= 5
                         )
                         _productState.value = resource.data.copy(
                             discount = calDiscount(resource.data.price.amount),
-                            variants = listOf()
+                            variants = listOf(),
+                            totalInventory = resource.data.totalInventory.let { totalInventory ->
+                                if (totalInventory < 0)
+                                    return@let totalInventory * (-1)
+                                return@let totalInventory
+                            }
                         )
                         _addToCardState.update {addToCardState ->
+
                             _variantState.value.let {variantsState ->
                                 addToCardState.copy(
                                     availableQuantity =
@@ -169,6 +174,14 @@ class ProductDetailsViewModel @Inject constructor(
             }
         }
     }
+
+    private fun mapAnyNegativeQuantity(variants:List<VariantItem>) : List<VariantItem> =
+        variants.map{variantItem ->
+            if (variantItem.availableQuantity < 0 )
+                return@map variantItem.copy(availableQuantity = variantItem.availableQuantity * (-1))
+            return@map variantItem
+        }
+
 
     private fun sendTotalCart(response: Resource<Cart?>) {
         when (response) {
