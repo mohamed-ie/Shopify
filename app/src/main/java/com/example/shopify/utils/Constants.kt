@@ -30,7 +30,7 @@ class Constants private constructor() {
     }
 
     enum class ProductQueryType(val typeString:String) {
-        TITLE("title"),LAST_CURSOR("lastCursor")
+        TITLE(""),LAST_CURSOR("lastCursor")
     }
 
 }

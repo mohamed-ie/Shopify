@@ -202,7 +202,7 @@ private fun WishListProductCardItemPreview() {
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("", "", "white/1", ID(""))),
+            variants = listOf(VariantItem("", "", "white/1",0, ID(""))),
             title = "iPhone 14 Pro 256GB Deep Purple 5G With FaceTime - International Version",
             vendor = "Adidas",
             price = Price(

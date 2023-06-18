@@ -42,7 +42,8 @@ class SearchViewModel @Inject constructor(
         } else {
             _searchedProductsState.update { searchedProductsState ->
                 searchedProductsState.copy(
-                    searchTextValue = key
+                    searchTextValue = key,
+                    isLoadingHasNext = true
                 )
             }
             viewModelScope.launch(Dispatchers.Default) {
@@ -55,7 +56,8 @@ class SearchViewModel @Inject constructor(
                                 searchedProductsState.copy(
                                     productList = brandProducts.toMutableStateList(),
                                     lastCursor = response.data.lastCursor,
-                                    hasNext = response.data.hasNext
+                                    hasNext = response.data.hasNext,
+                                    isLoadingHasNext = false
                                 )
                             } ?: _searchedProductsState.value
                         }
@@ -68,7 +70,12 @@ class SearchViewModel @Inject constructor(
 
     fun getProductsByLastCursor() {
         if (_searchedProductsState.value.hasNext)
-            viewModelScope.launch(Dispatchers.Default) {
+            _searchedProductsState.update {searchedProductsState ->
+                searchedProductsState.copy(
+                    isLoadingHasNext = true
+                )
+            }
+            viewModelScope.launch(Dispatchers.Main) {
                 when (
                     val response = repository.getProductsByQuery(
                         Constants.ProductQueryType.LAST_CURSOR,
@@ -78,24 +85,30 @@ class SearchViewModel @Inject constructor(
                     is Resource.Error -> toErrorScreenState()
                     is Resource.Success -> {
                         toStableScreenState()
-                        _searchedProductsState.update { searchedProductsState ->
-                            response.data?.data?.let { brandProducts ->
-                                val result = searchedProductsState.productList
-                                brandProducts.onEach {brandProduct ->
-                                   if (result.find { it.id ==  brandProduct.id} == null)
-                                       result.add(brandProduct)
-                                }
+                        response.data?.let { pageInfo ->
+                            _searchedProductsState.update { searchedProductsState ->
                                 searchedProductsState.copy(
-                                    productList = result,
-                                    lastCursor = response.data.lastCursor,
-                                    hasNext = response.data.hasNext
+                                    lastCursor = pageInfo.lastCursor,
+                                    hasNext = pageInfo.hasNext,
+                                    isLoadingHasNext = false
                                 )
-                            } ?: _searchedProductsState.value
-                        }
+                            }
+                            pageInfo.data.let {brandProducts ->
+                                val result = _searchedProductsState.value.productList
+                                brandProducts.onEach { brandProduct ->
+                                    if (result.find { it.id == brandProduct.id } == null)
+                                        result.add(brandProduct)
+                                }
+                            }
+
+                        } ?: _searchedProductsState.value
+
                     }
                 }
             }
     }
+
+
 
     fun onFavourite(index: Int) {
         viewModelScope.launch {

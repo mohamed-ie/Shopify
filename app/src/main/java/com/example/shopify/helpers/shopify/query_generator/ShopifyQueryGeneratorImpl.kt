@@ -282,7 +282,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             rootQuery.products({ productArguments ->
                 when (productQueryType) {
                     Constants.ProductQueryType.TITLE -> {
-                        productArguments.query("${productQueryType.typeString}:$queryContent")
+                        productArguments.query(queryContent)
                     }
 
                     Constants.ProductQueryType.LAST_CURSOR -> {
@@ -340,6 +340,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                                     productVariantQuery.title()
                                         .image { imageQuery -> imageQuery.url() }
                                         .price { moneyV2Query -> moneyV2Query.amount() }
+                                        .quantityAvailable()
                                 }
                             }
                         }

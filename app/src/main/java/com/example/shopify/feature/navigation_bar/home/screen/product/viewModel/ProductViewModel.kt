@@ -48,7 +48,7 @@ class ProductViewModel @Inject constructor(
     }
 
     private fun isLoggedIn() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.Main) {
             _productState.update { productsState ->
                 productsState.copy(isLoggedIn = repository.isLoggedIn().first())
             }

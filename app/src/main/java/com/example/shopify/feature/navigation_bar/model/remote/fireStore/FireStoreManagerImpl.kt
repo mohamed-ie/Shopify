@@ -81,6 +81,13 @@ class FireStoreManagerImpl @Inject constructor(
 
     }
 
+    override suspend fun createUserEmail(email: String): Resource<Unit> {
+        return fireStore.collection(Customer.PATH)
+            .document(email)
+            .set(mapOf(Customer.Fields.WISH_LIST to emptyList<String>()))
+            .awaitResource {}
+    }
+
     override suspend fun setCurrentCartId(email: String, cartId: String): Resource<Unit> {
         return fireStore.collection(Customer.PATH)
             .document(email)
@@ -143,14 +150,6 @@ class FireStoreManagerImpl @Inject constructor(
                 ?.map { it as String }
                 ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
             }
-    }
-
-    private suspend fun <T> FirebaseFirestore.runCatching(block: suspend (FirebaseFirestore) -> T): Resource<T> {
-        return try {
-            Resource.Success(block(this).apply { joinAll() })
-        } catch (e: Exception) {
-            Resource.Error(UIError.Unexpected)
-        }
     }
 
     private suspend fun <I,O> Task<I>.awaitResource(block: suspend (I)->O): Resource<O> {

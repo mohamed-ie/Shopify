@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,11 +60,13 @@ fun CartItemCard(
     toggleQuantitySelectorVisibility: () -> Unit,
     removeFromCart: () -> Unit,
     moveToWishlist: () -> Unit,
-    quantitySelected: (Int) -> Unit
+    quantitySelected: (Int) -> Unit,
+    onClick:()->Unit
 ) {
     val product = cartLine.cartProduct
     Column(
         modifier = Modifier
+            .clickable { onClick() }
             .background(Color.White)
             .fillMaxWidth()
             .padding(12.dp)
