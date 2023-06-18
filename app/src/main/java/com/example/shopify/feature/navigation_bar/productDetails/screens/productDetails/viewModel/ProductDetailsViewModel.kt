@@ -161,12 +161,12 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun addProductToCart() {
-        _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
         _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let { variantId ->
             viewModelScope.launch {
                 when (repository.addToCart(variantId.toString(), _addToCardState.value.selectedQuantity)) {
-                    is Resource.Error -> {}
+                    is Resource.Error -> toErrorScreenState()
                     is Resource.Success -> {
+                        _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
                         _addToCardState.value = _addToCardState.value.copy(isAdded = true)
                         sendTotalCart(repository.getCart())
                     }

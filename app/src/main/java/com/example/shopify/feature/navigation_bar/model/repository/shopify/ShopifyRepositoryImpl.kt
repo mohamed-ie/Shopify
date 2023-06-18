@@ -21,12 +21,14 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.remote.fireStore.FireStoreManager
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
+import com.example.shopify.type.CurrencyCode
 import com.example.shopify.type.DraftOrderDeleteInput
 import com.example.shopify.type.DraftOrderInput
 import com.example.shopify.type.DraftOrderLineItemInput
@@ -57,7 +59,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     private val dataStoreManager: ShopifyDataStoreManager,
     private val fireStoreManager: FireStoreManager,
     private val defaultDispatcher: CoroutineDispatcher,
-    private val apolloClient: ApolloClient
+    private val apolloClient: ApolloClient,
 ) : ShopifyRepository {
     private val adminManager = AdminManager()
 
@@ -109,7 +111,8 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override fun getBrands(): Flow<Resource<List<Brand>>> {
         val query = queryGenerator.generateBrandQuery()
-        return query.enqueue().mapResource(mapper::mapToBrandResponse)
+        return query.enqueue()
+            .mapResource(mapper::mapToBrandResponse)
     }
 
     override suspend fun getCart(): Resource<Cart?> {
@@ -129,23 +132,37 @@ class ShopifyRepositoryImpl @Inject constructor(
         val wishList = fireStoreManager.getWishList(email)
         return query.enqueue1()
             .mapResource(mapper::mapToProductsByBrandResponse)
-            .mapResource { brandProduct ->
-                brandProduct.map {
-                    it.copy(isFavourite = wishList.contains(it.id))
+            .mapSuspendResource { brandProducts ->
+                brandProducts.map {brandProduct ->
+                    brandProduct.copy(
+                        isFavourite = wishList.contains(brandProduct.id),
+                        price = mapper.mapPriceV2ToLivePrice(
+                            dataStoreManager.getCurrency().first(),
+                            dataStoreManager.getCurrencyAmountPerOnePound().first(),
+                            brandProduct.price
+                        )
+                    )
                 }
             }
     }
 
     override suspend fun getProductsByQuery(
         productQueryType: Constants.ProductQueryType,
-        queryContent: String
+        queryContent: String,
     ): Resource<Pageable<List<BrandProduct>>?> {
         val query = queryGenerator.generateProductsByQuery(productQueryType, queryContent)
         return query.enqueue1()
             .mapSuspendResource {
                 mapper.mapToProductsByQueryResponse(it)?.let { page ->
                     page.copy(data = page.data.map { brandProduct ->
-                        brandProduct.copy(isFavourite = isProductWishList(brandProduct.id))
+                        brandProduct.copy(
+                            isFavourite = isProductWishList(brandProduct.id),
+                            price = mapper.mapPriceV2ToLivePrice(
+                                dataStoreManager.getCurrency().first(),
+                                dataStoreManager.getCurrencyAmountPerOnePound().first(),
+                                brandProduct.price
+                            )
+                        )
                     })
                 }
             }
@@ -157,7 +174,15 @@ class ShopifyRepositoryImpl @Inject constructor(
             .enqueue()
             .mapSuspendResource {
                 mapper.mapToProduct(it).let { product ->
-                    product.copy(isFavourite = isProductWishList(product.id))
+                    product.copy(
+                        isFavourite = isProductWishList(product.id),
+                        price = mapper.mapPriceToLivePrice(
+                            dataStoreManager.getCurrency().first(),
+                            dataStoreManager.getCurrencyAmountPerOnePound().first(),
+                            product.price
+                        )
+                    )
+
                 }
             }
 
@@ -228,7 +253,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         adminManager.createDraftOrder(customerId, productVariantId, quantity)
             .mapSuspendResource { pair ->
                 //also save cart id
-                 pair?.first?.let { fireStoreManager.setCurrentCartId(email, it) }
+                pair?.first?.let { fireStoreManager.setCurrentCartId(email, it) }
                 joinAll()
                 //return server error message
                 pair?.second
@@ -251,7 +276,7 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun changeCartLineQuantity(
         merchandiseId: String,
-        quantity: Int
+        quantity: Int,
     ): Resource<Cart?> {
         val email = dataStoreManager.getEmail().first()
         val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
@@ -365,7 +390,7 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override fun getProductsCategory(
         productType: String,
-        productTag: String
+        productTag: String,
     ): Flow<Resource<List<BrandProduct>>> {
         return queryGenerator.generateProductCategoryQuery(productType, productTag).enqueue()
             .mapResource(mapper::mapToProductsCategoryResponse)
@@ -383,7 +408,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     }
 
     private fun <I, O> Resource<I>.mapResource(
-        transform: (I) -> O
+        transform: (I) -> O,
     ): Resource<O> {
         return run {
             when (this) {
@@ -394,7 +419,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     }
 
     private suspend fun <I, O> Resource<I>.mapSuspendResource(
-        transform: suspend (I) -> O
+        transform: suspend (I) -> O,
     ): Resource<O> {
         return run {
             when (this) {
@@ -410,7 +435,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         suspend fun createDraftOrder(
             customerId: String,
             variantId: String,
-            quantity: Int
+            quantity: Int,
         ): Resource<Pair<String, String>?> {
 //            val purchasingEntityInput = PurchasingEntityInput(customerId = customerId.present())
             val newLine =
@@ -438,7 +463,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         suspend fun addToDraftOrder(
             draftOrderId: String,
             variantId: String,
-            quantity: Int
+            quantity: Int,
         ): Resource<String?> {
             val lineItems = getDraftOrderLineItems(draftOrderId)
                 ?: return Resource.Error(UIError.Unexpected)
@@ -497,7 +522,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         suspend fun changeDraftOrderLineQuantity(
             draftOrderId: String,
             variantId: String,
-            quantity: Int
+            quantity: Int,
         ): Resource<Cart?> {
             val lineItems = getDraftOrderLineItems(draftOrderId)
                 ?: return Resource.Error(UIError.Unexpected)
@@ -518,7 +543,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         }
 
         private suspend fun getDraftOrderLineItems(
-            draftOrderId: String
+            draftOrderId: String,
         ): MutableList<DraftOrderLineItemInput>? {
             return apolloClient.query(DraftOrderLineItemsQuery(draftOrderId, Optional.Absent))
                 .execute()
@@ -536,7 +561,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         }
 
         private fun <I : Operation.Data, O> ApolloResponse<I>.mapToResource(
-            transform: (I) -> O
+            transform: (I) -> O,
         ): Resource<O> {
             if (hasErrors())
                 return Resource.Error(UIError.Unexpected)

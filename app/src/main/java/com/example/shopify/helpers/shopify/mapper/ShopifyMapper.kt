@@ -14,6 +14,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.helpers.UIError
 import com.shopify.buy3.GraphCallResult
@@ -50,4 +51,10 @@ interface ShopifyMapper {
     fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String?
     fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?
     fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart?
+    fun mapPriceToLivePrice(liveCurrencyCode: String, liveAmount: Float, price: Price): Price
+    fun mapPriceV2ToLivePrice(
+        liveCurrencyCode: String,
+        liveAmount: Float,
+        price: Storefront.MoneyV2
+    ): Storefront.MoneyV2
 }
