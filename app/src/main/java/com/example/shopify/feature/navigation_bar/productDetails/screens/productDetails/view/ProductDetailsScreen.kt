@@ -69,7 +69,9 @@ fun ProductDetailsScreen(
                 navigateToAuth = navigateToAuth
             )
         }
-        ScreenState.ERROR -> ErrorScreen {}
+        ScreenState.ERROR -> ErrorScreen {
+            viewModel.loadProductDetails()
+        }
     }
 
 }

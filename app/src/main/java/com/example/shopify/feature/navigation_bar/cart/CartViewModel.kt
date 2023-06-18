@@ -11,6 +11,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepositoryImpl
 import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +40,7 @@ class CartViewModel @Inject constructor(
     val couponState = _couponState.asStateFlow()
 
     fun loadCart() = viewModelScope.launch(defaultDispatcher) {
+        //(repository as? ShopifyRepositoryImpl)?.fireStoreManager?.getCurrentCartId("mohammedie98@gmail.com")
         toLoadingScreenState()
         handleCartResource(repository.getCart())
         checkIsLoggedIn()
