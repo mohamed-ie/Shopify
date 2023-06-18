@@ -76,4 +76,8 @@ class ShopifyDataStoreManagerImpl @Inject constructor(
     override suspend fun setCustomerId(customerId: String) {
         dataStore.edit { it[Constants.DataStoreKeys.CUSTOMER_ID] = customerId }
     }
+
+    override suspend fun clear() {
+        dataStore.edit { it.clear() }
+    }
 }

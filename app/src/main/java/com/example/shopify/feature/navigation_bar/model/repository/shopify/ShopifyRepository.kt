@@ -64,4 +64,5 @@ interface ShopifyRepository {
     suspend fun changePassword(password: String): Resource<String?>
     suspend fun changePhoneNumber(phone: String): Resource<String?>
     suspend fun changeName(firstName: String, lastName: String): Resource<String?>
+    suspend fun createUserEmail(email: String): Resource<Unit>
 }

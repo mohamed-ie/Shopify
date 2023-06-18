@@ -1,8 +1,9 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,57 +34,56 @@ fun CheckoutContent(
     back: () -> Unit
 ) {
     val cart = state.cart
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        NamedTopAppBar("", back)
-        LazyColumn(
-            modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            modifier = Modifier.fillMaxSize(),
         ) {
-            item {
-                ShipToCard(
-                    name = cart.address.name.asString(),
-                    address = cart.address.address.asString(),
-                    phone = cart.address.phone.asString(),
-                    onChangeClick = { navigateTo(AddressGraph.Addresses.withArgs(true,true)) }
-                )
+            NamedTopAppBar(back = back)
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                item {
+                    ShipToCard(
+                        name = cart.address.name.asString(),
+                        address = cart.address.address.asString(),
+                        phone = cart.address.phone.asString(),
+                        onChangeClick = {  navigateTo(AddressGraph.Addresses.withArgs("true","ture")) }
+                    )
+                }
+                item {
+                    PaymentMethodScreen(
+                        selected = state.selectedPaymentMethod,
+                        paymentMethodChanged = { onEvent(CheckoutEvent.PaymentMethodChanged(it)) }
+                    )
+                }
+                item {
+                    TotalCostCard(
+                        itemsCount = cart.lines.size,
+                        subTotalsPrice = cart.subTotalsPrice,
+                        shippingFee = cart.shippingFee,
+                        taxes = cart.taxes,
+                        discounts = cart.discounts,
+                        totalPrice = cart.totalPrice
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.order_summery),
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        ),
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+                items(cart.lines) {
+                    OrderItemScreen(cartLine = it)
+                }
+                item { Spacer(modifier = Modifier.height(8.dp)) }
             }
-            item {
-                PaymentMethodScreen(
-                    selected = state.selectedPaymentMethod,
-                    paymentMethodChanged = { onEvent(CheckoutEvent.PaymentMethodChanged(it)) }
-                )
-            }
-            item {
-                TotalCostCard(
-                    itemsCount = cart.lines.size,
-                    subTotalsPrice = cart.subTotalsPrice,
-                    shippingFee = cart.shippingFee,
-                    taxes = cart.taxes,
-                    discounts = cart.discounts,
-                    totalPrice = cart.totalPrice
-                )
-            }
-            item {
-                Text(
-                    text = stringResource(id = R.string.order_summery),
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    modifier = Modifier.padding(12.dp)
-                )
-            }
-            items(cart.lines) {
-                OrderItemScreen(cartLine = it)
-            }
+            CheckoutFooterScreen(
+                totalItems = cart.lines.size,
+                totalPrice = cart.totalPrice,
+                onPlaceOrderClick = { onEvent(CheckoutEvent.PlaceOrder) }
+            )
         }
-        CheckoutFooterScreen(
-            totalItems = cart.lines.size,
-            totalPrice = cart.totalPrice,
-            onPlaceOrderClick = {onEvent(CheckoutEvent.PlaceOrder)}
-        )
-    }
 }
 
 @Preview(showBackground = true)

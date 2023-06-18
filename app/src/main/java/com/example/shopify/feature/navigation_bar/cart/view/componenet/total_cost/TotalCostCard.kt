@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,7 +23,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.Green170
 import com.example.shopify.theme.ShopifyTheme
@@ -36,9 +36,10 @@ fun TotalCostCard(
     totalPrice: String,
     discounts: String?
 ) {
-    ElevatedCard(
+    OutlinedCard(
         modifier = Modifier.padding(8.dp),
-        elevation = CardDefaults.elevatedCardElevation(cartElevation),
+//        elevation = CardDefaults.elevatedCardElevation(cartElevation),
+        border = BorderStroke(width = .8.dp, color =  Color.Transparent),
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(Color.White)
     ) {

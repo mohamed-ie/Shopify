@@ -12,5 +12,6 @@ data class SearchedProductsState(
     val searchTextValue:String = "",
     val lastCursor:String = "",
     val hasNext:Boolean = false,
-    val isLogged:Boolean = false
+    val isLogged:Boolean = false,
+    val isLoadingHasNext:Boolean = false
 )

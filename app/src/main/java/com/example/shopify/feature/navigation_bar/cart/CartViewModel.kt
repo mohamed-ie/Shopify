@@ -11,14 +11,13 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepositoryImpl
 import com.example.shopify.helpers.Resource
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -59,7 +58,7 @@ class CartViewModel @Inject constructor(
             }
         }
 
-    private fun checkIsLoggedIn(){
+    private fun checkIsLoggedIn() {
         repository.isLoggedIn()
             .onEach { _state.update { cart -> cart.copy(isLoggedIn = it) } }
             .launchIn(viewModelScope)
@@ -82,7 +81,7 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun addCartItemToWishList(productID:ID){
+    private fun addCartItemToWishList(productID: ID) {
         viewModelScope.launch {
             repository.addProductWishListById(productID)
         }
@@ -112,17 +111,22 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun removeCartLineAndAddToWishList(index: Int) = viewModelScope.launch(defaultDispatcher){
-        _cartLinesState.update(index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
-        val cartLineId = _state.value.lines[index].id.toString()
-        when (val resource = repository.removeCartLines(cartLineId)) {
-            is Resource.Error -> toErrorScreenState()
-            is Resource.Success -> {
-                _state.value.lines[index].cartProduct.id.let {productId -> addCartItemToWishList(productId) }
-                handleCartResource(resource)
+    private fun removeCartLineAndAddToWishList(index: Int) =
+        viewModelScope.launch(defaultDispatcher) {
+            _cartLinesState.update(index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
+            val cartLineId = _state.value.lines[index].id.toString()
+            when (val resource = repository.removeCartLines(cartLineId)) {
+                is Resource.Error -> toErrorScreenState()
+                is Resource.Success -> {
+                    _state.value.lines[index].cartProduct.id.let { productId ->
+                        addCartItemToWishList(
+                            productId
+                        )
+                    }
+                    handleCartResource(resource)
+                }
             }
         }
-    }
 
     fun onCouponEvent(event: CartCouponEvent) {
         when (event) {
@@ -139,7 +143,10 @@ class CartViewModel @Inject constructor(
     }
 
     private fun applyCoupon() = viewModelScope.launch(defaultDispatcher) {
-        handleCartResource(repository.applyCouponToCart(couponState.value.coupon))
+//        handleCartResource(repository.applyCouponToCart(couponState.value.coupon))
+        _couponState.update { it.copy(errorVisible = false, isLoading = true) }
+        delay(1500)
+        _couponState.update { it.copy(errorVisible = true, isLoading = false) }
     }
 }
 
@@ -149,3 +156,4 @@ private fun MutableStateFlow<SnapshotStateList<CartLineState>>.update(
 ) = update { oldList ->
     oldList.apply { add(index, removeAt(index).run { state(this) }) }
 }
+

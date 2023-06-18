@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlin
 import com.example.shopify.theme.Gray
 import com.example.shopify.utils.shopifyLoading
 import kotlinx.coroutines.delay
+import java.lang.Math.abs
 
 @Composable
 fun CartItemCard(
@@ -59,11 +61,13 @@ fun CartItemCard(
     toggleQuantitySelectorVisibility: () -> Unit,
     removeFromCart: () -> Unit,
     moveToWishlist: () -> Unit,
-    quantitySelected: (Int) -> Unit
+    quantitySelected: (Int) -> Unit,
+    onClick:()->Unit
 ) {
     val product = cartLine.cartProduct
     Column(
         modifier = Modifier
+            .clickable { onClick() }
             .background(Color.White)
             .fillMaxWidth()
             .padding(12.dp)
@@ -154,7 +158,8 @@ fun CartItemCard(
                 state = if (state.isChooseQuantityOpen)
                     ShopifyOutlinedButtonState.Active
                 else
-                    ShopifyOutlinedButtonState.Normal
+                    ShopifyOutlinedButtonState.Normal,
+                enabled = !state.isChangingQuantity
             ) {
                 Text(
                     modifier = Modifier.shopifyLoading(state.isChangingQuantity),
@@ -179,7 +184,7 @@ fun CartItemCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             // remove
-            ShopifyOutlinedButton(onClick = removeFromCart) {
+            ShopifyOutlinedButton(onClick = removeFromCart, enabled = !state.isRemoving) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Rounded.DeleteOutline,
@@ -198,7 +203,7 @@ fun CartItemCard(
             Spacer(modifier = Modifier.weight(1f))
 
             //add to wishlist
-            ShopifyOutlinedButton(onClick = moveToWishlist) {
+            ShopifyOutlinedButton(onClick = moveToWishlist, enabled = !state.isMovingToWishlist) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Rounded.FavoriteBorder,
@@ -244,13 +249,15 @@ private fun QuantitySelector(
     ) {
         LaunchedEffect(key1 = Unit, block = {
             delay(800)
-            quantityListState.animateScrollToItem(selected - 1)
+            val index = abs(selected - 1)
+            if(index >0)
+            quantityListState.animateScrollToItem(index)
         })
 
         Column {
             Spacer(modifier = Modifier.height(20.dp))
             LazyRow(state = quantityListState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(availableQuantity) {
+                items(abs(availableQuantity)) {
                     ShopifyOutlinedButton(
                         onClick = { quantitySelected(it+1) },
                         state = if ((it) == selected-1)

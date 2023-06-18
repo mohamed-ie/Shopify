@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -90,13 +91,26 @@ class RegistrationViewModel @Inject constructor(
                     is Resource.Success -> {
                         if (response.data.error != null)
                             _uiErrorState.value = ErrorAuthUiState(response.data.error,true)
-                        else
-                            _uiEvent.emit(AuthUIEvent.NavigateToHome())
+                        else{
+                            loadCreatedEmail(repository.createUserEmail(_uiState.value.email.value))
+                        }
+
                     }
                 }
             }.launchIn(viewModelScope)
         }else {
             _uiLoadingState.value = false
+        }
+    }
+
+    private fun loadCreatedEmail(response:Resource<Unit>){
+        viewModelScope.launch {
+            when(response){
+                is Resource.Error -> {}
+                is Resource.Success -> {
+                    _uiEvent.emit(AuthUIEvent.NavigateToHome())
+                }
+            }
         }
     }
     private fun updateFieldsErrors() {

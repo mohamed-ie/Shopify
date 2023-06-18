@@ -36,7 +36,7 @@ fun NavGraphBuilder.productDetailsGraph(navController: NavController) {
                 },
                 navigateToCart = {
                     navController.navigate(CartGraph.Cart.route){
-                        popUpTo(Graph.PRODUCT_DETAILS){inclusive = true}
+//                        popUpTo(Graph.PRODUCT_DETAILS){inclusive = true}
                     }
                 },
                 navigateToSearch = {

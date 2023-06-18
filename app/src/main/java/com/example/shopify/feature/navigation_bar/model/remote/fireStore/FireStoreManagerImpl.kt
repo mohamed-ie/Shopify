@@ -9,7 +9,6 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.tasks.await
 import java.util.Collections
 import javax.inject.Inject
@@ -67,6 +66,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun updateCurrency(customerId: String, currency: String) {
+        customerId.ifEmpty { return  }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(Collections.singletonMap(Customer.Fields.CURRENCY, currency))
@@ -74,6 +74,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun getCurrency(customerId: String): Resource<String> {
+        customerId.ifEmpty { return Resource.Success("EGP") }
         return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
@@ -81,7 +82,16 @@ class FireStoreManagerImpl @Inject constructor(
 
     }
 
+    override suspend fun createUserEmail(email: String): Resource<Unit> {
+        email.ifEmpty { return Resource.Success(Unit) }
+        return fireStore.collection(Customer.PATH)
+            .document(email.lowercase())
+            .set(mapOf(Customer.Fields.WISH_LIST to emptyList<String>()))
+            .awaitResource {}
+    }
+
     override suspend fun setCurrentCartId(email: String, cartId: String): Resource<Unit> {
+        email.ifEmpty { return Resource.Success(Unit) }
         return fireStore.collection(Customer.PATH)
             .document(email)
             .update(Customer.Fields.CURRENT_CART_ID, cartId)
@@ -89,6 +99,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun clearDraftOrderId(email: String): Resource<Unit> {
+        email.ifEmpty { return Resource.Success(Unit) }
         return fireStore.collection(Customer.PATH)
                     .document(email)
                     .update(Customer.Fields.CURRENT_CART_ID, null)
@@ -97,6 +108,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun getCurrentCartId(email: String): Resource<String?> {
+        email.ifEmpty { return Resource.Success(null) }
         return fireStore.collection(Customer.PATH)
                     .document(email)
                     .get()
@@ -108,6 +120,7 @@ class FireStoreManagerImpl @Inject constructor(
 
 
     override suspend fun updateWishList(customerId: String, productId: ID) {
+        customerId.ifEmpty { return  }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .update(
@@ -117,6 +130,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun removeAWishListProduct(customerId: String, productId: ID) {
+        customerId.ifEmpty { return  }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .update(
@@ -135,6 +149,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun getWishList(customerId: String): Resource<List<ID>> {
+        customerId.ifEmpty { return Resource.Success(listOf()) }
         return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
@@ -143,14 +158,6 @@ class FireStoreManagerImpl @Inject constructor(
                 ?.map { it as String }
                 ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
             }
-    }
-
-    private suspend fun <T> FirebaseFirestore.runCatching(block: suspend (FirebaseFirestore) -> T): Resource<T> {
-        return try {
-            Resource.Success(block(this).apply { joinAll() })
-        } catch (e: Exception) {
-            Resource.Error(UIError.Unexpected)
-        }
     }
 
     private suspend fun <I,O> Task<I>.awaitResource(block: suspend (I)->O): Resource<O> {

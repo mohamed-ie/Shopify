@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.shopify.feature.auth.authGraph
 import com.example.shopify.feature.landing.landingGraph
 import com.example.shopify.feature.navigation_bar.HomeNavigationBarScreen
 
@@ -22,6 +21,7 @@ fun ShopifyGraph(navController: NavHostController) {
         composable(route = Graph.HOME){
             HomeNavigationBarScreen()
         }
+
 
     }
 }

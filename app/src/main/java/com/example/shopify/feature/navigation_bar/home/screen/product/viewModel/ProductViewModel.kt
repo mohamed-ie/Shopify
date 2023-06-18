@@ -8,7 +8,6 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.ProductsState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
-import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +47,7 @@ class ProductViewModel @Inject constructor(
     }
 
     private fun isLoggedIn() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.Main) {
             _productState.update { productsState ->
                 productsState.copy(isLoggedIn = repository.isLoggedIn().first())
             }
@@ -70,8 +69,8 @@ class ProductViewModel @Inject constructor(
         }
         _productState.update { oldState ->
             oldState.copy(
-                minPrice = prices.min(),
-                maxPrice = prices.max(),
+                minPrice = prices.min()-1,
+                maxPrice = prices.max()+1,
                 brandProducts = brandProducts.toMutableStateList()
             )
         }

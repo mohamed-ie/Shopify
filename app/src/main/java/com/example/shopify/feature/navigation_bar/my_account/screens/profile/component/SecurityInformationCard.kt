@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,7 +27,7 @@ fun SecurityInformationCard(onChangePasswordClick: () -> Unit, onChangePhoneNumb
             .fillMaxWidth()
             .padding(vertical = 2.dp),
         shape = RectangleShape,
-        elevation = CardDefaults.cardElevation(2.dp),
+//        elevation = CardDefaults.cardElevation(2.dp),
     ) {
         Column(
             modifier = Modifier

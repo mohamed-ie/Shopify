@@ -99,7 +99,7 @@ fun ReviewDetailsContentPreview() {
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("","","white/1")),
+            variants = listOf(VariantItem("","","white/1",0)),
             title = "iPhone 14 Pro 256GB Deep Purple 5G With FaceTime - International Version",
             price = Price(
                 amount = "172.00",

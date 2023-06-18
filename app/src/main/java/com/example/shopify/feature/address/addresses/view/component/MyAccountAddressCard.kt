@@ -40,7 +40,7 @@ fun MyAccountAddressCard(
     phone: String,
     address: String,
     name: String,
-    isDefault: Boolean = false,
+    isDefault: Boolean ,
     clickable: Boolean,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
