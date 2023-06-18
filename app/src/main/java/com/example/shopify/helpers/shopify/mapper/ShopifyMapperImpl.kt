@@ -27,7 +27,6 @@ import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
-import com.shopify.buy3.Storefront.ProductConnection
 import com.shopify.graphql.support.ID
 import javax.inject.Inject
 
@@ -116,7 +115,13 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapQueryToCart(data: DraftOrderQuery.Data): Cart =
         data.draftOrder.toCart()
 
-    private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection): List<BrandProduct> =
+    override fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String? =
+        response.run {
+            data?.customerUpdate?.customerUserErrors?.getOrNull(0)?.message?:
+            errors.getOrNull(0)?.message()
+        }
+
+    private fun mapProductConnectionToProductsBrand(productConnection: Storefront.ProductConnection): List<BrandProduct> =
         productConnection.edges.map { productEdge ->
             productEdge.node.run {
                 BrandProduct(

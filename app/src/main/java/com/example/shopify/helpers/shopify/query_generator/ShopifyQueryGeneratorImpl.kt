@@ -12,6 +12,7 @@ import com.shopify.buy3.Storefront.CheckoutCreateInput
 import com.shopify.buy3.Storefront.CheckoutLineItemInput
 import com.shopify.buy3.Storefront.CreditCardPaymentInputV2
 import com.shopify.buy3.Storefront.CustomerAddressCreatePayloadQuery
+import com.shopify.buy3.Storefront.CustomerUpdateInput
 import com.shopify.buy3.Storefront.MailingAddressQuery
 import com.shopify.buy3.Storefront.MutationQuery
 import com.shopify.buy3.Storefront.OrderEdgeQuery
@@ -381,10 +382,7 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                         checkoutQuery.order { orderQuery ->
                             orderQuery
                                 .orderNumber()
-                                .totalPrice {
-                                    it.amount()
-                                        .currencyCode()
-                                }
+                                .totalPrice { it.amount().currencyCode() }
                         }
                     }.errorMessage()
                         .ready()
@@ -534,6 +532,13 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
                 .setDeliveryAddressPreferences(listOf(deliveryAddress))
             mutation.cartBuyerIdentityUpdate(cartId, input) { cartBuyerIdentityUpdate ->
                 cartBuyerIdentityUpdate.userErrors { it.message() }
+            }
+        }
+
+    override fun generateUpdateCustomerQuery(accessToken: String,input: CustomerUpdateInput): MutationQuery =
+        Storefront.mutation {mutation->
+            mutation.customerUpdate(accessToken,input){customerUpdate->
+                customerUpdate.customerUserErrors{ it.message() }
             }
         }
 

@@ -44,6 +44,7 @@ import com.example.shopify.utils.shopify.enqueue1
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphClient
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.CustomerUpdateInput
 import com.shopify.graphql.support.ID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -289,11 +290,40 @@ class ShopifyRepositoryImpl @Inject constructor(
 //            .mapResource(mapper::mapToApplyCouponToCart)
     }
 
+    override suspend fun changePassword(password: String): Resource<String?> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        val input = CustomerUpdateInput()
+            .setPassword(password)
+        return queryGenerator.generateUpdateCustomerQuery(accessToken, input)
+            .enqueue1()
+            .mapResource(mapper::mapToUpdateCustomerInfo)
+    }
+
+    override suspend fun changePhoneNumber(phone: String): Resource<String?> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        val input = CustomerUpdateInput()
+            .setPhone(phone)
+        return queryGenerator.generateUpdateCustomerQuery(accessToken,input)
+            .enqueue1()
+            .mapResource(mapper::mapToUpdateCustomerInfo)
+    }
+
     override suspend fun updateCartShippingAddress(address: Storefront.MailingAddress): Resource<String?> {
         val email = dataStoreManager.getEmail().first()
         val cartId = getCartId(email).getOrNull() ?: return Resource.Error(UIError.Unexpected)
 
         return adminManager.updateShippingAddress(cartId, address)
+    }
+
+    override suspend fun changeName(firstName: String, lastName: String): Resource<String?> {
+        val accessToken = dataStoreManager.getAccessToken().first()
+        val input = CustomerUpdateInput()
+            .setFirstName(firstName)
+            .setLastName(lastName)
+
+        return queryGenerator.generateUpdateCustomerQuery(accessToken,input)
+            .enqueue1()
+            .mapResource(mapper::mapToUpdateCustomerInfo)
     }
 
     private suspend fun getCartId(email: String) =
