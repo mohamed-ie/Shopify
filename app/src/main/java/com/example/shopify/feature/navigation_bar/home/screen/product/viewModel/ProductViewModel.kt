@@ -8,7 +8,6 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.ProductsState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
-import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +55,8 @@ class ProductViewModel @Inject constructor(
     }
 
     private fun setProductBrandId() {
-        state.get<String>("brandName")?.also {
+        val brandName: String = state.get<String>("brandName") ?: "VANS"
+        brandName.also {
             _productState.update { productsState ->
                 productsState.copy(brandProductId = it)
             }
