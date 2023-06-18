@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.AddressGraph
-import com.example.shopify.feature.common.component.RemoteErrorHeader
+import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemCard
@@ -41,6 +41,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.footer.CartFooter
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.header.CartHeader
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
+import com.example.shopify.feature.navigation_bar.common.component.RemoteErrorHeader
 import com.example.shopify.theme.Green170
 
 val cartElevation = 2.dp
@@ -59,9 +60,12 @@ fun CartScreenContent(
         RemoteErrorHeader(error = cart.error)
         CartHeader(
             itemsCount = itemsCount,
-            address = cart.address,
+            address = cart.address.address.asString(),
             navigateToWishlistScreen = {
-                navigateTo(Graph.WISH_LIST)
+                if (cart.isLoggedIn)
+                    navigateTo(Graph.WISH_LIST)
+                else
+                    navigateTo(Auth.SIGN_IN)
             },
             navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true")) }
         )
@@ -203,7 +207,7 @@ private fun EmptyCart() {
 //            lines = listOf(
 //                CartLine(
 //                    productVariantID = ID(""),
-//                    id = ID(""),
+//                    index = ID(""),
 //                    Storefront.MoneyV2().setAmount("372.00")
 //                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                    quantity = 1,
@@ -217,7 +221,7 @@ private fun EmptyCart() {
 //                ),
 //                CartLine(
 //                    productVariantID = ID(""),
-//                    id = ID(""),
+//                    index = ID(""),
 //                    Storefront.MoneyV2().setAmount("900.00")
 //                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                    quantity = 1,

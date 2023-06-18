@@ -43,7 +43,7 @@ fun OrderItemScreen(
         modifier = Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -124,7 +124,7 @@ fun OrderItemScreen(
 //        OrderItemScreen(
 //                    CartLine(
 //                        productVariantID = ID(""),
-//                        id = ID(""),
+//                        index = ID(""),
 //                        Storefront.MoneyV2().setAmount("900.00")
 //                            .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                        quantity = 1,

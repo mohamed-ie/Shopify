@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val repository: ShopifyRepository,
+    private val repository: ShopifyRepository
 ) : BaseScreenViewModel() {
 
     private val _searchedProductsState = MutableStateFlow(SearchedProductsState())
@@ -26,22 +27,29 @@ class SearchViewModel @Inject constructor(
 
     init {
         toStableScreenState()
+        viewModelScope.launch {
+            _searchedProductsState.update {
+                it.copy(isLogged = repository.isLoggedIn().first())
+            }
+        }
     }
-
 
     fun getProductsBySearchKeys(key: String) {
         toLoadingScreenState()
-        if (key.isBlank() || key.isEmpty()){
+        if (key.isBlank() || key.isEmpty()) {
             _searchedProductsState.update { SearchedProductsState() }
             toStableScreenState()
-        }else{
-            _searchedProductsState.update { searchedProductsState -> searchedProductsState.copy(searchTextValue = key) }
+        } else {
+            _searchedProductsState.update { searchedProductsState ->
+                searchedProductsState.copy(
+                    searchTextValue = key
+                )
+            }
             viewModelScope.launch(Dispatchers.Default) {
                 when (val response =
                     repository.getProductsByQuery(Constants.ProductQueryType.TITLE, key)) {
                     is Resource.Error -> toErrorScreenState()
                     is Resource.Success -> {
-                        toStableScreenState()
                         _searchedProductsState.update { searchedProductsState ->
                             response.data?.data?.let { brandProducts ->
                                 searchedProductsState.copy(
@@ -51,17 +59,16 @@ class SearchViewModel @Inject constructor(
                                 )
                             } ?: _searchedProductsState.value
                         }
+                        toStableScreenState()
                     }
                 }
             }
         }
-
     }
-
 
     fun getProductsByLastCursor() {
         if (_searchedProductsState.value.hasNext)
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.Default) {
                 when (
                     val response = repository.getProductsByQuery(
                         Constants.ProductQueryType.LAST_CURSOR,
@@ -73,10 +80,13 @@ class SearchViewModel @Inject constructor(
                         toStableScreenState()
                         _searchedProductsState.update { searchedProductsState ->
                             response.data?.data?.let { brandProducts ->
+                                val result = searchedProductsState.productList
+                                brandProducts.onEach {brandProduct ->
+                                   if (result.find { it.id ==  brandProduct.id} == null)
+                                       result.add(brandProduct)
+                                }
                                 searchedProductsState.copy(
-                                    productList = searchedProductsState.productList.plus(
-                                        brandProducts
-                                    ).toMutableStateList(),
+                                    productList = result,
                                     lastCursor = response.data.lastCursor,
                                     hasNext = response.data.hasNext
                                 )
@@ -87,5 +97,20 @@ class SearchViewModel @Inject constructor(
             }
     }
 
+    fun onFavourite(index: Int) {
+        viewModelScope.launch {
+            _searchedProductsState.value.productList[index].also { brandProduct ->
+                if (brandProduct.isFavourite) {
+                    repository.removeProductWishListById(brandProduct.id)
+                } else
+                    repository.addProductWishListById(brandProduct.id)
 
+                _searchedProductsState.update { productState ->
+                    productState.productList[index] =
+                        productState.productList[index].copy(isFavourite = !brandProduct.isFavourite)
+                    productState.copy(productList = productState.productList)
+                }
+            }
+        }
+    }
 }

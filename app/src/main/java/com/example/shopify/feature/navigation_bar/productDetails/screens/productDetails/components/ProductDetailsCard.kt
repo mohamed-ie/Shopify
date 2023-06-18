@@ -40,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
+import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ImageCardScrollHorizontally
+import com.example.shopify.feature.navigation_bar.home.screen.product.ui.PreviewImageCardScrollHorizontally
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.shopifyColors
 import com.example.shopify.utils.shopifyLoading
@@ -48,7 +50,7 @@ import com.example.shopify.utils.shopifyLoading
 fun ProductDetailsCard(
     vendor:String,
     title:String,
-    thumbnail:String,
+    thumbnails:List<String>,
     currencyCode:String,
     price:String,
     realPrice:String,
@@ -79,59 +81,14 @@ fun ProductDetailsCard(
             fontWeight = FontWeight.Medium
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            SubcomposeAsyncImage(
-                modifier = Modifier.aspectRatio(1f, false),
-                contentScale = ContentScale.Inside,
-                model = thumbnail,
-                contentDescription = null,
-                loading = {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .shopifyLoading()
-                    )
-                },
-                error = {
-                    Icon(
-                        modifier = Modifier.fillMaxSize(),
-                        imageVector = Icons.Rounded.BrokenImage,
-                        tint = Color.Gray,
-                        contentDescription = null
-                    )
-                }
+        Box(modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+            ){
+            ImageCardScrollHorizontally(
+                images = thumbnails,
+                isFavourite = isFavourite,
+                addToFavourite = {onFavouriteClick(isFavourite)}
             )
-            IconButton(
-                onClick = { onFavouriteClick(isFavourite) },
-                modifier = Modifier
-                    .padding(top = 15.dp)
-                    .shadow(5.dp, shape = CircleShape, spotColor = Color.Black)
-                    .clip(CircleShape)
-                    .size(35.dp)
-                    .background(Color.White)
-
-            ) {
-                if (isFavourite) {
-                    Icon(
-                        imageVector = Icons.Rounded.Favorite,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-                else{
-                    Icon(
-                        imageVector =  Icons.Default.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.Gray
-                    )
-                }
-
-            }
         }
         Spacer(modifier = Modifier.height(25.dp))
         Row {
@@ -218,7 +175,7 @@ fun PreviewProductDetailsCard() {
     ProductDetailsCard(
         vendor = "Adidas",
         title = "Ultima show Running Shoes Pink",
-        thumbnail = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
+        thumbnails = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
         currencyCode = "AED",
         price = "172.00",
         realPrice = "249.00",

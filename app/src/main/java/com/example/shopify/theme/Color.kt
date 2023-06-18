@@ -18,8 +18,10 @@ val ShopifyBorderStrokeColor = Color.Gray.copy(.5f)
 
 object ShopifyColors {
     val Black = Color(0xFF33363D)
+    val LightServer = Color(0xFFF9F9F9)
     val Gray = Color(0xFF5B6E81)
     val LightGray = Color(0x9E5B6E81)
+    val Silver = Color(0xFFEFF3FD)
     val ServerColor = Color(0xFFEAEBF4)
     val DarkGreenColor = Color(0xFF00AA00)
     val Orange = Color(0xFFF3AB31)

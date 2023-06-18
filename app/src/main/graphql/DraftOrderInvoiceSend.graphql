@@ -1,0 +1,11 @@
+mutation draftOrderInvoiceSend($id: ID!) {
+    draftOrderInvoiceSend(id: $id) {
+        draftOrder {
+            invoiceSentAt
+            invoiceUrl
+        }
+        userErrors {
+            message
+        }
+    }
+}

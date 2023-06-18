@@ -35,8 +35,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.ShopifyTheme
 

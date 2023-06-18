@@ -51,7 +51,7 @@ fun ReviewTopBar(
                     .aspectRatio(1f)
                     .padding(start = 15.dp),
                 contentScale = ContentScale.Inside,
-                model = product.image,
+                model = product.images[0],
                 contentDescription = null,
                 loading = {
                     Box(
@@ -94,7 +94,7 @@ fun ReviewTopBar(
 fun ReviewTopBarPreview() {
     ReviewTopBar(
         product = Product(
-            image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
+            images = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
             description = "The Stan Smith owned the tennis court in the '70s." +
                     " Today it runs the streets with the same clean," +
                     " classic style." +

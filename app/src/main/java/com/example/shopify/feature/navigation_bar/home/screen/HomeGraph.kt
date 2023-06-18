@@ -23,7 +23,10 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController, paddingValues: P
         composable(route = HomeGraph.Home.route) {
             HomeScreen(
                 viewModel = hiltViewModel(),
-                navigateTo = navController::navigate
+                navigateTo = navController::navigate,
+                navigateToSearch = {
+                    navController.navigate(NavigationBarGraph.SEARCH)
+                }
             )
         }
 
@@ -31,7 +34,10 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController, paddingValues: P
             ProductScreen(
                 viewModel = hiltViewModel(),
                 back = navController::popBackStack,
-                navigateTo = navController::navigate
+                navigateTo = navController::navigate,
+                navigateToSearch = {
+                    navController.navigate(NavigationBarGraph.SEARCH)
+                }
             )
         }
     }

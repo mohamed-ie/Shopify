@@ -14,6 +14,6 @@ data class WishedBottomSheetState(
     val isAdded:Boolean = false,
     val isTotalPriceLoaded:Boolean = false,
     val availableQuantity:Int = 0,
-    val totalCartPrice: Price = Price("",""),
+    val totalCartPrice: String = "",
     val productTitle:String = ""
 )

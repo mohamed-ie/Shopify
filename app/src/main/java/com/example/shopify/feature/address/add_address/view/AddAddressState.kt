@@ -1,6 +1,6 @@
 package com.example.shopify.feature.address.add_address.view
 
-import com.example.shopify.feature.common.state.TextFieldState
+import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
 
 data class AddAddressState(
     val street: TextFieldState = TextFieldState(),

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
@@ -72,7 +72,7 @@ fun WishListProductCardItem(
                     .aspectRatio(1f, false)
                     .padding(15.dp),
                 contentScale = ContentScale.Inside,
-                model = product.image,
+                model = product.images[0],
                 contentDescription = null,
                 loading = {
                     Box(
@@ -149,7 +149,9 @@ fun WishListProductCardItem(
             ) {
                 Button(
                     onClick = { addToCart() },
-                    modifier = Modifier.weight(0.9f).height(28.dp),
+                    modifier = Modifier
+                        .weight(0.9f)
+                        .height(28.dp),
                     shape = RoundedCornerShape(7.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
@@ -192,7 +194,7 @@ fun WishListProductCardItem(
 private fun WishListProductCardItemPreview() {
     WishListProductCardItem(
         product = Product(
-            image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
+            images = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
             description = "The Stan Smith owned the tennis court in the '70s." +
                     " Today it runs the streets with the same clean," +
                     " classic style." +

@@ -10,7 +10,7 @@ data class AddToCardState (
     val isAdded:Boolean = false,
     val isTotalPriceLoaded:Boolean = false,
     val availableQuantity:Int = 0,
-    val totalCartPrice: Price = Price("",""),
+    val totalCartPrice: String = "",
     val sendSelectedQuantity:(Int) ->Unit,
     val openQuantity:()->Unit,
     val closeQuantity:()->Unit,

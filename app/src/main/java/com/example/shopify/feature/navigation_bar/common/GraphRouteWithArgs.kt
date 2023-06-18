@@ -1,4 +1,4 @@
-package com.example.shopify.feature.common
+package com.example.shopify.feature.navigation_bar.common
 
 import androidx.navigation.NamedNavArgument
 
@@ -8,5 +8,5 @@ data class GraphRouteWithArgs(
     val args: List<NamedNavArgument>,
     val routeToBeFormatted: String
 ) {
-    fun withArgs(vararg args: String) = String.format(routeToBeFormatted, *args)
+    fun withArgs(vararg args: Any) = String.format(routeToBeFormatted, *args)
 }

@@ -15,23 +15,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.landing.splash.viewModel.SplashViewModel
 import kotlinx.coroutines.delay
 
 
 @Composable
 fun SplashScreen(
-    viewModel: SplashViewModel,
-    navigateToHome:()->Unit,
-    navigateToAuth:()->Unit
+    navigateToHome:()->Unit
 ) {
 
     LaunchedEffect(key1 = Unit){
         delay(1000L)
-        when(viewModel.isLoggedIn){
-            true -> {navigateToHome()}
-            false -> {navigateToAuth()}
-        }
+        navigateToHome()
     }
 
     SplashScreenContent()

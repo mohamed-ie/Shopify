@@ -9,9 +9,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
 import com.example.shopify.feature.address.addresses.AddressesViewModel
-import com.example.shopify.feature.common.ConfirmationDialog
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.state.ScreenState
+import com.example.shopify.feature.navigation_bar.common.ConfirmationDialog
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -19,7 +19,8 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun AddressesScreen(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    allowPick: Boolean = false,
+    pickShipping: Boolean = false,
+    pickBilling: Boolean = false,
     viewModel: AddressesViewModel,
     back: () -> Unit,
     navigateTo: (String) -> Unit
@@ -40,7 +41,7 @@ fun AddressesScreen(
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> AddressesScreenContent(
             navigateTo = navigateTo,
-            allowPick = allowPick,
+            allowPick = pickShipping||pickBilling,
             back = back,
             onEvent = viewModel::onEvent,
             addresses = state.addresses

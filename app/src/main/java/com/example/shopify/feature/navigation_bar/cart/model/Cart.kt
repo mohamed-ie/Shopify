@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.cart.model
 
+import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.shopify.buy3.Storefront.MoneyV2
 
 data class Cart(
@@ -11,9 +12,10 @@ data class Cart(
     val checkoutPrice: String? = null,
     val coupons: Map<String, MoneyV2> = emptyMap(),
     val discounts: String? = null,
-    val address: String = "",
+    val address: MyAccountMinAddress = MyAccountMinAddress(),
     val error: String? = null,
     val couponError: String? = null,
     val hasNextPage: Boolean = false,
-    val endCursor: String = ""
+    val endCursor: String = "",
+    val isLoggedIn:Boolean = false
 )

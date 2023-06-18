@@ -45,9 +45,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
-import com.example.shopify.feature.common.component.ShopifyOutlinedButtonState
 import com.example.shopify.feature.navigation_bar.cart.model.CartLine
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButtonState
 import com.example.shopify.theme.Gray
 import com.example.shopify.utils.shopifyLoading
 import kotlinx.coroutines.delay
@@ -279,7 +279,7 @@ private fun QuantitySelector(
 //            CartLineState(),
 //            CartLine(
 //                productVariantID = ID(""),
-//                id = ID(""),
+//                index = ID(""),
 //                Storefront.MoneyV2().setAmount("372.00")
 //                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                quantity = 1,
@@ -307,7 +307,7 @@ private fun QuantitySelector(
 //            CartLineState(true, ),
 //            CartLine(
 //                productVariantID = ID(""),
-//                id = ID(""),
+//                index = ID(""),
 //                Storefront.MoneyV2().setAmount("372.00")
 //                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
 //                quantity = 5,

@@ -12,8 +12,6 @@ import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
 import com.example.shopify.feature.navigation_bar.category.view.CategoryScreen
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ProductDetailsScreen
-import com.example.shopify.feature.navigation_bar.productDetails.screens.reviews.view.ReviewDetailsScreen
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
 
 fun NavGraphBuilder.categoryGraph(paddingValues: PaddingValues, navController: NavHostController) {
@@ -27,6 +25,9 @@ fun NavGraphBuilder.categoryGraph(paddingValues: PaddingValues, navController: N
                 paddingValues = paddingValues,
                 navigateTo = { productId ->
                     navController.navigate("${CategoryGraph.PRODUCT_DETAILS}/${productId.encodeProductId()}")
+                },
+                navigateToSearch = {
+                    navController.navigate(NavigationBarGraph.SEARCH)
                 }
             )
         }
