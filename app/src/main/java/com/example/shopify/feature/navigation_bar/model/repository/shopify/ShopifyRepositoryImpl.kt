@@ -1,7 +1,7 @@
 package com.example.shopify.feature.navigation_bar.model.repository.shopify
 
+import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
 import com.apollographql.apollo3.api.Optional
 import com.example.shopify.DraftOrderCompleteMutation
@@ -456,8 +456,8 @@ class ShopifyRepositoryImpl @Inject constructor(
             val createInput = DraftOrderCreateMutation(input = input)
 
             return apolloClient.mutation(createInput)
-                .execute()
-                .mapToResource {
+                .executeCatching()
+                .mapResource {
                     it.draftOrderCreate
                         ?.draftOrder
                         ?.run {
@@ -489,15 +489,11 @@ class ShopifyRepositoryImpl @Inject constructor(
         }
 
         //return error message if failed
-        suspend fun deleteDraftOrder(draftOrderId: String): Resource<String?> {
-            val response =
-                apolloClient.mutation(DraftOrderDeleteMutation(DraftOrderDeleteInput(draftOrderId)))
-                    .execute()
+        suspend fun deleteDraftOrder(draftOrderId: String): Resource<String?> =
+            apolloClient.mutation(DraftOrderDeleteMutation(DraftOrderDeleteInput(draftOrderId)))
+                .executeCatching()
+                .mapResource { it.draftOrderDelete?.userErrors?.getOrNull(0)?.message }
 
-            if (response.hasErrors())
-                Resource.Error(UIError.Unexpected)
-            return Resource.Success(response.errors?.getOrNull(0)?.message)
-        }
 
         /*
         since draft order must contain at least 1 item
@@ -522,8 +518,8 @@ class ShopifyRepositoryImpl @Inject constructor(
 
         private suspend fun updateDraftOrder(input: DraftOrderUpdateMutation): Resource<Cart?> {
             return apolloClient.mutation(input)
-                .execute()
-                .mapToResource { mapper.mapMutationToCart(it) }
+                .executeCatching()
+                .mapResource { mapper.mapMutationToCart(it) }
         }
 
         suspend fun changeDraftOrderLineQuantity(
@@ -554,14 +550,14 @@ class ShopifyRepositoryImpl @Inject constructor(
             paymentPending: Boolean,
         ): Resource<String?> {
             return apolloClient.mutation(DraftOrderCompleteMutation(draftOrderId, paymentPending))
-                .execute()
-                .mapToResource { it.draftOrderComplete?.userErrors?.getOrNull(0)?.message }
+                .executeCatching()
+                .mapResource { it.draftOrderComplete?.userErrors?.getOrNull(0)?.message }
         }
 
         suspend fun sendInvoice(cartId: String): Resource<Pair<String?, String?>?> {
             return apolloClient.mutation(DraftOrderInvoiceSendMutation(cartId))
-                .execute()
-                .mapToResource {
+                .executeCatching()
+                .mapResource {
                     it.draftOrderInvoiceSend?.run {
                         Pair(
                             draftOrder?.invoiceUrl.toString(),
@@ -597,8 +593,8 @@ class ShopifyRepositoryImpl @Inject constructor(
             draftOrderId: String,
         ): MutableList<DraftOrderLineItemInput>? {
             return apolloClient.query(DraftOrderLineItemsQuery(draftOrderId, Optional.Absent))
-                .execute()
-                .data
+                .executeCatching()
+                .getOrNull()
                 ?.draftOrder
                 ?.lineItems
                 ?.nodes
@@ -613,17 +609,21 @@ class ShopifyRepositoryImpl @Inject constructor(
 
         suspend fun getDraftOrder(cartId: String): Resource<Cart?> {
             return apolloClient.query(DraftOrderQuery(cartId, Optional.Absent))
-                .execute()
-                .mapToResource { mapper.mapQueryToCart(it) }
+                .executeCatching()
+                .mapResource { mapper.mapQueryToCart(it) }
         }
 
-        private fun <I : Operation.Data, O> ApolloResponse<I>.mapToResource(
-            transform: (I) -> O,
-        ): Resource<O> {
-            if (hasErrors())
-                return Resource.Error(UIError.Unexpected)
-            return Resource.Success(transform(dataAssertNoErrors))
-        }
+        private suspend fun <D : Operation.Data> ApolloCall<D>.executeCatching(): Resource<D> =
+            try {
+                val response = execute()
+                if (response.hasErrors())
+                    Resource.Error(UIError.Unexpected)
+                else
+                    Resource.Success(response.dataAssertNoErrors)
+            } catch (e: Exception) {
+                Resource.Error(UIError.Unexpected)
+            }
+
 
         @JvmName("present")
         private fun <T : Any> T?.present(): Optional<T?> = Optional.present(this)
