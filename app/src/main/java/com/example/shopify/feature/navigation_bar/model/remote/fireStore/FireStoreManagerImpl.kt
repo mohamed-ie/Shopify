@@ -1,11 +1,15 @@
 package com.example.shopify.feature.navigation_bar.model.remote.fireStore
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.tasks.await
 import java.util.Collections
 import javax.inject.Inject
@@ -40,14 +44,16 @@ class FireStoreManagerImpl @Inject constructor(
     override suspend fun getReviewsByProductId(
         id: ID,
         reviewsCount: Int?
-    ): List<Review> =
+    ): Resource<List<Review>> =
         fireStore.collection(PATH)
             .document(id.encodeProductId())
             .collection(REVIEW_PATH)
             .get()
-            .await()
-            .documents
-            .map(mapper::mapSnapShotDocumentsToReview)
+            .awaitResource {
+                it.documents
+                    .map(mapper::mapSnapShotDocumentsToReview)
+            }
+
 
 
     override suspend fun setProductReviewByProductId(productId: ID, review: Review) {
@@ -56,7 +62,7 @@ class FireStoreManagerImpl @Inject constructor(
             .collection(REVIEW_PATH)
             .document(review.reviewer)
             .set(review.copy(createdAt = FieldValue.serverTimestamp(), time = null))
-            .await()
+            .awaitResource {}
 
     }
 
@@ -64,37 +70,40 @@ class FireStoreManagerImpl @Inject constructor(
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(Collections.singletonMap(Customer.Fields.CURRENCY, currency))
-            .await()
+            .awaitResource {}
     }
 
-    override suspend fun getCurrency(customerId: String): String {
+    override suspend fun getCurrency(customerId: String): Resource<String> {
         return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
-            .await()
-            .get(Customer.Fields.CURRENCY) as String
+            .awaitResource { it.get(Customer.Fields.CURRENCY) as String }
+
     }
 
-    override suspend fun setCurrentCartId(email: String, cartId: String) {
-        fireStore.collection(Customer.PATH)
-            .document(email)
-            .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
-            .await()
-    }
-
-    override suspend fun clearDraftOrderId(email: String) {
-        fireStore.collection(Customer.PATH)
-            .document(email)
-            .update(Customer.Fields.CURRENT_CART_ID,null)
-            .await()
-    }
-
-    override suspend fun getCurrentCartId(email: String): String? {
+    override suspend fun setCurrentCartId(email: String, cartId: String): Resource<Unit> {
         return fireStore.collection(Customer.PATH)
             .document(email)
-            .get()
-            .await()
-            .get(Customer.Fields.CURRENT_CART_ID) as String?
+            .update(Customer.Fields.CURRENT_CART_ID, cartId)
+            .awaitResource {}
+    }
+
+    override suspend fun clearDraftOrderId(email: String): Resource<Unit> {
+        return fireStore.collection(Customer.PATH)
+                    .document(email)
+                    .update(Customer.Fields.CURRENT_CART_ID, null)
+                    .awaitResource {}
+
+    }
+
+    override suspend fun getCurrentCartId(email: String): Resource<String?> {
+        return fireStore.collection(Customer.PATH)
+                    .document(email)
+                    .get()
+                    .awaitResource{
+                        it.get(Customer.Fields.CURRENT_CART_ID) as String?
+                    }
+
     }
 
 
@@ -104,8 +113,7 @@ class FireStoreManagerImpl @Inject constructor(
             .update(
                 Customer.Fields.WISH_LIST,
                 FieldValue.arrayUnion(mapper.mapProductIDToEncodedProductId(productId))
-            )
-            .await()
+            ).awaitResource {}
     }
 
     override suspend fun removeAWishListProduct(customerId: String, productId: ID) {
@@ -115,7 +123,7 @@ class FireStoreManagerImpl @Inject constructor(
                 Customer.Fields.WISH_LIST,
                 FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId))
             )
-            .await()
+            .awaitResource {}
     }
 
     override suspend fun createCustomer(customerId: String) {
@@ -123,16 +131,35 @@ class FireStoreManagerImpl @Inject constructor(
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(customerMap)
-            .await()
+            .awaitResource {}
     }
 
-    override suspend fun getWishList(customerId: String): List<ID> {
-        return (fireStore.collection(Customer.PATH)
+    override suspend fun getWishList(customerId: String): Resource<List<ID>> {
+        return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
-            .await()
-            .get(Customer.Fields.WISH_LIST) as? List<*>)
-            ?.map { it as String }
-            ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+            .awaitResource { documentSnapshot ->
+                (documentSnapshot.get(Customer.Fields.WISH_LIST) as? List<*>)
+                ?.map { it as String }
+                ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+            }
     }
+
+    private suspend fun <T> FirebaseFirestore.runCatching(block: suspend (FirebaseFirestore) -> T): Resource<T> {
+        return try {
+            Resource.Success(block(this).apply { joinAll() })
+        } catch (e: Exception) {
+            Resource.Error(UIError.Unexpected)
+        }
+    }
+
+    private suspend fun <I,O> Task<I>.awaitResource(block: suspend (I)->O): Resource<O> {
+        return try {
+            Resource.Success(block(await()))
+        }
+        catch (e: Exception) {
+            Resource.Error(UIError.Unexpected)
+        }
+    }
+
 }

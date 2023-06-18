@@ -36,8 +36,8 @@ interface ShopifyRepository {
         productType: String,
         productTag: String
     ): Flow<Resource<List<BrandProduct>>>
-    fun getProductsTag(): Flow<Resource<List<String>>>
-    fun getProductsType(): Flow<Resource<List<String>>>
+    suspend fun getProductsTag(): Resource<List<String>>
+    suspend fun getProductsType(): Resource<List<String>>
     suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<Boolean>
     suspend fun deleteAddress(addressId: ID): Resource<Boolean>
     fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>>
