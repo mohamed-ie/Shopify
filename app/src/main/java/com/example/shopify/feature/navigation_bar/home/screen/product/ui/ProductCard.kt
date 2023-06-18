@@ -36,16 +36,13 @@ fun ProductCard(
 ) {
     Card(
         modifier = Modifier
-            .padding(3.dp)
+            .padding(4.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(2.dp),
+        shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = onProductItemClick
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-            ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             ImageCardScrollHorizontally(product.images, product.isFavourite, onFavouriteClick)
             Text(
                 modifier = Modifier

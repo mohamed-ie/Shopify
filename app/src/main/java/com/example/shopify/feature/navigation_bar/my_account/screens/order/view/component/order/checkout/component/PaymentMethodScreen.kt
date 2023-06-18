@@ -43,7 +43,7 @@ fun PaymentMethodScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(8.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -52,7 +52,7 @@ fun PaymentMethodScreen(
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             ),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         paymentMethods.forEach { method ->
             RadioButtonOption(

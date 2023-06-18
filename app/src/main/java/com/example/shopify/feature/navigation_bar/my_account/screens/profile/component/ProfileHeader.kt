@@ -28,7 +28,7 @@ fun ProfileHeader(name: String, email: String, onEditInfoClick: () -> Unit) {
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 16.dp)
+                .padding(top = 24.dp, bottom = 12.dp, start = 16.dp, end = 16.dp)
         ) {
             Text(
                 text = name,

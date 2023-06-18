@@ -46,7 +46,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsG
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.example.shopify.theme.Green170
 
-val cartElevation = 2.dp
+val cartElevation = .5.dp
 
 @Composable
 fun CartScreenContent(
@@ -69,7 +69,7 @@ fun CartScreenContent(
                 else
                     navigateTo(Auth.SIGN_IN)
             },
-            navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true")) }
+            navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true","ture")) }
         )
         if (cart.lines.isEmpty())
             EmptyCart()

@@ -9,7 +9,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.shopify.R
-import com.example.shopify.feature.address.addressGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.change_password.ChangePasswordScreen
@@ -60,9 +59,6 @@ fun NavGraphBuilder.myAccountGraph(paddingValues: PaddingValues, navController: 
                 back = navController::popBackStack
             )
         }
-
-        addressGraph(navController)
-
     }
 }
 
@@ -76,7 +72,8 @@ object MyAccountGraph {
 
     const val CHANGE_PASSWORD = "CHANGE_PASSWORD"
     const val CHANGE_PHONE_NUMBER = "CHANGE_PHONE_NUMBER"
-    const val ADD_ADDRESS = "ADD_ADDRESS"
+    const val ADD_ADDRESS = "ADD_ADDRESS_1"
+
     const val PROFILE = "PROFILE"
     const val EDIT_INFO = "EDIT_INFO"
 }
