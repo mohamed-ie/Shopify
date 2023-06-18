@@ -127,7 +127,7 @@ class CartViewModel @Inject constructor(
     fun onCouponEvent(event: CartCouponEvent) {
         when (event) {
             CartCouponEvent.Apply -> {
-//                applyCoupon()
+                applyCoupon()
             }
 
             CartCouponEvent.Clear ->

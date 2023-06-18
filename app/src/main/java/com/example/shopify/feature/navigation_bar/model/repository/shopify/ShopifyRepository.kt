@@ -61,4 +61,7 @@ interface ShopifyRepository {
     suspend fun changeCartLineQuantity(merchandiseId: String, quantity: Int): Resource<Cart?>
     suspend fun completeOrder(paymentPending: Boolean) :Resource<String?>
     suspend fun sendCompletePayment(): Resource<Pair<String?, String?>?>
+    suspend fun changePassword(password: String): Resource<String?>
+    suspend fun changePhoneNumber(phone: String): Resource<String?>
+    suspend fun changeName(firstName: String, lastName: String): Resource<String?>
 }

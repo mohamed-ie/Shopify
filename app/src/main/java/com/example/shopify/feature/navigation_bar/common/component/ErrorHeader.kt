@@ -56,7 +56,7 @@ fun RemoteErrorHeader(error: String?) {
             }
             Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
             Text(
-                text = error!!,
+                text = error?:"",
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 style = MaterialTheme.typography.labelMedium
             )

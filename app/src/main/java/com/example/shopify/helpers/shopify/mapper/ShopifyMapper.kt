@@ -1,5 +1,6 @@
 package com.example.shopify.helpers.shopify.mapper
 
+import com.apollographql.apollo3.api.ApolloResponse
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
@@ -49,4 +50,5 @@ interface ShopifyMapper {
     fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String?
     fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?
     fun mapQueryToCart(data: DraftOrderQuery.Data): Cart?
+    fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String?
 }

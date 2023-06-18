@@ -6,6 +6,7 @@ data class TextFieldState(
     val value: String = "",
     val isError: Boolean = false,
     val error: UIText = UIText.DynamicString("Help"),
+    val triallingIconState: Boolean = false
 ) {
     companion object {
         const val NUMBERS_PATTERN = "[0-9]*"
@@ -27,9 +28,11 @@ data class TextFieldState(
             return copy(value = newValue)
         return this
     }
+
     fun updateValue(newValue: String): TextFieldState {
-            return copy(value = newValue)
+        return copy(value = newValue)
     }
+
     fun updateZipValue(newValue: String): TextFieldState {
         if (zipRegex.matches(newValue))
             return copy(value = newValue)
