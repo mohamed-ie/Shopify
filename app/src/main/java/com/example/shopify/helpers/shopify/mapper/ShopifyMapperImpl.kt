@@ -14,6 +14,7 @@ import com.example.shopify.feature.navigation_bar.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
@@ -22,6 +23,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.helpers.UIError
 import com.example.shopify.type.CurrencyCode
+import com.example.shopify.helpers.UIText
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
@@ -166,8 +168,17 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
         return response.data?.customer?.orders?.edges?.map {
             Order(
-                it.node.orderNumber, it.node.billingAddress,
-                it.node.cancelReason, it.node.processedAt, it.node.totalPrice, it.node.lineItems
+                financialStatus = it.node.financialStatus,
+                fulfillment = it.node.fulfillmentStatus,
+                orderNumber = it.node.orderNumber,
+                processedAt = it.node.processedAt,
+                subTotalPrice = it.node.subtotalPrice,
+                totalShippingPrice = it.node.totalShippingPrice,
+                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations),
+                totalTax = it.node.totalTax,
+                totalPrice = it.node.totalPrice,
+                billingAddress = it.node.shippingAddress,
+                lineItems = mapToLinesItemResponse(it.node.lineItems)
             )
         } ?: listOf()
     }
@@ -212,16 +223,9 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         } ?: MinCustomerInfo()
     }
 
-    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress> {
+    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<Storefront.MailingAddress> {
         return response.data?.customer?.addresses?.edges?.map {
-            it.node.run {
-                MyAccountMinAddress(
-                    id = id,
-                    name = "$firstName $lastName",
-                    address = toAddressString(),
-                    phone = phone
-                )
-            }
+            it.node
         } ?: emptyList()
     }
 
@@ -315,10 +319,30 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return Storefront.MoneyV2().setAmount(newAmount.toString())
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
+
+    private fun mapToDiscount(response: MutableList<Storefront.DiscountAllocation>): Storefront.MoneyV2 {
+        return if (!response.isEmpty()) {
+            response[0].allocatedAmount
+        } else
+            Storefront.MoneyV2()
+    }
 }
 
-private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
+private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection): List<LineItems> =
+    response.edges.map {
+        LineItems(
+            id = it.node.variant.product.id,
+            name = it.node.variant.product.title,
+            thumbnail = it.node.variant.product.featuredImage.url,
+            collection = it.node.variant.product.productType,
+            vendor = it.node.variant.product.vendor,
+            description = it.node.variant.product.description,
+            price = it.node.variant.price
+        )
+    }
 
+
+private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
     val lines = this?.lineItems?.nodes?.map {
         val product = it.product
 
@@ -346,6 +370,15 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
     val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
     val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
         ?.run { "$currencyCode $amount" }
+
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
 
     return Cart(
         lines = lines ?: emptyList(),
@@ -367,10 +400,11 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
 
     val lines = this?.lineItems?.nodes?.map {
         val product = it.product
+
         val cartProduct = CartProduct(
             id = ID(product?.id),
             name = it.name,
-            thumbnail = it.image?.url as String,
+            thumbnail = it.image?.url as String?,
             collection = product?.productType ?: "",
             vendor = it.vendor ?: ""
         )
@@ -392,6 +426,14 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
     val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
         ?.run { "$currencyCode $amount" }
 
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
     return Cart(
         lines = lines ?: emptyList(),
         taxes = taxes,

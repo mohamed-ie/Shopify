@@ -141,6 +141,21 @@
     <string name="the_start">The start</string>
     <string name="price_range">Price Range</string>
     <string name="results">Results:</string>
+    <string name="credit_card">Credit Card</string>
+    <string name="cash_on_delivery">Cash on Delivery</string>
+    <string name="order_id">Order ID</string>
+    <string name="placed_on_date">Placed On</string>
+    <string name="view_details">View Details</string>
+    <string name="review_seller">Review Seller</string>
+    <string name="review_delivery">Review Delivery</string>
+    <string name="review_product">Review Product</string>
     <string name="sign_in">Sign in</string>
+    <string name="complete_your_purchase">Complete your purchase</string>
+    <string name="order_summery">Order Summery</string>
+    <string name="not_selected">Not selected yet</string>
+    <string name="ship_address">Shipping Address</string>
+    <string name="cash_on_delivary">Cash On Delivery</string>
+    <string name="payment_Method">Payment Method</string>
+    <string name="order_summary">Order Summary</string>
 
 </resources>

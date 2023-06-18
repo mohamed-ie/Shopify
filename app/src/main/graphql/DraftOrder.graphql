@@ -6,7 +6,7 @@ query DraftOrder($id: ID!,$after: String){
         totalShippingPrice
         totalTax
         currencyCode
-        lineItems(first: 248,after: $after){
+        lineItems(first: 200,after: $after){
             nodes {
                 id
                 image{url}
@@ -38,6 +38,9 @@ query DraftOrder($id: ID!,$after: String){
         }
 
         shippingAddress {
+            firstName
+            lastName
+            phone
             formattedArea
         }
 

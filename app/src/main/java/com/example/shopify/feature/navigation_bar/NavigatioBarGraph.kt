@@ -15,6 +15,7 @@ import com.example.shopify.feature.navigation_bar.cart.cartNavigation
 import com.example.shopify.feature.navigation_bar.category.categoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.myAccountGraph
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.orderGraph
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.productDetailsGraph
 import com.example.shopify.feature.search.view.SearchScreen
@@ -38,6 +39,7 @@ fun ColumnScope.NavigationBarGraph(
         categoryGraph(paddingValues, navController)
         cartNavigation(navController)
         wishListGraph(navController)
+        orderGraph(navController)
         productDetailsGraph(navController)
         composable(route = NavigationBarGraph.SEARCH) {
             SearchScreen(

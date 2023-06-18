@@ -1,4 +1,4 @@
-package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
+package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,23 +27,25 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
-import com.example.shopify.feature.navigation_bar.cart.model.CartLine
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.theme.Gray
+import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
+import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
+
 
 @Composable
-fun OrderItemScreen(
-    cartLine: CartLine,
-) {
-    val product = cartLine.cartProduct
+fun OrderDetailsProducts(lineItems: LineItems) {
     Column(
         modifier = Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(12.dp)
     ) {
         Row(
             modifier = Modifier
@@ -56,7 +58,7 @@ fun OrderItemScreen(
                     .aspectRatio(1f, true)
                     .weight(1f),
                 contentScale = ContentScale.Inside,
-                model = product.thumbnail,
+                model = lineItems.thumbnail,
                 contentDescription = null,
                 loading = {
                     Box(
@@ -82,12 +84,12 @@ fun OrderItemScreen(
                     .weight(2f)
             ) {
                 Text(
-                    text = product.collection,
+                    text = lineItems.collection,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray
                 )
                 Text(
-                    text = product.name,
+                    text = lineItems.name,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -95,7 +97,7 @@ fun OrderItemScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = cartLine.price?:"",
+                    text = "${lineItems.price.currencyCode} ${lineItems.price.amount}",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -107,7 +109,7 @@ fun OrderItemScreen(
                         append(stringResource(id = R.string.sold_by))
                         append(" ")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(product.vendor)
+                            append(lineItems.vendor)
                         }
                     },
                     style = MaterialTheme.typography.bodyMedium,
@@ -116,27 +118,23 @@ fun OrderItemScreen(
         }
     }
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewItemScreen() {
-//    ShopifyTheme {
-//        OrderItemScreen(
-//                    CartLine(
-//                        productVariantID = ID(""),
-//                        index = ID(""),
-//                        Storefront.MoneyV2().setAmount("900.00")
-//                            .setCurrencyCode(Storefront.CurrencyCode.EGP),
-//                        quantity = 1,
-//                        availableQuantity = 20,
-//                        cartProduct = CartProduct(
-//                            name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
-//                            collection = "Electronics",
-//                            thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
-//                            vendor = "Amazon"
-//                        )
-//                    )
-//
-//        )
-//    }
-//}
+
+@Preview
+@Composable
+fun PreviewOrderDetailsProduct() {
+    ShopifyTheme() {
+        OrderDetailsProducts(
+            lineItems = LineItems(
+                id = ID("gid://shopify/Product/8312391237939"),
+                name = "VANS | AUTHENTIC | (MULTI EYELETS) | GRADIENT/CRIMSON",
+                thumbnail = "https://cdn.shopify.com/s/files/1/0774/1662/8531/products/d841f71ea6845bf6005453e15a18c632.jpg?v=1685530920",
+                collection = "SHOES",
+                vendor = "VANS",
+                price = Storefront.MoneyV2().setAmount("50")
+                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
+                description = "The forefather of the Vans family, the Vans Authentic was introduced in 1966 and nearly 4 decades later is still going strong, its popularity extending from the original fans - skaters and surfers to all sorts. The Vans Authentic is constructed from canvas and Vans' signature waffle outsole construction."
+            )
+        )
+    }
+
+}

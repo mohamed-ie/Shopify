@@ -979,7 +979,7 @@ enum AppInstallationSortKeys {
   APP_TITLE
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -1475,7 +1475,7 @@ enum AppRevenueAttributionRecordSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -1794,7 +1794,7 @@ enum AppSubscriptionSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -1910,7 +1910,7 @@ enum AppTransactionSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -2061,7 +2061,7 @@ enum AppUsageRecordSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -2148,7 +2148,7 @@ enum AutomaticDiscountSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -3778,7 +3778,7 @@ enum CatalogSortKeys {
   TITLE
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -4097,7 +4097,7 @@ type Channel implements Node {
   """
   The unique identifier for the channel.
   """
-  handle: String! @deprecated(reason: "Use `id` instead.")
+  handle: String! @deprecated(reason: "Use `index` instead.")
 
   """
   Whether the collection is available to the channel.
@@ -4331,7 +4331,7 @@ enum CheckoutProfileSortKeys {
   IS_PUBLISHED
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -4372,7 +4372,7 @@ enum CodeDiscountSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -4535,7 +4535,7 @@ type Collection implements HasMetafieldDefinitions & HasMetafields & HasPublishe
 
   As of the `2022-04` version release, the Storefront GraphQL API will no longer return Base64 encoded IDs to match the behavior of the Admin GraphQL API. Therefore, you can safely use the `id` field's value instead.
   """
-  storefrontId: StorefrontID! @deprecated(reason: "Use `id` instead.")
+  storefrontId: StorefrontID! @deprecated(reason: "Use `index` instead.")
 
   """
   The suffix of the Liquid template being used to show the collection in an online store. For example, if the value is `custom`, then the collection is using the `collection.custom.liquid` template. If the value is `null`, then the collection is using the default `collection.liquid` template.
@@ -5227,7 +5227,7 @@ enum CollectionSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -6195,7 +6195,7 @@ enum CompanyContactRoleAssignmentSortKeys {
   LOCATION_NAME
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -6256,7 +6256,7 @@ enum CompanyContactRoleSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -6307,7 +6307,7 @@ enum CompanyContactSortKeys {
   NAME_EMAIL
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -6919,7 +6919,7 @@ enum CompanyLocationSortKeys {
   COMPANY_AND_LOCATION_NAME
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -7045,7 +7045,7 @@ enum CompanySortKeys {
   TOTAL_SPENT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -11425,7 +11425,7 @@ enum CustomerSavedSearchSortKeys {
   NAME
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -11866,7 +11866,7 @@ enum CustomerSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -12378,7 +12378,7 @@ enum DeletionEventSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -14518,7 +14518,7 @@ type DiscountAutomaticBxgy implements HasEvents & Node {
   """
   A legacy unique ID for the discount.
   """
-  id: ID! @deprecated(reason: "Use DiscountAutomaticNode.id instead.")
+  id: ID! @deprecated(reason: "Use DiscountAutomaticNode.index instead.")
 
   """
   The date and time when the discount starts.
@@ -15867,7 +15867,7 @@ enum DiscountCodeSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -16869,7 +16869,7 @@ enum DiscountSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -18164,7 +18164,7 @@ enum DraftOrderSortKeys {
   CUSTOMER_NAME
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -18631,7 +18631,7 @@ enum EventSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -19065,7 +19065,7 @@ enum FileSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -19720,7 +19720,7 @@ enum FulfillmentEventSortKeys {
   HAPPENED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -21207,7 +21207,7 @@ The set of valid sort keys for the FulfillmentOrder query.
 """
 enum FulfillmentOrderSortKeys {
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -22463,7 +22463,7 @@ enum GiftCardSortKeys {
   EXPIRES_ON
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -22554,7 +22554,7 @@ interface HasEvents {
 }
 
 """
-Localization extensions associated with the specified resource. For example, the tax id for government invoice.
+Localization extensions associated with the specified resource. For example, the tax index for government invoice.
 """
 interface HasLocalizationExtensions {
   """
@@ -23955,7 +23955,7 @@ A [JSON](https://www.json.org/json-en.html) object.
 Example value:
 `{
   "product": {
-    "id": "gid://shopify/Product/1346443542550",
+    "index": "gid://shopify/Product/1346443542550",
     "title": "White T-shirt",
     "options": [{
       "name": "Size",
@@ -25638,7 +25638,7 @@ enum LocationSortKeys {
   NAME
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -27390,7 +27390,7 @@ enum MarketingActivitySortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -28109,7 +28109,7 @@ enum MarketingEventSortKeys {
   STARTED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -29460,7 +29460,7 @@ The set of valid sort keys for the MetafieldDefinition query.
 """
 enum MetafieldDefinitionSortKeys {
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -31460,7 +31460,7 @@ enum MethodDefinitionSortKeys {
   RATE_PROVIDER_TYPE
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -32277,7 +32277,7 @@ type Mutation {
   """
   Duplicates a draft order.
   """
-  draftOrderDuplicate("The ID of the draft order to duplicate." draftOrderId: ID @deprecated(reason: "Use `id` instead."), "The ID of the draft order to duplicate." id: ID): DraftOrderDuplicatePayload
+  draftOrderDuplicate("The ID of the draft order to duplicate." draftOrderId: ID @deprecated(reason: "Use `index` instead."), "The ID of the draft order to duplicate." id: ID): DraftOrderDuplicatePayload
 
   """
   Previews a draft order invoice email.
@@ -33801,7 +33801,7 @@ input ObjectDimensionsInput {
 An article in the blogging system. You can query articles from
 [the REST API](https://shopify.dev/api/admin-rest/latest/resources/article)
 if you need to access more information about an article. Currently, `OnlineStoreArticle` is
-only useful to pass an article `id` to the `tagsAdd` mutation. For more information, refer to
+only useful to pass an article `index` to the `tagsAdd` mutation. For more information, refer to
 the [tagsAdd](https://shopify.dev/api/admin-graphql/latest/mutations/tagsadd) mutation.
 """
 type OnlineStoreArticle implements HasPublishedTranslations & Navigable & Node {
@@ -35539,7 +35539,7 @@ enum OrderSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -37877,7 +37877,7 @@ enum PriceListSortKeys {
   NAME
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -39485,7 +39485,7 @@ enum PriceRuleSortKeys {
   UPDATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -40135,7 +40135,7 @@ type Product implements HasMetafieldDefinitions & HasMetafields & HasPublishedTr
 
   As of the `2022-04` version release, the Storefront GraphQL API will no longer return Base64 encoded IDs to match the behavior of the Admin GraphQL API. Therefore, you can safely use the `id` field's value instead.
   """
-  storefrontId: StorefrontID! @deprecated(reason: "Use `id` instead.")
+  storefrontId: StorefrontID! @deprecated(reason: "Use `index` instead.")
 
   """
   A comma separated list of tags associated with the product. Updating `tags` overwrites
@@ -40329,7 +40329,7 @@ enum ProductCollectionSortKeys {
   CREATED
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -40721,7 +40721,7 @@ enum ProductImageSortKeys {
   POSITION
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -40949,7 +40949,7 @@ enum ProductMediaSortKeys {
   POSITION
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -41339,7 +41339,7 @@ enum ProductSortKeys {
   PUBLISHED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -41665,7 +41665,7 @@ type ProductVariant implements HasMetafieldDefinitions & HasMetafields & HasPubl
 
   As of the `2022-04` version release, the Storefront GraphQL API will no longer return Base64 encoded IDs to match the behavior of the Admin GraphQL API. Therefore, you can safely use the `id` field's value instead.
   """
-  storefrontId: StorefrontID! @deprecated(reason: "Use `id` instead.")
+  storefrontId: StorefrontID! @deprecated(reason: "Use `index` instead.")
 
   """
   The tax code for the product variant.
@@ -42179,7 +42179,7 @@ enum ProductVariantSortKeys {
   POSITION
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -42693,7 +42693,7 @@ enum ProfileItemSortKeys {
   PUBLISHED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -47847,7 +47847,7 @@ enum SegmentSortKeys {
   LAST_EDIT_DATE
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -48826,7 +48826,7 @@ enum SellingPlanGroupSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -54172,7 +54172,7 @@ enum SubscriptionBillingCyclesSortKeys {
   CYCLE_INDEX
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
@@ -58396,7 +58396,7 @@ enum UrlRedirectSortKeys {
   PATH
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 }
@@ -58963,7 +58963,7 @@ enum WebhookSubscriptionSortKeys {
   CREATED_AT
 
   """
-  Sort by the `id` value.
+  Sort by the `index` value.
   """
   ID
 
