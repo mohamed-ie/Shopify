@@ -124,8 +124,6 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun getCart(): Resource<Cart?> {
         val email = dataStoreManager.getEmail().first()
-        val cartId =
-            fireStoreManager.getCurrentCartId(email) ?: return Resource.Success(null)
 
         val cartId = fireStoreManager.getCurrentCartId(email)
             .getOrNull() ?: return Resource.Success(null)
@@ -142,7 +140,7 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapSuspendResource { brandProducts ->
                 brandProducts.map {brandProduct ->
                     brandProduct.copy(
-                        isFavourite = wishList.contains(brandProduct.id),
+                        isFavourite = wishList.getOrNull()?.contains(brandProduct.id) ?: false,
                         price = mapper.mapPriceV2ToLivePrice(
                             dataStoreManager.getCurrency().first(),
                             dataStoreManager.getCurrencyAmountPerOnePound().first(),
@@ -293,7 +291,7 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun sendCompletePayment(): Resource<Pair<String?, String?>?> {
         val email = dataStoreManager.getEmail().first()
-        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+        val cartId = getCartId(email).getOrNull() ?: return Resource.Error(UIError.Unexpected)
         return adminManager.sendInvoice(cartId)
     }
 
@@ -302,7 +300,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         quantity: Int
     ): Resource<Cart?> {
         val email = dataStoreManager.getEmail().first()
-        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+        val cartId = getCartId(email).getOrNull() ?: return Resource.Error(UIError.Unexpected)
 
         return adminManager.changeDraftOrderLineQuantity(cartId, merchandiseId, quantity)
     }
@@ -319,7 +317,7 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun changePassword(password: String): Resource<String?> {
         val accessToken = dataStoreManager.getAccessToken().first()
-        val input = CustomerUpdateInput()
+        val input = Storefront.CustomerUpdateInput()
             .setPassword(password)
         return queryGenerator.generateUpdateCustomerQuery(accessToken, input)
             .enqueue1()
@@ -328,7 +326,7 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun changePhoneNumber(phone: String): Resource<String?> {
         val accessToken = dataStoreManager.getAccessToken().first()
-        val input = CustomerUpdateInput()
+        val input = Storefront.CustomerUpdateInput()
             .setPhone(phone)
         return queryGenerator.generateUpdateCustomerQuery(accessToken,input)
             .enqueue1()
@@ -337,14 +335,14 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun updateCartShippingAddress(address: Storefront.MailingAddress): Resource<String?> {
         val email = dataStoreManager.getEmail().first()
-        val cartId = getCartId(email) ?: return Resource.Error(UIError.Unexpected)
+        val cartId = getCartId(email).getOrNull() ?: return Resource.Error(UIError.Unexpected)
 
         return adminManager.updateShippingAddress(cartId, address)
     }
 
     override suspend fun changeName(firstName: String, lastName: String): Resource<String?> {
         val accessToken = dataStoreManager.getAccessToken().first()
-        val input = CustomerUpdateInput()
+        val input = Storefront.CustomerUpdateInput()
             .setFirstName(firstName)
             .setLastName(lastName)
 
@@ -352,6 +350,9 @@ class ShopifyRepositoryImpl @Inject constructor(
             .enqueue1()
             .mapResource(mapper::mapToUpdateCustomerInfo)
     }
+
+    override suspend fun createUserEmail(email: String) : Resource<Unit> =
+        fireStoreManager.createUserEmail(email)
 
     private suspend fun getCartId(email: String) =
         fireStoreManager.getCurrentCartId(email)
@@ -370,7 +371,7 @@ class ShopifyRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getWishList(customerId: String): List<ID> =
-        fireStoreManager.getWishList(customerId)
+        fireStoreManager.getWishList(customerId).getOrNull() ?: emptyList()
 
 
     override fun getShopifyProductsByWishListIDs() = flow {

@@ -16,4 +16,5 @@ interface FireStoreManager {
     suspend fun getCurrentCartId(email: String): Resource<String?>
     suspend fun setCurrentCartId(email: String, cartId: String): Resource<Unit>
     suspend fun clearDraftOrderId(email: String): Resource<Unit>
+    suspend fun createUserEmail(email: String): Resource<Unit>
 }
