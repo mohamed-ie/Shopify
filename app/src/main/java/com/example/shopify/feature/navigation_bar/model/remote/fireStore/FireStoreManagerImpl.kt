@@ -5,8 +5,6 @@ import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
-import com.example.shopify.helpers.mapResource
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
@@ -80,26 +78,35 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun setCurrentCartId(email: String, cartId: String): Resource<Void> {
-        return fireStore.collection(Customer.PATH)
-            .document(email)
-            .update(Customer.Fields.CURRENT_CART_ID, cartId)
-            .awaitResource()
-
+        return fireStore
+            .runCatching {
+                it.collection(Customer.PATH)
+                    .document(email)
+                    .update(Customer.Fields.CURRENT_CART_ID, cartId)
+                    .await()
+            }
     }
 
     override suspend fun clearDraftOrderId(email: String): Resource<Void> {
-        return fireStore.collection(Customer.PATH)
-            .document(email)
-            .update(Customer.Fields.CURRENT_CART_ID, null)
-            .awaitResource()
+        return fireStore
+            .runCatching {
+                it.collection(Customer.PATH)
+                    .document(email)
+                    .update(Customer.Fields.CURRENT_CART_ID, null)
+                    .await()
+            }
     }
 
     override suspend fun getCurrentCartId(email: String): Resource<String?> {
-        return fireStore.collection(Customer.PATH)
-            .document(email)
-            .get()
-            .awaitResource()
-            .mapResource { it.get(Customer.Fields.CURRENT_CART_ID) as String? }
+        return fireStore
+            .runCatching {
+                it.collection(Customer.PATH)
+                    .document(email)
+                    .get()
+                    .await()
+                    .get(Customer.Fields.CURRENT_CART_ID) as String?
+            }
+
     }
 
 
@@ -141,32 +148,10 @@ class FireStoreManagerImpl @Inject constructor(
             ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
     }
 
-    private suspend fun <T> Task<T>.awaitResource(): Resource<T> {
+    private suspend fun <T> FirebaseFirestore.runCatching(block: suspend (FirebaseFirestore) -> T): Resource<T> {
         return try {
-            Resource.Success(await())
-        }
-//        catch (e:FirebaseFirestoreException){
-//            when(e.code){
-//                FirebaseFirestoreException.Code.OK -> TODO()
-//                FirebaseFirestoreException.Code.CANCELLED -> TODO()
-//                FirebaseFirestoreException.Code.UNKNOWN -> TODO()
-//                FirebaseFirestoreException.Code.INVALID_ARGUMENT -> TODO()
-//                FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> TODO()
-//                FirebaseFirestoreException.Code.NOT_FOUND -> TODO()
-//                FirebaseFirestoreException.Code.ALREADY_EXISTS -> TODO()
-//                FirebaseFirestoreException.Code.PERMISSION_DENIED -> TODO()
-//                FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED -> TODO()
-//                FirebaseFirestoreException.Code.FAILED_PRECONDITION -> TODO()
-//                FirebaseFirestoreException.Code.ABORTED -> TODO()
-//                FirebaseFirestoreException.Code.OUT_OF_RANGE -> TODO()
-//                FirebaseFirestoreException.Code.UNIMPLEMENTED -> TODO()
-//                FirebaseFirestoreException.Code.INTERNAL -> TODO()
-//                FirebaseFirestoreException.Code.UNAVAILABLE -> TODO()
-//                FirebaseFirestoreException.Code.DATA_LOSS -> TODO()
-//                FirebaseFirestoreException.Code.UNAUTHENTICATED -> TODO()
-//            }
-//        }
-        catch (e: Exception) {
+            Resource.Success(block(this))
+        } catch (e: Exception) {
             Resource.Error(UIError.Unexpected)
         }
     }
