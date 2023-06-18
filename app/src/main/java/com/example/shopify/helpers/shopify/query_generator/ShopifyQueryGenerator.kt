@@ -5,6 +5,7 @@ import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInf
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.CustomerUpdateInput
 import com.shopify.buy3.Storefront.MailingAddressInput
 import com.shopify.graphql.support.ID
 
@@ -73,4 +74,5 @@ interface ShopifyQueryGenerator {
     ): Storefront.QueryRootQuery
 
     fun generateGetCustomerId(accessToken: String): Storefront.QueryRootQuery
+    fun generateUpdateCustomerQuery(accessToken: String, input: CustomerUpdateInput):Storefront.MutationQuery
 }

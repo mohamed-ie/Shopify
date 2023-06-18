@@ -33,6 +33,7 @@ class ProductViewModel @Inject constructor(
         isLoggedIn()
     }
 
+
     fun getProduct() = viewModelScope.launch(Dispatchers.Default) {
         when (val it = repository.getProductsByBrandName(_productState.value.brandProductId)) {
             is Resource.Success -> {

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.category.model.CategoryState
 import com.example.shopify.feature.navigation_bar.category.viewModel.CategoryViewModel
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.SearchHeader
 import com.example.shopify.feature.navigation_bar.common.state.ScreenState
@@ -55,7 +56,7 @@ fun CategoryScreen(
             navigateToSearch = navigateToSearch
         )
 
-        ScreenState.ERROR -> {}
+        ScreenState.ERROR -> ErrorScreen {viewModel.loadData()}
     }
 
 }

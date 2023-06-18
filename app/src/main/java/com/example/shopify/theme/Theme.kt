@@ -27,7 +27,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40,
     //background = MaterialTheme.shopifyColors.ServerColor,
-    //surfaceVariant = Color.White
+    surfaceVariant = Color.White
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),

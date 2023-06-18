@@ -12,8 +12,11 @@ import com.example.shopify.R
 import com.example.shopify.feature.address.addressGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
-import com.example.shopify.feature.navigation_bar.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.my_account.screens.change_password.ChangePasswordScreen
+import com.example.shopify.feature.navigation_bar.my_account.screens.change_phone_number.ChangePhoneNumberScreen
+import com.example.shopify.feature.navigation_bar.my_account.screens.edit_info.EditInfoScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.MyAccountScreen
+import com.example.shopify.feature.navigation_bar.my_account.screens.profile.ProfileScreen
 
 
 fun NavGraphBuilder.myAccountGraph(paddingValues: PaddingValues, navController: NavHostController) {
@@ -25,18 +28,39 @@ fun NavGraphBuilder.myAccountGraph(paddingValues: PaddingValues, navController: 
             MyAccountScreen(
                 innerPadding = paddingValues,
                 viewModel = hiltViewModel(),
-                navigateTo = { navController.navigate(it) },
-                back = { navController.popBackStack() }
+                navigateTo = navController::navigate
             )
         }
 
         composable(route = MyAccountGraph.PROFILE) {
-
+            ProfileScreen(
+                viewModel = hiltViewModel(),
+                navigateTo = navController::navigate,
+                back = navController::popBackStack
+            )
         }
 
-        composable(route = MyAccountGraph.ERROR) {
-            ErrorScreen { navController.popBackStack() }
+        composable(route = MyAccountGraph.EDIT_INFO) {
+            EditInfoScreen(
+                viewModel = hiltViewModel(),
+                back = navController::popBackStack
+            )
         }
+
+        composable(route = MyAccountGraph.CHANGE_PHONE_NUMBER) {
+            ChangePhoneNumberScreen(
+                viewModel = hiltViewModel(),
+                back = navController::popBackStack
+            )
+        }
+
+        composable(route = MyAccountGraph.CHANGE_PASSWORD) {
+            ChangePasswordScreen(
+                viewModel = hiltViewModel(),
+                back = navController::popBackStack
+            )
+        }
+
         addressGraph(navController)
 
     }
@@ -50,8 +74,9 @@ object MyAccountGraph {
         icon = Icons.Rounded.Person
     )
 
-    const val ADDRESSES = "ADDRESSES"
+    const val CHANGE_PASSWORD = "CHANGE_PASSWORD"
+    const val CHANGE_PHONE_NUMBER = "CHANGE_PHONE_NUMBER"
     const val ADD_ADDRESS = "ADD_ADDRESS"
     const val PROFILE = "PROFILE"
-    const val ERROR = "PROFILE"
+    const val EDIT_INFO = "EDIT_INFO"
 }

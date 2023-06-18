@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
 import com.example.shopify.feature.auth.Auth
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.common.SearchHeader
@@ -76,7 +77,9 @@ fun ProductScreen(
             navigateToSearch = navigateToSearch
         )
 
-        ScreenState.ERROR -> {}
+        ScreenState.ERROR -> ErrorScreen {
+            viewModel.getProduct()
+        }
     }
 
     PriceSliderDialog(

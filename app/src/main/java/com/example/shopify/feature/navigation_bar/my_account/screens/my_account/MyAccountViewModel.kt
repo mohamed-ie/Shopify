@@ -24,11 +24,9 @@ class MyAccountViewModel @Inject constructor(
 
     val isSignedIn = repository.isLoggedIn()
 
-    init {
-        loadMinCustomerInfo()
-    }
 
-    private fun loadMinCustomerInfo() {
+    fun loadMinCustomerInfo() {
+        toLoadingScreenState()
         repository.getMinCustomerInfo().onEach { resource ->
             when (resource) {
                 is Resource.Error -> toErrorScreenState()
@@ -71,4 +69,5 @@ class MyAccountViewModel @Inject constructor(
         _state.update { it.copy(isSignOutDialogVisible = false) }
         viewModelScope.launch { repository.signOut() }
     }
+
 }

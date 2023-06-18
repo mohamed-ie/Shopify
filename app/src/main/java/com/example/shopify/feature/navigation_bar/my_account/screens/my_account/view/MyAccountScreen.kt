@@ -2,29 +2,45 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.my_account
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.common.ConfirmationDialog
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.RadioGroupModalBottomSheet
 import com.example.shopify.feature.navigation_bar.common.state.ScreenState
-import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.MyAccountViewModel
 import com.shopify.buy3.Storefront.CurrencyCode
 
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun MyAccountScreen(
+    lifecycleOwner: LifecycleOwner= LocalLifecycleOwner.current,
     innerPadding: PaddingValues,
     viewModel: MyAccountViewModel,
     navigateTo: (String) -> Unit,
-    back: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val isSignedIn by viewModel.isSignedIn.collectAsState(false)
     val screenState by viewModel.screenState.collectAsState()
+
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadMinCustomerInfo()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     when (screenState) {
         ScreenState.LOADING -> LoadingScreen()
@@ -43,7 +59,7 @@ fun MyAccountScreen(
             )
 
 
-        ScreenState.ERROR -> navigateTo(MyAccountGraph.ERROR)
+        ScreenState.ERROR -> ErrorScreen {viewModel.loadMinCustomerInfo()}
     }
 
     ConfirmationDialog(

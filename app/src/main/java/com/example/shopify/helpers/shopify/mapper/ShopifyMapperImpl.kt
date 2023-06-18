@@ -149,10 +149,16 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
-    override fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart =
-        response.data?.draftOrder.toCart()
+    override fun mapQueryToCart(data: DraftOrderQuery.Data): Cart =
+        data.draftOrder.toCart()
 
-    private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection): List<BrandProduct> =
+    override fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String? =
+        response.run {
+            data?.customerUpdate?.customerUserErrors?.getOrNull(0)?.message?:
+            errors.getOrNull(0)?.message()
+        }
+
+    private fun mapProductConnectionToProductsBrand(productConnection: Storefront.ProductConnection): List<BrandProduct> =
         productConnection.edges.map { productEdge ->
             productEdge.node.run {
                 BrandProduct(
@@ -387,7 +393,7 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
         shippingFee = shippingFee,
         totalPrice = totalPrice,
         discounts = discounts,
-        address = this?.shippingAddress?.formattedArea ?: "",
+//        address = this?.shippingAddress?.formattedArea ?: "",
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
         endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
@@ -441,7 +447,7 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
         shippingFee = shippingFee,
         totalPrice = totalPrice,
         discounts = discounts,
-        address = this?.shippingAddress?.formattedArea ?: "",
+        address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
         endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
