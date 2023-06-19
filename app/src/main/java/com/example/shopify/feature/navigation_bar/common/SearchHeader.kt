@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,8 +33,9 @@ fun SearchHeader(
     Button(
         onClick = onClick,
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 12.dp)
             .padding(bottom = 3.dp)
             .offset(y = (-7).dp),
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.shopifyColors.ServerColor),

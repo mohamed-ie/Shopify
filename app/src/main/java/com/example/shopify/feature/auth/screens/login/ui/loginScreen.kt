@@ -46,7 +46,8 @@ import kotlinx.coroutines.flow.onEach
 fun LoginScreen(
     viewModel: LoginViewModel,
     navigateToSignUp:()->Unit,
-    navigateToHome:()->Unit
+    navigateToHome:()->Unit,
+    onCloseScreen:()->Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val errorUiState by viewModel.uiErrorState.collectAsState()
@@ -68,7 +69,8 @@ fun LoginScreen(
         navigateToSignUp = navigateToSignUp,
         onEmailTextChange = viewModel::sendEmailValue,
         onPasswordTextChange = viewModel::sendPasswordValue,
-        onSignIn = viewModel::signIn
+        onSignIn = viewModel::signIn,
+        onCloseScreen = onCloseScreen
     )
 }
 
@@ -80,7 +82,8 @@ fun LoginScreenContent(
     loadingUiState:Boolean,
     onEmailTextChange:(String) -> Unit,
     onPasswordTextChange:(String) -> Unit,
-    onSignIn:() ->Unit
+    onSignIn:() ->Unit,
+    onCloseScreen:()->Unit
 ) {
     Column {
         AnimatedVisibility(
@@ -99,7 +102,7 @@ fun LoginScreenContent(
                     .fillMaxWidth()
                     .padding(vertical = 20.dp)
             )
-            AuthHeader()
+            AuthHeader(onCloseScreen)
             Spacer(modifier = Modifier.padding(vertical = 15.dp))
 
             Text(
@@ -146,12 +149,13 @@ fun LoginScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 5.dp)
-                    .height(50.dp)
-                    .shopifyLoading(loadingUiState),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+                    .height(50.dp),
                 shape = RoundedCornerShape(5.dp),
             ){
-                Text(text = stringResource(R.string.signin))
+                Text(
+                    text = stringResource(R.string.signin),
+                    modifier = Modifier.shopifyLoading(loadingUiState, Color.White)
+                )
             }
 
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
@@ -167,7 +171,10 @@ fun LoginScreenContent(
                     text = stringResource(R.string.sign_up),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.Black,
-                    modifier = Modifier.clip(MaterialTheme.shapes.extraSmall).clickable { navigateToSignUp() }.padding(start = 2.dp)
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.extraSmall)
+                        .clickable { navigateToSignUp() }
+                        .padding(start = 2.dp)
                 )
             }
         }
@@ -179,6 +186,15 @@ fun LoginScreenContent(
 @Preview
 @Composable
 fun PreviewLogin() {
-    //LoginScreen()
+//    LoginScreenContent(
+//        uiState = LoginUiState(),
+//        errorUiState = ErrorAuthUiState(),
+//        navigateToSignUp = { /*TODO*/ },
+//        loadingUiState = false,
+//        onEmailTextChange = {},
+//        onPasswordTextChange = {}
+//    ) {
+//
+//    }
 }
 

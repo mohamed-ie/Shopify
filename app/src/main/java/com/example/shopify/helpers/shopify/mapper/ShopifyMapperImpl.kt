@@ -1,16 +1,20 @@
 package com.example.shopify.helpers.shopify.mapper
 
+import com.apollographql.apollo3.api.ApolloResponse
+import com.example.shopify.DraftOrderQuery
+import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.model.CartLine
 import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
+import com.example.shopify.feature.navigation_bar.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
@@ -18,13 +22,17 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.helpers.UIError
+import com.example.shopify.type.CurrencyCode
+import com.example.shopify.helpers.UIText
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
+import com.shopify.buy3.Storefront.MoneyV2
 import com.shopify.buy3.Storefront.ProductConnection
 import com.shopify.graphql.support.ID
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -44,7 +52,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
     override fun mapToSignInResponse(
         response: GraphResponse<Storefront.Mutation>,
-        signInUserInfo: SignInUserInfo
+        signInUserInfo: SignInUserInfo,
     ): SignInUserInfoResult {
         val customerAccessToken = response.data?.customerAccessTokenCreate?.customerAccessToken
         return SignInUserInfoResult(
@@ -53,7 +61,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             customerAccessToken?.accessToken ?: "",
             customerAccessToken?.expiresAt?.toDate()?.time.toString().takeIf { it != "null" },
             response.data?.customerAccessTokenCreate?.customerUserErrors?.getOrNull(0)?.message
-                ?: ""
+                ?: "",
         )
     }
 
@@ -65,14 +73,15 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 description = storefrontProduct.description ?: "",
                 totalInventory = storefrontProduct.totalInventory ?: 0,
                 vendor = storefrontProduct.vendor ?: "",
-                image = storefrontProduct.images?.nodes?.getOrNull(0)?.url ?: "",
+                images = storefrontProduct.images.nodes.map { it.url },
                 variants = (storefrontProduct.variants?.edges as List<Storefront.ProductVariantEdge>).map { productVariantNode ->
                     productVariantNode.node.let { productVariant ->
                         VariantItem(
                             image = productVariant.image.url,
                             id = productVariant.id,
                             price = productVariant.price.amount,
-                            title = productVariant.title
+                            title = productVariant.title,
+                            availableQuantity = productVariant.quantityAvailable
                         )
                     }
                 },
@@ -87,6 +96,37 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
+
+    override fun mapPriceToLivePrice(
+        liveCurrencyCode: String,
+        liveAmount: Float,
+        price: Price,
+    ): Price {
+        if (liveCurrencyCode != CurrencyCode.EGP.toString()
+        )
+            return Price(
+                (liveAmount * price.amount.toFloat()).toString(),
+                liveCurrencyCode
+            )
+        return price
+    }
+
+    override fun mapPriceV2ToLivePrice(
+        liveCurrencyCode: String,
+        liveAmount: Float,
+        price: MoneyV2,
+    ): MoneyV2 {
+        if (liveCurrencyCode != CurrencyCode.EGP.toString()
+        )
+            return MoneyV2().setAmount(
+                (liveAmount * price.amount.toFloat()).toString()
+            )
+                .setCurrencyCode(Storefront.CurrencyCode.valueOf(liveCurrencyCode))
+
+        return price
+    }
+
+
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
             BrandProduct(
@@ -99,8 +139,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return res
     }
 
-    override fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?  =
-        response.data?.products?.let {productConnection ->
+    override fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>? =
+        response.data?.products?.let { productConnection ->
             val productsBrand = mapProductConnectionToProductsBrand(productConnection)
             Pageable(
                 hasNext = productConnection.pageInfo.hasNextPage ?: false,
@@ -109,9 +149,17 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
+    override fun mapQueryToCart(data: DraftOrderQuery.Data): Cart =
+        data.draftOrder.toCart()
 
-    private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection):List<BrandProduct>  =
-        productConnection.edges.map {productEdge ->
+    override fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String? =
+        response.run {
+            data?.customerUpdate?.customerUserErrors?.getOrNull(0)?.message?:
+            errors.getOrNull(0)?.message()
+        }
+
+    private fun mapProductConnectionToProductsBrand(productConnection: Storefront.ProductConnection): List<BrandProduct> =
+        productConnection.edges.map { productEdge ->
             productEdge.node.run {
                 BrandProduct(
                     id = id,
@@ -123,16 +171,20 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
 
 
-
-
-
-
-
     override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
         return response.data?.customer?.orders?.edges?.map {
             Order(
-                it.node.orderNumber, it.node.billingAddress,
-                it.node.cancelReason, it.node.processedAt, it.node.totalPrice, it.node.lineItems
+                financialStatus = it.node.financialStatus,
+                fulfillment = it.node.fulfillmentStatus,
+                orderNumber = it.node.orderNumber,
+                processedAt = it.node.processedAt,
+                subTotalPrice = it.node.subtotalPrice,
+                totalShippingPrice = it.node.totalShippingPrice,
+                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations),
+                totalTax = it.node.totalTax,
+                totalPrice = it.node.totalPrice,
+                billingAddress = it.node.shippingAddress,
+                lineItems = mapToLinesItemResponse(it.node.lineItems)
             )
         } ?: listOf()
     }
@@ -177,16 +229,9 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         } ?: MinCustomerInfo()
     }
 
-    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MyAccountMinAddress> {
+    override fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<Storefront.MailingAddress> {
         return response.data?.customer?.addresses?.edges?.map {
-            it.node.run {
-                MyAccountMinAddress(
-                    id = id,
-                    name = "$firstName $lastName",
-                    address = toAddressString(),
-                    phone = phone
-                )
-            }
+            it.node
         } ?: emptyList()
     }
 
@@ -221,7 +266,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
 
     override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand> {
-        return response.data?.collections?.edges?.drop(1)?.map {
+        return response.data?.collections?.edges?.drop(1)?.dropLast(4)?.map {
             Brand(title = it.node.title, url = it.node.image?.url)
         } ?: listOf()
     }
@@ -267,67 +312,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         )
     }
 
-    override fun mapToCart(graphResponse: GraphResponse<Storefront.QueryRoot>): Cart? =
-        graphResponse.data?.cart?.toCart()
-
-
-    override fun mapToRemoveCartLines(response: GraphResponse<Storefront.Mutation>): Cart? =
-        response.data?.cartLinesRemove?.run { cart.toCart(userErrors?.getOrNull(0)?.message) }
-
-    override fun mapToChangeCartLineQuantity(response: GraphResponse<Storefront.Mutation>): Cart? =
-        response.data?.cartLinesUpdate?.run { cart.toCart(userErrors?.getOrNull(0)?.message) }
-
-    override fun mapToApplyCouponToCart(response: GraphResponse<Storefront.Mutation>): Cart? =
-        response.data?.cartDiscountCodesUpdate?.run {
-            cart.toCart(couponError = userErrors.getOrNull(0)?.message)
-        }
-
-    private fun Storefront.Cart.toCart(error: String? = null, couponError: String? = null): Cart =
-        run {
-            val lines = lines?.edges?.map {
-                val merchandise = it.node.merchandise as Storefront.ProductVariant
-                val product = merchandise.product
-
-                val cartProduct = CartProduct(
-                    id = product.id,
-                    name = product.title,
-                    thumbnail = merchandise.image.url,
-                    collection = product.productType,
-                    vendor = product.vendor
-                )
-                CartLine(
-                    productVariantID = merchandise.id,
-                    id = it.node.id,
-                    price = merchandise.price,
-                    quantity = it.node.quantity,
-                    availableQuantity = merchandise.quantityAvailable,
-                    cartProduct = cartProduct
-                )
-            }
-            val cost = cost
-            val coupons = discountAllocations
-                ?.takeIf { it is Storefront.CartCodeDiscountAllocation }
-                ?.map { it as Storefront.CartCodeDiscountAllocation }
-                ?.associate { it.code to it.discountedAmount }
-                ?: emptyMap()
-
-            val mailingAddress = buyerIdentity.deliveryAddressPreferences.getOrNull(0) as? Storefront.MailingAddress?
-
-            Cart(
-                lines = lines ?: emptyList(),
-                taxes = cost?.totalTaxAmount,
-                subTotalsPrice = cost?.subtotalAmount,
-                shippingFee = cost?.totalDutyAmount,
-                checkoutPrice = cost?.checkoutChargeAmount,
-                totalPrice = cost?.totalAmount,
-                discounts = cost?.totalAmount - cost?.totalTaxAmount - cost?.checkoutChargeAmount,
-                coupons = coupons,
-                address = mailingAddress?.toAddressString()?:"",
-                couponError = couponError,
-                error = error,
-                hasNextPage = this.lines?.pageInfo?.hasNextPage ?: false
-            )
-        }
+    override fun mapMutationToCart(data: DraftOrderUpdateMutation.Data): Cart? =
+        data.draftOrderUpdate?.run { draftOrder.toCart(userErrors.getOrNull(0)?.message) }
 
     override fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String? =
         response.data?.cartBuyerIdentityUpdate?.userErrors?.getOrNull(0)?.message
@@ -339,4 +325,147 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         return Storefront.MoneyV2().setAmount(newAmount.toString())
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
+
+    private fun mapToDiscount(response: MutableList<Storefront.DiscountAllocation>): Storefront.MoneyV2 {
+        return if (!response.isEmpty()) {
+            response[0].allocatedAmount
+        } else
+            Storefront.MoneyV2()
+    }
+}
+
+private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection): List<LineItems> =
+    response.edges.map {
+        LineItems(
+            id = it.node.variant.product.id,
+            name = it.node.variant.product.title,
+            thumbnail = it.node.variant.product.featuredImage.url,
+            collection = it.node.variant.product.productType,
+            vendor = it.node.variant.product.vendor,
+            description = it.node.variant.product.description,
+            price = it.node.variant.price
+        )
+    }
+
+
+private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
+    val lines = this?.lineItems?.nodes?.map {
+        val product = it.product
+
+        val cartProduct = CartProduct(
+            id = ID(product?.id),
+            name = it.name,
+            thumbnail = it.image?.url as String,
+            collection = product?.productType ?: "",
+            vendor = it.vendor ?: ""
+        )
+        CartLine(
+            id = ID(it.id),
+            productVariantID = ID(it.variant?.id),
+            price = it.variant?.price.run { "$currencyCode ${this ?: "0.00"}" },
+            quantity = it.quantity,
+            availableQuantity = it.variant?.inventoryQuantity!!,
+            cartProduct = cartProduct
+        )
+    }
+
+    val taxes = "${this?.currencyCode} ${this?.totalTax ?: "0.00"}"
+    val subTotalPrice = "${this?.currencyCode} ${this?.subtotalPrice ?: "0.00"}"
+    val shippingFee = if (this?.totalShippingPrice?.toString() == "0.00") "FREE"
+    else "${this?.currencyCode} ${this?.totalShippingPrice ?: "0.00"}"
+    val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
+    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
+        ?.run { "$currencyCode $amount" }
+
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
+
+    return Cart(
+        lines = lines ?: emptyList(),
+        taxes = taxes,
+        subTotalsPrice = subTotalPrice,
+        shippingFee = shippingFee,
+        totalPrice = totalPrice,
+        discounts = discounts,
+//        address = this?.shippingAddress?.formattedArea ?: "",
+        hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
+        error = error,
+        endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
+    )
+}
+
+private fun DraftOrderQuery.DraftOrder?.toCart(
+    error: String? = null
+): Cart {
+
+    val lines = this?.lineItems?.nodes?.map {
+        val product = it.product
+
+        val cartProduct = CartProduct(
+            id = ID(product?.id),
+            name = it.name,
+            thumbnail = it.image?.url as String?,
+            collection = product?.productType ?: "",
+            vendor = it.vendor ?: ""
+        )
+        CartLine(
+            id = ID(it.id),
+            productVariantID = ID(it.variant?.id),
+            price = it.variant?.price.run { "$currencyCode ${this ?: "0.00"}" },
+            quantity = it.quantity,
+            availableQuantity = it.variant?.inventoryQuantity!!,
+            cartProduct = cartProduct
+        )
+    }
+
+    val taxes = "${this?.currencyCode} ${this?.totalTax ?: "0.00"}"
+    val subTotalPrice = "${this?.currencyCode} ${this?.subtotalPrice ?: "0.00"}"
+    val shippingFee = if (this?.totalShippingPrice?.toString() == "0.00") "FREE"
+    else "${this?.currencyCode} ${this?.totalShippingPrice ?: "0.00"}"
+    val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
+    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
+        ?.run { "$currencyCode $amount" }
+
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
+    return Cart(
+        lines = lines ?: emptyList(),
+        taxes = taxes,
+        subTotalsPrice = subTotalPrice,
+        shippingFee = shippingFee,
+        totalPrice = totalPrice,
+        discounts = discounts,
+        address = shippingAddress ?: MyAccountMinAddress(),
+        hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
+        error = error,
+        endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
+    )
+}
+
+private fun DraftOrderQuery.DraftOrder?.mapPriceToLivePrice(
+    error: String? = null,
+    liveCurrencyCode: String,
+    liveAmount: Float,
+    price: Price,
+): Price {
+    if (liveCurrencyCode != CurrencyCode.EGP.toString()
+    )
+        return Price(
+            (liveAmount * price.amount.toFloat()).toString(),
+            liveCurrencyCode
+        )
+    return price
+
 }

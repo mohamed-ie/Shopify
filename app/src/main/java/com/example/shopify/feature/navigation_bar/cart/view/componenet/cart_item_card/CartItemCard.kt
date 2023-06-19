@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,20 +43,16 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
-import com.example.shopify.feature.common.component.ShopifyOutlinedButtonState
 import com.example.shopify.feature.navigation_bar.cart.model.CartLine
-import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButtonState
 import com.example.shopify.theme.Gray
-import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
-import com.shopify.buy3.Storefront
-import com.shopify.graphql.support.ID
 import kotlinx.coroutines.delay
+import java.lang.Math.abs
 
 @Composable
 fun CartItemCard(
@@ -64,11 +61,13 @@ fun CartItemCard(
     toggleQuantitySelectorVisibility: () -> Unit,
     removeFromCart: () -> Unit,
     moveToWishlist: () -> Unit,
-    quantitySelected: (Int) -> Unit
+    quantitySelected: (Int) -> Unit,
+    onClick:()->Unit
 ) {
     val product = cartLine.cartProduct
     Column(
         modifier = Modifier
+            .clickable { onClick() }
             .background(Color.White)
             .fillMaxWidth()
             .padding(12.dp)
@@ -129,7 +128,7 @@ fun CartItemCard(
 
                 //price
                 Text(
-                    text = cartLine.price.run { "${currencyCode.name} $amount" },
+                    text = cartLine.price?:"",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -159,7 +158,8 @@ fun CartItemCard(
                 state = if (state.isChooseQuantityOpen)
                     ShopifyOutlinedButtonState.Active
                 else
-                    ShopifyOutlinedButtonState.Normal
+                    ShopifyOutlinedButtonState.Normal,
+                enabled = !state.isChangingQuantity
             ) {
                 Text(
                     modifier = Modifier.shopifyLoading(state.isChangingQuantity),
@@ -184,7 +184,7 @@ fun CartItemCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             // remove
-            ShopifyOutlinedButton(onClick = removeFromCart) {
+            ShopifyOutlinedButton(onClick = removeFromCart, enabled = !state.isRemoving) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Rounded.DeleteOutline,
@@ -203,7 +203,7 @@ fun CartItemCard(
             Spacer(modifier = Modifier.weight(1f))
 
             //add to wishlist
-            ShopifyOutlinedButton(onClick = moveToWishlist) {
+            ShopifyOutlinedButton(onClick = moveToWishlist, enabled = !state.isMovingToWishlist) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = Icons.Rounded.FavoriteBorder,
@@ -249,13 +249,15 @@ private fun QuantitySelector(
     ) {
         LaunchedEffect(key1 = Unit, block = {
             delay(800)
-            quantityListState.animateScrollToItem(selected - 1)
+            val index = abs(selected - 1)
+            if(index >0)
+            quantityListState.animateScrollToItem(index)
         })
 
         Column {
             Spacer(modifier = Modifier.height(20.dp))
             LazyRow(state = quantityListState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(availableQuantity) {
+                items(abs(availableQuantity)) {
                     ShopifyOutlinedButton(
                         onClick = { quantitySelected(it+1) },
                         state = if ((it) == selected-1)
@@ -275,59 +277,59 @@ private fun QuantitySelector(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCartCard() {
-    ShopifyTheme {
-        CartItemCard(
-            CartLineState(),
-            CartLine(
-                productVariantID = ID(""),
-                id = ID(""),
-                Storefront.MoneyV2().setAmount("372.00")
-                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
-                quantity = 1,
-                availableQuantity = 5,
-                cartProduct = CartProduct(
-                    name = "Pro Airpods Compatible With Android iPhone White",
-                    collection = "Generic",
-                    thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
-                    vendor = "Egyptian German"
-                )
-            ),
-            {},
-            {},
-            {},
-            {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCartCardOpenQuantityChooser() {
-    ShopifyTheme {
-        CartItemCard(
-            CartLineState(true, ),
-            CartLine(
-                productVariantID = ID(""),
-                id = ID(""),
-                Storefront.MoneyV2().setAmount("372.00")
-                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
-                quantity = 5,
-                availableQuantity = 10,
-                cartProduct = CartProduct(
-                    name = "Pro Airpods Compatible With Android iPhone White",
-                    collection = "Generic",
-                    thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
-                    vendor = "Egyptian German"
-                )
-            ),
-            {},
-            {},
-            {},
-            {},
-        )
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewCartCard() {
+//    ShopifyTheme {
+//        CartItemCard(
+//            CartLineState(),
+//            CartLine(
+//                productVariantID = ID(""),
+//                index = ID(""),
+//                Storefront.MoneyV2().setAmount("372.00")
+//                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//                quantity = 1,
+//                availableQuantity = 5,
+//                cartProduct = CartProduct(
+//                    name = "Pro Airpods Compatible With Android iPhone White",
+//                    collection = "Generic",
+//                    thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
+//                    vendor = "Egyptian German"
+//                )
+//            ),
+//            {},
+//            {},
+//            {},
+//            {},
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewCartCardOpenQuantityChooser() {
+//    ShopifyTheme {
+//        CartItemCard(
+//            CartLineState(true, ),
+//            CartLine(
+//                productVariantID = ID(""),
+//                index = ID(""),
+//                Storefront.MoneyV2().setAmount("372.00")
+//                    .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//                quantity = 5,
+//                availableQuantity = 10,
+//                cartProduct = CartProduct(
+//                    name = "Pro Airpods Compatible With Android iPhone White",
+//                    collection = "Generic",
+//                    thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
+//                    vendor = "Egyptian German"
+//                )
+//            ),
+//            {},
+//            {},
+//            {},
+//            {},
+//        )
+//    }
+//}

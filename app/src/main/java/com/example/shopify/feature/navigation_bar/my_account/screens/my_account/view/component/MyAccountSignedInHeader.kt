@@ -35,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.Graph
+import com.example.shopify.feature.auth.Auth
+import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.example.shopify.theme.ShopifyTheme
 
 @Composable
@@ -73,13 +75,13 @@ fun MyAccountSignedInHeader(
                 MyHeaderListItem(
                     name = stringResource(id = R.string.profile),
                     icon = Icons.Outlined.AccountCircle,
-                    onClick = {/*navigateTo()*/ }
+                    onClick = { navigateTo(MyAccountGraph.PROFILE) }
                 )
 
                 MyHeaderListItem(
                     name = stringResource(id = R.string.orders),
                     icon = Icons.Outlined.Ballot,
-                    onClick = {/*navigateTo()*/ }
+                    onClick = { navigateTo(Graph.ORDERS) }
                 )
 
                 MyHeaderListItem(
@@ -126,7 +128,7 @@ fun MyAccountHeader(navigateTo: (String) -> Unit) {
                 MyHeaderListItem(
                     name = stringResource(id = R.string.signin),
                     icon = Icons.Outlined.AccountCircle,
-                    onClick = {/*navigateTo()*/ }
+                    onClick = { navigateTo(Auth.SIGN_IN) }
                 )
 
                 Column(
@@ -138,7 +140,7 @@ fun MyAccountHeader(navigateTo: (String) -> Unit) {
                             .clip(CircleShape)
                             .background(Color.Black.copy(alpha = .7f))
                             .padding(4.dp),
-                        onClick = {}
+                        onClick = {navigateTo(Auth.SIGN_UP) }
                     ) {
                         Box(
                             modifier = Modifier.size(33.dp),

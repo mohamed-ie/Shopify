@@ -5,7 +5,7 @@ import com.shopify.graphql.support.ID
 
 data class Product(
     val id:ID = ID(""),
-    val image: String = "",
+    val images: List<String> = listOf(),
     val description: String = "",
     val totalInventory: Int = 0,
     val variants: List<VariantItem> = listOf(),
@@ -13,7 +13,8 @@ data class Product(
     val price: Price = Price("",""),
     val discount: Discount = Discount("",0),
     val vendor: String = "",
-    val isFavourite:Boolean = false
+    val isFavourite:Boolean = false,
+    val isLogged:Boolean = false
 )
 
 
@@ -31,6 +32,7 @@ data class VariantItem(
     val image: String?,
     val price: String?,
     val title: String?,
+    val availableQuantity:Int,
     val id: ID? = null
 )
 

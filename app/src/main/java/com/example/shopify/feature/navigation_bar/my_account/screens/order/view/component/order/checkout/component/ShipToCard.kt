@@ -1,62 +1,65 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.shopify.R
 import com.example.shopify.theme.ShopifyTheme
 
 @Composable
 fun ShipToCard(
+    name: String,
     address: String,
+    phone: String,
     onChangeClick: () -> Unit
 ) {
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(8.dp, vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Ship To",
-                style = TextStyle(
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            TextButton(onClick = onChangeClick) {
+                Text(
+                    text = stringResource(id = R.string.change),
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    color = MaterialTheme.colorScheme.primary,
                 )
-            )
-            Text(
-                text = AnnotatedString("Change"),
-                style = TextStyle(
-                    color = Color.Blue,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.clickable { onChangeClick() }
-            )
+            }
         }
         Card(
             modifier = Modifier
@@ -64,33 +67,31 @@ fun ShipToCard(
                 .padding(vertical = 8.dp),
             shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 0.dp
-            )
+            border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.2f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            Row(modifier = Modifier.padding(8.dp)) {
+            Row(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = "location",
-                    modifier = Modifier
-                        .padding(
-                            start = 4.dp, end = 16.dp
-                        )
-                        .align(Alignment.CenterVertically)
+                    modifier = Modifier.padding(4.dp),
+                    imageVector = Icons.Outlined.LocationOn,
+                    contentDescription = null,
                 )
-                Column() {
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "home",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
+                        text = name,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
                         text = address,
-                        style = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.padding(top = 8.dp)
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = phone,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
@@ -104,7 +105,8 @@ fun ShipToCard(
 fun PreviewShipToScreen() {
     ShopifyTheme {
         ShipToCard(
-            address = "galal street - elhassan building - haram - giza - egypt ",
+            name="ahmed",
+            address = "galal street - elhassan building - haram - giza - egypt ", "01120060103",
             onChangeClick = { }
         )
     }

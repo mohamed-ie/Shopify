@@ -9,8 +9,9 @@ import com.shopify.graphql.support.ID
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
-    navigateToProductDetails:(ID)->Unit,
-    back:()->Unit
+    navigateToProductDetails: (ID) -> Unit,
+    navigateToAuth: () -> Unit,
+    back: () -> Unit,
 ) {
     val searchedProductsState by viewModel.searchedProductsState.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
@@ -18,7 +19,12 @@ fun SearchScreen(
     SearchScreenContent(
         searchedProductsState = searchedProductsState,
         navigateToProductDetails = navigateToProductDetails,
-        onFavourite = {_,_ ->},
+        onFavourite = { index ->
+            if (searchedProductsState.isLogged)
+                viewModel.onFavourite(index)
+            else
+                navigateToAuth()
+        },
         back = back,
         onValueChange = viewModel::getProductsBySearchKeys,
         searchSectionState = screenState,

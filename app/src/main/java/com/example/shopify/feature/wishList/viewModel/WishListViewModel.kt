@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.wishList.view.WishedBottomSheetState
 import com.example.shopify.feature.wishList.view.WishedProductState
 import com.example.shopify.helpers.Resource
@@ -72,7 +71,7 @@ class WishListViewModel @Inject constructor(
             viewModelScope.launch {
                 _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = true)
                 wishedProduct.product.variants[0].id?.let {variantId ->
-                    when(repository.addToCart(variantId,1)){
+                    when(repository.addToCart(variantId.toString(),1)){
                         is Resource.Error -> {}
                         is Resource.Success -> {
                             _productsState.value[productIndex] = wishedProduct.copy(isAddingToCard = false)
@@ -98,10 +97,7 @@ class WishListViewModel @Inject constructor(
             is Resource.Success -> {
                 _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
                     isTotalPriceLoaded = true,
-                    totalCartPrice = Price(
-                        amount = response.data?.totalPrice?.amount ?: "",
-                        currencyCode = response.data?.totalPrice?.currencyCode?.name ?: ""
-                    )
+                    totalCartPrice = response.data?.totalPrice ?: ""
                 )
 
             }

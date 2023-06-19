@@ -16,10 +16,10 @@ buildscript {
         work_manager_hilt_version = '1.0.0'
         run_time_work_manager_version = '2.8.1'
         startup_version = '1.1.1'
+        apollo_version = '3.8.2'
         robo_electric_version = '4.8'
         coroutines_test_version = '1.7.1'
         core_testing_version = '2.2.0'
-
     }
 }
 

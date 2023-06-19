@@ -39,11 +39,11 @@ class ShopifyDataStoreManagerImpl @Inject constructor(
 
     override fun getAccessToken(): Flow<String> =
         dataStore.data.map { preference ->
-            preference[Constants.DataStoreKeys.USER_ACCESS_TOKEN] ?:""
+            preference[Constants.DataStoreKeys.USER_ACCESS_TOKEN] ?: ""
         }
 
     override fun getEmail(): Flow<String> =
-        dataStore.data.map { it[Constants.DataStoreKeys.USER_EMAIL] ?: "" }
+        dataStore.data.map { it[Constants.DataStoreKeys.USER_EMAIL]?.lowercase() ?: "" }
 
     override fun getCurrency(): Flow<String> =
         dataStore.data.map { it[Constants.DataStoreKeys.CURRENCY] ?: "EGP" }
@@ -68,4 +68,16 @@ class ShopifyDataStoreManagerImpl @Inject constructor(
 
     override fun getCurrencyAmountPerOnePound(): Flow<Float> =
         dataStore.data.map { it[Constants.DataStoreKeys.CURRENCY_AMOUNT]?.toFloat() ?: 0f }
+
+    override fun getCustomerId(): Flow<String> =
+        dataStore.data.map { it[Constants.DataStoreKeys.CUSTOMER_ID] ?: "" }
+
+
+    override suspend fun setCustomerId(customerId: String) {
+        dataStore.edit { it[Constants.DataStoreKeys.CUSTOMER_ID] = customerId }
+    }
+
+    override suspend fun clear() {
+        dataStore.edit { it.clear() }
+    }
 }

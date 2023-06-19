@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.theme.shopifyColors
 import com.example.shopify.utils.shopifyLoading
@@ -36,7 +36,7 @@ import com.example.shopify.utils.shopifyLoading
 @Composable
 fun AddedCartBottomSheetCard(
     productTitle:String,
-    productPrice: Price,
+    productPrice: String,
     isAdded:Boolean,
     isTotalPriceAdded:Boolean,
     continueShopping:()->Unit,
@@ -95,7 +95,7 @@ fun AddedCartBottomSheetCard(
                 color = Color.DarkGray
             )
             Text(
-                text =  productPrice.currencyCode + " " + productPrice.amount,
+                text =  productPrice,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.DarkGray,
@@ -140,7 +140,7 @@ fun AddedCartBottomSheetCard(
 fun AddedCartBottomSheetPreview() {
     AddedCartBottomSheetCard(
         productTitle = "iPhone 14 Pro 256GB Deep Purple 5G Wit",
-        Price("4,199.00","AED"),
+       "4 AED",
         isAdded = false,
         continueShopping = {},
         viewCart = {},

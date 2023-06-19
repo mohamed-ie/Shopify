@@ -8,10 +8,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.example.shopify.feature.common.LoadingScreen
-import com.example.shopify.feature.common.state.ScreenState
-import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.cart.CartViewModel
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
+import com.example.shopify.feature.navigation_bar.common.LoadingScreen
+import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 
 
 @Composable
@@ -20,9 +20,9 @@ fun CartScreen(
     viewModel: CartViewModel,
     navigateTo: (String) -> Unit
 ) {
-    DisposableEffect(key1 =lifecycleOwner){
+    DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
+            if (event == Lifecycle.Event.ON_RESUME) {
                 viewModel.loadCart()
             }
         }
@@ -47,6 +47,6 @@ fun CartScreen(
             navigateTo = navigateTo
         )
 
-        ScreenState.ERROR -> {navigateTo(CartGraph.ERROR)}
+        ScreenState.ERROR -> ErrorScreen {viewModel.loadCart()}
     }
 }

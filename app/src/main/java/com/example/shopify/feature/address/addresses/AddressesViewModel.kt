@@ -6,7 +6,6 @@ import com.example.shopify.feature.address.addresses.view.AddressesEvent
 import com.example.shopify.feature.address.addresses.view.AddressesState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
-import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddressesViewModel @Inject constructor(
     val repository: ShopifyRepository,
-    val defaultDispatcher: CoroutineDispatcher
+    val defaultDispatcher: CoroutineDispatcher,
 ) : BaseScreenViewModel() {
     private val _state = MutableStateFlow(AddressesState())
     val state = _state.asStateFlow()
@@ -28,10 +27,9 @@ class AddressesViewModel @Inject constructor(
     private val _back = MutableSharedFlow<Boolean>()
     val back = _back.asSharedFlow()
 
-    private var addressId: ID? = null
+    private var addressIndex:Int ? = null
 
-    fun loadAddresses() {
-        viewModelScope.launch {
+    fun loadAddresses() = viewModelScope.launch {
             when (val resource = repository.getAddresses()) {
                 is Resource.Error -> toErrorScreenState()
                 is Resource.Success -> {
@@ -40,7 +38,7 @@ class AddressesViewModel @Inject constructor(
                 }
             }
         }
-    }
+
 
     fun onEvent(event: AddressesEvent) {
         when (event) {
@@ -50,18 +48,18 @@ class AddressesViewModel @Inject constructor(
             }
 
             is AddressesEvent.ToggleDeleteConfirmationDialogVisibility -> {
-                addressId = event.id
+                addressIndex = event.index
                 _state.update { it.copy(isDeleteDialogVisible = it.isDeleteDialogVisible.not()) }
             }
 
-            is AddressesEvent.UpdateCartAddress ->
-                updateCartAddress(event.id)
+            is AddressesEvent.UpdateAddress ->
+                updateShippingAddress(event.index)
         }
     }
 
-    private fun updateCartAddress(id: ID) = viewModelScope.launch(defaultDispatcher) {
+    private fun updateShippingAddress(index:Int) = viewModelScope.launch(defaultDispatcher) {
         toLoadingScreenState()
-        when (repository.updateCartAddress(id)) {
+        when (repository.updateCartShippingAddress(state.value.addresses[index])) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success ->  _back.emit(true)
         }
@@ -69,8 +67,8 @@ class AddressesViewModel @Inject constructor(
 
     private fun deleteAddress() = viewModelScope.launch(defaultDispatcher) {
         toLoadingScreenState()
-        addressId?.let {
-            when (repository.deleteAddress(it)) {
+        addressIndex?.let {
+            when (repository.deleteAddress(state.value.addresses[it].id)) {
                 is Resource.Error -> toErrorScreenState()
                 is Resource.Success -> {
                     toStableScreenState()

@@ -1,28 +1,26 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,14 +29,22 @@ import androidx.compose.ui.unit.sp
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.theme.ShopifyTheme
 
+private val paymentMethods = listOf(
+    PaymentMethod.CreditCard,
+    PaymentMethod.CashOnDelivery
+)
+
 @Composable
-fun PaymentMethodScreen() {
-    var selectedOption by remember { mutableStateOf(PaymentMethod.CreditCard) }
+fun PaymentMethodScreen(
+    selected: PaymentMethod,
+    paymentMethodChanged: (PaymentMethod) -> Unit
+) {
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
             text = "Payment Method",
@@ -46,20 +52,23 @@ fun PaymentMethodScreen() {
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             ),
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-
-        RadioButtonOption(
-            text = "Credit Card",
-            selected = selectedOption == PaymentMethod.CreditCard,
-            onClick = { selectedOption = PaymentMethod.CreditCard }
-        )
+        paymentMethods.forEach { method ->
+            RadioButtonOption(
+                text = stringResource(id = method.nameResource),
+                icon = method.icon,
+                selected = selected == method,
+                onClick = { paymentMethodChanged(method) }
+            )
+        }
     }
 }
 
 @Composable
 fun RadioButtonOption(
     text: String,
+    icon: ImageVector,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -68,34 +77,26 @@ fun RadioButtonOption(
         modifier = Modifier
             .border(
                 border = BorderStroke(1.dp, color = Color.LightGray),
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.medium
             )
-            .padding(vertical = 8.dp)
-            .fillMaxWidth()
-            .clickable { onClick() }
+            .clip(shape = MaterialTheme.shapes.medium)
+            .background(Color.White)
+            .clickable(onClick = onClick)
+
     ) {
-        RadioButton(
-            selected = selected,
-            onClick = { onClick() },
-            colors = RadioButtonDefaults.colors(selectedColor = Color.Blue)
+        RadioButton(selected = selected, onClick = onClick)
+        Text(
+            text = text,
+            fontWeight = FontWeight.Medium,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier,
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = text,
-                style = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.padding(start = 8.dp),
-                fontWeight = FontWeight.Bold
-            )
-            Icon(
-                imageVector = Icons.Default.CreditCard,
-                contentDescription = ""
-            )
-        }
+        Spacer(modifier = Modifier.weight(1f))
+        Icon(
+            imageVector = icon,
+            contentDescription = null
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
     }
 }
 
@@ -103,6 +104,6 @@ fun RadioButtonOption(
 @Composable
 fun PreviewPaymentMethodScreen() {
     ShopifyTheme {
-        PaymentMethodScreen()
+        PaymentMethodScreen(PaymentMethod.CreditCard, {})
     }
 }

@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyTextField
-import com.example.shopify.feature.common.state.TextFieldState
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyTextField
+import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.theme.shopifyColors
 

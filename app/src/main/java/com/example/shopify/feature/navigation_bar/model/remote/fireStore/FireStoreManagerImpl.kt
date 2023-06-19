@@ -1,8 +1,11 @@
 package com.example.shopify.feature.navigation_bar.model.remote.fireStore
 
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shopify.graphql.support.ID
@@ -40,14 +43,16 @@ class FireStoreManagerImpl @Inject constructor(
     override suspend fun getReviewsByProductId(
         id: ID,
         reviewsCount: Int?
-    ): List<Review> =
+    ): Resource<List<Review>> =
         fireStore.collection(PATH)
             .document(id.encodeProductId())
             .collection(REVIEW_PATH)
             .get()
-            .await()
-            .documents
-            .map(mapper::mapSnapShotDocumentsToReview)
+            .awaitResource {
+                it.documents
+                    .map(mapper::mapSnapShotDocumentsToReview)
+            }
+
 
 
     override suspend fun setProductReviewByProductId(productId: ID, review: Review) {
@@ -56,59 +61,83 @@ class FireStoreManagerImpl @Inject constructor(
             .collection(REVIEW_PATH)
             .document(review.reviewer)
             .set(review.copy(createdAt = FieldValue.serverTimestamp(), time = null))
-            .await()
+            .awaitResource {}
 
     }
 
     override suspend fun updateCurrency(customerId: String, currency: String) {
+        customerId.ifEmpty { return  }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(Collections.singletonMap(Customer.Fields.CURRENCY, currency))
-            .await()
+            .awaitResource {}
     }
 
-    override suspend fun getCurrency(customerId: String): String {
+    override suspend fun getCurrency(customerId: String): Resource<String> {
+        customerId.ifEmpty { return Resource.Success("EGP") }
         return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
-            .await()
-            .get(Customer.Fields.CURRENCY) as String
+            .awaitResource { it.get(Customer.Fields.CURRENCY) as String }
+
     }
 
-    override suspend fun setCurrentCartId(customerId: String, cartId: String) {
-        fireStore.collection(Customer.PATH)
-            .document(customerId)
-            .set(Collections.singletonMap(Customer.Fields.CURRENT_CART_ID, cartId))
-            .await()
+    override suspend fun createUserEmail(email: String): Resource<Unit> {
+        email.ifEmpty { return Resource.Success(Unit) }
+        return fireStore.collection(Customer.PATH)
+            .document(email.lowercase())
+            .set(mapOf(Customer.Fields.WISH_LIST to emptyList<String>()))
+            .awaitResource {}
     }
 
-    override suspend fun getCurrentCartId(email: String): String? {
+    override suspend fun setCurrentCartId(email: String, cartId: String): Resource<Unit> {
+        email.ifEmpty { return Resource.Success(Unit) }
         return fireStore.collection(Customer.PATH)
             .document(email)
-            .get()
-            .await()
-            .get(Customer.Fields.CURRENT_CART_ID) as String?
+            .update(Customer.Fields.CURRENT_CART_ID, cartId)
+            .awaitResource {}
+    }
+
+    override suspend fun clearDraftOrderId(email: String): Resource<Unit> {
+        email.ifEmpty { return Resource.Success(Unit) }
+        return fireStore.collection(Customer.PATH)
+                    .document(email)
+                    .update(Customer.Fields.CURRENT_CART_ID, null)
+                    .awaitResource {}
+
+    }
+
+    override suspend fun getCurrentCartId(email: String): Resource<String?> {
+        email.ifEmpty { return Resource.Success(null) }
+        return fireStore.collection(Customer.PATH)
+                    .document(email)
+                    .get()
+                    .awaitResource{
+                        it.get(Customer.Fields.CURRENT_CART_ID) as String?
+                    }
+
     }
 
 
     override suspend fun updateWishList(customerId: String, productId: ID) {
+        customerId.ifEmpty { return  }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .update(
                 Customer.Fields.WISH_LIST,
                 FieldValue.arrayUnion(mapper.mapProductIDToEncodedProductId(productId))
-            )
-            .await()
+            ).awaitResource {}
     }
 
     override suspend fun removeAWishListProduct(customerId: String, productId: ID) {
+        customerId.ifEmpty { return  }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .update(
                 Customer.Fields.WISH_LIST,
                 FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId))
             )
-            .await()
+            .awaitResource {}
     }
 
     override suspend fun createCustomer(customerId: String) {
@@ -116,16 +145,28 @@ class FireStoreManagerImpl @Inject constructor(
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(customerMap)
-            .await()
+            .awaitResource {}
     }
 
-    override suspend fun getWishList(customerId: String): List<ID> {
-        return (fireStore.collection(Customer.PATH)
+    override suspend fun getWishList(customerId: String): Resource<List<ID>> {
+        customerId.ifEmpty { return Resource.Success(listOf()) }
+        return fireStore.collection(Customer.PATH)
             .document(customerId)
             .get()
-            .await()
-            .get(Customer.Fields.WISH_LIST) as? List<*>)
-            ?.map { it as String }
-            ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+            .awaitResource { documentSnapshot ->
+                (documentSnapshot.get(Customer.Fields.WISH_LIST) as? List<*>)
+                ?.map { it as String }
+                ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+            }
     }
+
+    private suspend fun <I,O> Task<I>.awaitResource(block: suspend (I)->O): Resource<O> {
+        return try {
+            Resource.Success(block(await()))
+        }
+        catch (e: Exception) {
+            Resource.Error(UIError.Unexpected)
+        }
+    }
+
 }

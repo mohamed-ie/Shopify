@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.common.component.ShopifyOutlinedButton
+import com.example.shopify.feature.navigation_bar.common.component.ShopifyOutlinedButton
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.AddedCartBottomSheetCard
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.OverViewCard
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.components.ProductDetailsCard
@@ -57,6 +57,7 @@ fun ProductDetailsScreenContent(
     reviewsState: ReviewsState,
     viewReviewsMore: () -> Unit,
     viewCart: () -> Unit,
+    navigateToAuth: () -> Unit,
     onFavouriteClick: (Boolean) -> Unit,
     back: () -> Unit,
     navigateToSearch:()->Unit
@@ -83,7 +84,7 @@ fun ProductDetailsScreenContent(
                 ProductDetailsCard(
                     vendor = product.vendor,
                     title = product.title,
-                    thumbnail = product.image,
+                    thumbnails = product.images,
                     currencyCode = product.price.currencyCode,
                     price = product.price.amount,
                     realPrice = product.discount.realPrice,
@@ -159,7 +160,12 @@ fun ProductDetailsScreenContent(
                 },
                 openQuantity = { addToCardState.openQuantity() },
                 closeQuantity = { addToCardState.closeQuantity() },
-                addToCard = { addToCardState.addToCard() }
+                addToCard = {
+                    if (product.isLogged)
+                        addToCardState.addToCard()
+                    else
+                        navigateToAuth()
+                }
             )
         }
         if (addToCardState.expandBottomSheet) {
@@ -179,7 +185,7 @@ fun ProductDetailsScreenContent(
                     isAdded = addToCardState.isAdded,
                     isTotalPriceAdded = addToCardState.isTotalPriceLoaded,
                     continueShopping = { addToCardState.continueShopping() },
-                    viewCart = { viewCart() }
+                    viewCart = {viewCart()}
                 )
             }
         }
@@ -193,7 +199,7 @@ fun ProductDetailsScreenContent(
 private fun ProductDetailsScreenContentPreview() {
     ProductDetailsScreenContent(
         Product(
-            image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
+            images = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
             description = "The Stan Smith owned the tennis court in the '70s." +
                     " Today it runs the streets with the same clean," +
                     " classic style." +
@@ -201,7 +207,7 @@ private fun ProductDetailsScreenContentPreview() {
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("", "", "white/1")),
+            variants = listOf(VariantItem("", "", "white/1",0)),
             title = "Ultima show Running Shoes Pink",
             price = Price(
                 amount = "172.00",
@@ -240,7 +246,8 @@ private fun ProductDetailsScreenContentPreview() {
         viewCart = {},
         back = {},
         onFavouriteClick = {},
-        navigateToSearch = {}
+        navigateToSearch = {},
+        navigateToAuth = {}
     )
 }
 

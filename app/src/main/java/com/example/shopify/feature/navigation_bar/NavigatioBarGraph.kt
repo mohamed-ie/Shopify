@@ -9,10 +9,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.feature.Graph
+import com.example.shopify.feature.address.addressGraph
+import com.example.shopify.feature.auth.Auth
+import com.example.shopify.feature.auth.authGraph
 import com.example.shopify.feature.navigation_bar.cart.cartNavigation
 import com.example.shopify.feature.navigation_bar.category.categoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.homeGraph
 import com.example.shopify.feature.navigation_bar.my_account.myAccountGraph
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.orderGraph
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.productDetailsGraph
 import com.example.shopify.feature.search.view.SearchScreen
@@ -30,11 +34,14 @@ fun ColumnScope.NavigationBarGraph(
         route = Graph.ROOT,
         startDestination = NavigationBarGraph.HOME
     ) {
+        addressGraph(navController)
         myAccountGraph(paddingValues, navController)
+        authGraph(navController)
         homeGraph(navController, paddingValues)
         categoryGraph(paddingValues, navController)
         cartNavigation(navController)
         wishListGraph(navController)
+        orderGraph(navController)
         productDetailsGraph(navController)
         composable(route = NavigationBarGraph.SEARCH) {
             SearchScreen(
@@ -42,6 +49,7 @@ fun ColumnScope.NavigationBarGraph(
                 navigateToProductDetails = { productId ->
                     navController.navigate("${ProductDetailsGraph.PRODUCT_DETAILS}/${productId.encodeProductId()}")
                 },
+                navigateToAuth = {navController.navigate(Auth.SIGN_IN)},
                 back = { navController.popBackStack() }
             )
         }

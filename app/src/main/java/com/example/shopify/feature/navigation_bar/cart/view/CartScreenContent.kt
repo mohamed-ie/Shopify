@@ -25,16 +25,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.AddressGraph
-import com.example.shopify.feature.common.component.RemoteErrorHeader
+import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.cart.model.CartLine
-import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemCard
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartLineState
@@ -44,12 +41,12 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.footer.CartFooter
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.header.CartHeader
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
+import com.example.shopify.feature.navigation_bar.common.component.RemoteErrorHeader
+import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.example.shopify.theme.Green170
-import com.example.shopify.theme.ShopifyTheme
-import com.shopify.buy3.Storefront
-import com.shopify.graphql.support.ID
 
-val cartElevation = 2.dp
+val cartElevation = .5.dp
 
 @Composable
 fun CartScreenContent(
@@ -65,19 +62,24 @@ fun CartScreenContent(
         RemoteErrorHeader(error = cart.error)
         CartHeader(
             itemsCount = itemsCount,
-            address = cart.address,
+            address = cart.address.address.asString(),
             navigateToWishlistScreen = {
-                navigateTo(Graph.WISH_LIST)
+                if (cart.isLoggedIn)
+                    navigateTo(Graph.WISH_LIST)
+                else
+                    navigateTo(Auth.SIGN_IN)
             },
-            navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true")) }
+            navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true","ture")) }
         )
         if (cart.lines.isEmpty())
             EmptyCart()
         else
             LazyColumn(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                item { }
                 itemsIndexed(cart.lines) { index, cartItem ->
                     CartItemCard(
                         state = itemsState[index],
@@ -93,11 +95,11 @@ fun CartScreenContent(
                         moveToWishlist = { onCartItemEvent(CartItemEvent.MoveToWishlist(index)) },
                         quantitySelected = {
                             onCartItemEvent(
-                                CartItemEvent.QuantityChanged(
-                                    index,
-                                    it
-                                )
+                                CartItemEvent.QuantityChanged(index, it)
                             )
+                        },
+                        onClick = {
+                            navigateTo("${ProductDetailsGraph.PRODUCT_DETAILS}/${cartItem.cartProduct.id.encodeProductId()}")
                         }
                     )
                 }
@@ -114,17 +116,11 @@ fun CartScreenContent(
                 item {
                     TotalCostCard(
                         itemsCount = itemsCount,
-                        subTotalsPrice = cart.subTotalsPrice?.run { "${currencyCode.name} $amount" }
-                            ?: stringResource(id = R.string.free),
-                        checkout = cart.checkoutPrice?.run { "${currencyCode.name} $amount" }
-                            ?: stringResource(id = R.string.free),
-                        shippingFee = cart.shippingFee?.run { "${currencyCode.name} $amount" }
-                            ?: stringResource(id = R.string.free),
-                        taxes = cart.taxes?.run { "${currencyCode.name} $amount" }
-                            ?: stringResource(id = R.string.free),
-                        discounts = cart.discounts?.run { "${currencyCode.name} $amount" },
-                        totalPrice = cart.totalPrice?.run { "${currencyCode.name} $amount" }
-                            ?: stringResource(id = R.string.free)
+                        subTotalsPrice = cart.subTotalsPrice,
+                        shippingFee = cart.shippingFee,
+                        taxes = cart.taxes,
+                        discounts = cart.discounts,
+                        totalPrice = cart.totalPrice
                     )
                 }
 
@@ -161,8 +157,7 @@ fun CartScreenContent(
             }
         CartFooter(
             itemsCount = itemsCount,
-            totalPrice = cart.totalPrice?.run { "${currencyCode.name} $amount" }
-                ?: stringResource(id = R.string.free),
+            totalPrice = cart.totalPrice,
             checkout = {
                 // navigate to place checkout
                 navigateTo(CartGraph.CHECK_OUT)
@@ -208,60 +203,61 @@ private fun EmptyCart() {
         Spacer(modifier = Modifier.weight(2f))
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCartScreenContent() {
-    ShopifyTheme {
-        val cart = Cart(
-            lines = listOf(
-                CartLine(
-                    productVariantID = ID(""),
-                    id = ID(""),
-                    Storefront.MoneyV2().setAmount("372.00")
-                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
-                    quantity = 1,
-                    availableQuantity = 5,
-                    cartProduct = CartProduct(
-                        name = "Pro Airpods Compatible With Android iPhone White",
-                        collection = "Generic",
-                        thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
-                        vendor = "Egyptian German"
-                    )
-                ),
-                CartLine(
-                    productVariantID = ID(""),
-                    id = ID(""),
-                    Storefront.MoneyV2().setAmount("900.00")
-                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
-                    quantity = 1,
-                    availableQuantity = 20,
-                    cartProduct = CartProduct(
-                        name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
-                        collection = "Electronics",
-                        thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
-                        vendor = "Amazon"
-                    )
-                ),
-            ),
-            Storefront.MoneyV2().setAmount("303.00")
-                .setCurrencyCode(Storefront.CurrencyCode.EGP),
-            Storefront.MoneyV2().setAmount("1272.00")
-                .setCurrencyCode(Storefront.CurrencyCode.EGP),
-            null,
-            Storefront.MoneyV2().setAmount("1575.50")
-                .setCurrencyCode(Storefront.CurrencyCode.EGP),
-            checkoutPrice = Storefront.MoneyV2().setAmount("1575.50")
-                .setCurrencyCode(Storefront.CurrencyCode.EGP),
-        )
-        CartScreenContent(
-            cart = Cart(),
-            itemsState = listOf(
-                CartLineState(),
-                CartLineState(isChooseQuantityOpen = true)
-            ),
-            couponState = CartCouponState(), {}, {}) {
-
-        }
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewCartScreenContent() {
+//    ShopifyTheme {
+//        val cart = Cart(
+//            lines = listOf(
+//                CartLine(
+//                    productVariantID = ID(""),
+//                    index = ID(""),
+//                    Storefront.MoneyV2().setAmount("372.00")
+//                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//                    quantity = 1,
+//                    availableQuantity = 5,
+//                    cartProduct = CartProduct(
+//                        name = "Pro Airpods Compatible With Android iPhone White",
+//                        collection = "Generic",
+//                        thumbnail = "https://m.media-amazon.com/images/I/51ujve2qY8L._AC_SY741_.jpg",
+//                        vendor = "Egyptian German"
+//                    )
+//                ),
+//                CartLine(
+//                    productVariantID = ID(""),
+//                    index = ID(""),
+//                    Storefront.MoneyV2().setAmount("900.00")
+//                        .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//                    quantity = 1,
+//                    availableQuantity = 20,
+//                    cartProduct = CartProduct(
+//                        name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
+//                        collection = "Electronics",
+//                        thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
+//                        vendor = "Amazon"
+//                    )
+//                ),
+//            ),
+//            Storefront.MoneyV2().setAmount("303.00")
+//                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//            Storefront.MoneyV2().setAmount("1272.00")
+//                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//            null,
+//            Storefront.MoneyV2().setAmount("1575.50")
+//                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//            checkoutPrice = Storefront.MoneyV2().setAmount("1575.50")
+//                .setCurrencyCode(Storefront.CurrencyCode.EGP),
+//
+//        )
+//        CartScreenContent(
+//            cart = Cart(endCursor = this?.lineItems?.pageInfo?.endCursor ?:""),
+//            itemsState = listOf(
+//                CartLineState(),
+//                CartLineState(isChooseQuantityOpen = true)
+//            ),
+//            couponState = CartCouponState(), {}, {}) {
+//
+//        }
+//    }
+//}

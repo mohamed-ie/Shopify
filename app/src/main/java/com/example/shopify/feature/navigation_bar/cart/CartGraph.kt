@@ -10,8 +10,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.shopify.R
-import com.example.shopify.feature.address.addressGraph
-import com.example.shopify.feature.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.NavigationBarScreen
 import com.example.shopify.feature.navigation_bar.cart.view.CartScreen
@@ -24,13 +22,10 @@ fun NavGraphBuilder.cartNavigation(navController: NavController) {
         composable(route = CartGraph.Cart.route) {
             CartScreen(
                 viewModel = hiltViewModel(),
-                navigateTo = navController::navigate
+                navigateTo = navController::navigate,
             )
         }
 
-        composable(route = CartGraph.ERROR) {
-            ErrorScreen { navController.popBackStack() }
-        }
         composable(route = CartGraph.CHECK_OUT) {
             val parentEntry = remember(it) {
                 navController.getBackStackEntry(CartGraph.CHECK_OUT)
@@ -40,7 +35,7 @@ fun NavGraphBuilder.cartNavigation(navController: NavController) {
                 back = { navController.popBackStack() }
             )
         }
-        composable(route = CartGraph.CREDIT_CARD) {
+        composable(route = CartGraph.CREDIT_CARD_INFO) {
             val parentEntry = remember(it) {
                 navController.getBackStackEntry(CartGraph.CHECK_OUT)
             }
@@ -51,15 +46,14 @@ fun NavGraphBuilder.cartNavigation(navController: NavController) {
             )
         }
 
-        addressGraph(navController)
+//        addressGraph(navController)
         // checkoutGraph(navController)
     }
 }
 
 object CartGraph {
-    const val ERROR = "ERROR"
     const val CHECK_OUT = "CHECK_OUT"
-    const val CREDIT_CARD = "CREDIT_CARD"
+    const val CREDIT_CARD_INFO = "CREDIT_CARD"
 
     object Cart :
         NavigationBarScreen(route = "CART", name = R.string.cart, icon = Icons.Rounded.ShoppingCart)

@@ -4,6 +4,8 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'com.google.gms.google-services'
     id 'kotlin-kapt'
+    id 'com.apollographql.apollo3' version "$apollo_version"
+
 }
 
 android {
@@ -26,7 +28,8 @@ android {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
         buildConfigField "String", "DOMAIN", "\"${properties.getProperty('domain')}\""
-        buildConfigField "String", "ACCESS_TOKEN", "\"${properties.getProperty('access_token')}\""
+        buildConfigField "String", "STORE_FRONT_ACCESS_TOKEN", "\"${properties.getProperty('store_front_access_token')}\""
+        buildConfigField "String", "ADMIN_ACCESS_TOKEN", "\"${properties.getProperty('admin_access_token')}\""
     }
 
     buildTypes {
@@ -121,6 +124,9 @@ dependencies {
     implementation "androidx.startup:startup-runtime:$startup_version"
     implementation "androidx.work:work-runtime-ktx:$run_time_work_manager_version"
 
+    //apollo
+    implementation "com.apollographql.apollo3:apollo-runtime:$apollo_version"
+
     //robolectric
     testImplementation "org.robolectric:robolectric:$robo_electric_version"
 
@@ -129,4 +135,10 @@ dependencies {
 
     //core testing
     testImplementation "androidx.arch.core:core-testing:$core_testing_version"
+}
+
+apollo {
+    service("service") {
+        packageName.set("com.example.shopify")
+    }
 }

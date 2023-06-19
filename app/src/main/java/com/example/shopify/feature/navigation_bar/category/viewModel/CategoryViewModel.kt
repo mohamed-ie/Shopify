@@ -5,6 +5,7 @@ import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.feature.navigation_bar.category.model.CategoryState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.getOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,30 +27,43 @@ class CategoryViewModel @Inject constructor(
 
 
     init {
+        loadData()
+    }
+
+    fun loadData() = viewModelScope.launch {
+        toLoadingScreenState()
         val tags = repository.getProductsTag()
         val types = repository.getProductsType()
-        tags.zip(types) { tag, type ->
-            when (tag) {
-                is Resource.Success -> {
-                    _categoryState.update { oldState ->
-                        oldState.copy(productTag = tag.data)
-                    }
+        when (tags) {
+            is Resource.Success -> {
+                _categoryState.update { oldState ->
+                    oldState.copy(productTag = tags.data)
                 }
-
-                is Resource.Error -> tag.error
             }
-            when (type) {
-                is Resource.Success -> {
-                    _categoryState.update { oldState ->
-                        oldState.copy(productType = type.data)
-                    }
+
+            is Resource.Error -> {
+                tags.error
+                toErrorScreenState()
+            }
+        }
+        when (types) {
+            is Resource.Success -> {
+                _categoryState.update { oldState ->
+                    oldState.copy(productType = types.data)
                 }
-
-                is Resource.Error -> type.error
             }
-            getProductByQuery()
-            toStableScreenState()
-        }.launchIn(viewModelScope)
+
+            is Resource.Error -> {
+                types.error
+                toErrorScreenState()
+            }
+        }
+        _categoryState.value.run {
+            if (productTag.isNotEmpty() && productType.isNotEmpty()) {
+                getProductByQuery()
+                toStableScreenState()
+            }
+        }
     }
 
     private fun getProductByQuery() {
@@ -65,7 +79,7 @@ class CategoryViewModel @Inject constructor(
                         }
                     }
 
-                    is Resource.Error -> it.error
+                    is Resource.Error -> {toErrorScreenState()}
                 }
             }
         }
