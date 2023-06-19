@@ -91,7 +91,7 @@ fun HomeScreen(
             navigateToSearch = navigateToSearch
         )
 
-        ScreenState.ERROR -> ErrorScreen { viewModel.getBrandList() }
+        ScreenState.ERROR -> ErrorScreen {}
     }
 }
 
