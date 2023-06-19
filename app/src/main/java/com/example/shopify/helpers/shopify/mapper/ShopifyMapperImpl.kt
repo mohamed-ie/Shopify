@@ -22,14 +22,17 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.helpers.UIError
+import com.example.shopify.type.CurrencyCode
 import com.example.shopify.helpers.UIText
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
+import com.shopify.buy3.Storefront.MoneyV2
 import com.shopify.buy3.Storefront.ProductConnection
 import com.shopify.graphql.support.ID
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -77,7 +80,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                             image = productVariant.image.url,
                             id = productVariant.id,
                             price = productVariant.price.amount,
-                            title = productVariant.title
+                            title = productVariant.title,
+                            availableQuantity = productVariant.quantityAvailable
                         )
                     }
                 },
@@ -91,6 +95,37 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 )
             )
         }
+
+
+    override fun mapPriceToLivePrice(
+        liveCurrencyCode: String,
+        liveAmount: Float,
+        price: Price,
+    ): Price {
+        if (liveCurrencyCode != CurrencyCode.EGP.toString()
+        )
+            return Price(
+                (liveAmount * price.amount.toFloat()).toString(),
+                liveCurrencyCode
+            )
+        return price
+    }
+
+    override fun mapPriceV2ToLivePrice(
+        liveCurrencyCode: String,
+        liveAmount: Float,
+        price: MoneyV2,
+    ): MoneyV2 {
+        if (liveCurrencyCode != CurrencyCode.EGP.toString()
+        )
+            return MoneyV2().setAmount(
+                (liveAmount * price.amount.toFloat()).toString()
+            )
+                .setCurrencyCode(Storefront.CurrencyCode.valueOf(liveCurrencyCode))
+
+        return price
+    }
+
 
     override fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct> {
         val res = response.data?.collections?.edges?.get(0)?.node?.products?.edges?.map {
@@ -114,10 +149,16 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
-    override fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart =
-        response.data?.draftOrder.toCart()
+    override fun mapQueryToCart(data: DraftOrderQuery.Data): Cart =
+        data.draftOrder.toCart()
 
-    private fun mapProductConnectionToProductsBrand(productConnection: ProductConnection): List<BrandProduct> =
+    override fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String? =
+        response.run {
+            data?.customerUpdate?.customerUserErrors?.getOrNull(0)?.message?:
+            errors.getOrNull(0)?.message()
+        }
+
+    private fun mapProductConnectionToProductsBrand(productConnection: Storefront.ProductConnection): List<BrandProduct> =
         productConnection.edges.map { productEdge ->
             productEdge.node.run {
                 BrandProduct(
@@ -225,7 +266,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
 
     override fun mapToBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<Brand> {
-        return response.data?.collections?.edges?.drop(1)?.map {
+        return response.data?.collections?.edges?.drop(1)?.dropLast(4)?.map {
             Brand(title = it.node.title, url = it.node.image?.url)
         } ?: listOf()
     }
@@ -351,7 +392,6 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
         subTotalsPrice = subTotalPrice,
         shippingFee = shippingFee,
         totalPrice = totalPrice,
-        address = shippingAddress ?: MyAccountMinAddress(),
         discounts = discounts,
 //        address = this?.shippingAddress?.formattedArea ?: "",
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
@@ -360,7 +400,10 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
     )
 }
 
-private fun DraftOrderQuery.DraftOrder?.toCart(error: String? = null): Cart {
+private fun DraftOrderQuery.DraftOrder?.toCart(
+    error: String? = null
+): Cart {
+
     val lines = this?.lineItems?.nodes?.map {
         val product = it.product
 
@@ -409,4 +452,20 @@ private fun DraftOrderQuery.DraftOrder?.toCart(error: String? = null): Cart {
         error = error,
         endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
     )
+}
+
+private fun DraftOrderQuery.DraftOrder?.mapPriceToLivePrice(
+    error: String? = null,
+    liveCurrencyCode: String,
+    liveAmount: Float,
+    price: Price,
+): Price {
+    if (liveCurrencyCode != CurrencyCode.EGP.toString()
+    )
+        return Price(
+            (liveAmount * price.amount.toFloat()).toString(),
+            liveCurrencyCode
+        )
+    return price
+
 }

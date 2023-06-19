@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.shopify.feature.Graph
+import com.example.shopify.feature.address.addressGraph
 import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.auth.authGraph
 import com.example.shopify.feature.navigation_bar.cart.cartNavigation
@@ -33,6 +34,7 @@ fun ColumnScope.NavigationBarGraph(
         route = Graph.ROOT,
         startDestination = NavigationBarGraph.HOME
     ) {
+        addressGraph(navController)
         myAccountGraph(paddingValues, navController)
         authGraph(navController)
         homeGraph(navController, paddingValues)

@@ -106,7 +106,7 @@ fun CartHeader(
                 Row(
                     modifier = Modifier
                         .clip(shape = MaterialTheme.shapes.small)
-                        .background(color = Color.LightGray.copy(alpha = .5f))
+                        .background(color = MaterialTheme.colorScheme.background)
                         .clickable(onClick = navigateToAddressesScreen)
                         .padding(8.dp)
                         .fillMaxWidth(),

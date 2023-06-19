@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
+import com.example.shopify.feature.address.AddressGraph
 import com.example.shopify.feature.address.addresses.view.component.MyAccountAddressCard
 import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
-import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.shopify.buy3.Storefront.MailingAddress
 
 @Composable
@@ -60,7 +60,8 @@ fun AddressesScreenContent(
                         },
                         onEdit = {
                             /*   navigateTo(address.index)*/
-                        }
+                        },
+                        isDefault = index != 0
                     )
                 }
             }
@@ -69,7 +70,7 @@ fun AddressesScreenContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
-                onClick = { navigateTo(MyAccountGraph.ADD_ADDRESS) },
+                onClick = { navigateTo(AddressGraph.ADD_ADDRESS) },
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(

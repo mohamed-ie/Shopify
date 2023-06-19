@@ -2,6 +2,7 @@ package com.example.shopify.feature.navigation_bar.home.screen.product.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
 import com.example.shopify.feature.auth.Auth
+import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
 import com.example.shopify.feature.navigation_bar.common.SearchHeader
@@ -34,7 +36,6 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Prod
 import com.example.shopify.feature.navigation_bar.home.screen.product.viewModel.ProductViewModel
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
-import com.example.shopify.ui.screen.Product.ui.Slider
 import com.shopify.graphql.support.ID
 
 @Composable
@@ -66,7 +67,7 @@ fun ProductScreen(
             navigateToHome = back,
             navigateToProductDetails = { navigateTo("${ProductDetailsGraph.PRODUCT_DETAILS}/${it.encodeProductId()}") },
             updateSliderValue = viewModel::updateSliderValue,
-            onFavourite = {index ->
+            onFavourite = { index ->
                 if (state.isLoggedIn)
                     viewModel.onFavourite(index)
                 else
@@ -75,7 +76,9 @@ fun ProductScreen(
             navigateToSearch = navigateToSearch
         )
 
-        ScreenState.ERROR -> {}
+        ScreenState.ERROR -> ErrorScreen {
+            viewModel.getProduct()
+        }
     }
 
     PriceSliderDialog(
@@ -97,15 +100,19 @@ fun ProductScreenContent(
 ) {
     Column() {
         NamedTopAppBar("", navigateToHome)
-        SearchHeader {navigateToSearch()}
+        SearchHeader { navigateToSearch() }
         Slider(
             minValue = productsState.minPrice,
             maxValue = productsState.maxPrice,
             value = productsState.sliderValue,
             onValueChange = updateSliderValue
         )
-        LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.weight(1f)) {
-            items(productsState.brandProducts.count()) {index ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(4.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            items(productsState.brandProducts.count()) { index ->
                 productsState.brandProducts[index].run {
                     ProductCard(
                         product = this,

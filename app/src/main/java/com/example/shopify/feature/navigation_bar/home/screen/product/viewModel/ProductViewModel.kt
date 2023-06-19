@@ -32,6 +32,7 @@ class ProductViewModel @Inject constructor(
         isLoggedIn()
     }
 
+
     fun getProduct() = viewModelScope.launch(Dispatchers.Default) {
         when (val it = repository.getProductsByBrandName(_productState.value.brandProductId)) {
             is Resource.Success -> {
@@ -46,7 +47,7 @@ class ProductViewModel @Inject constructor(
     }
 
     private fun isLoggedIn() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(Dispatchers.Main) {
             _productState.update { productsState ->
                 productsState.copy(isLoggedIn = repository.isLoggedIn().first())
             }
@@ -69,8 +70,8 @@ class ProductViewModel @Inject constructor(
         }
         _productState.update { oldState ->
             oldState.copy(
-                minPrice = prices.min(),
-                maxPrice = prices.max(),
+                minPrice = prices.min()-1,
+                maxPrice = prices.max()+1,
                 brandProducts = brandProducts.toMutableStateList()
             )
         }

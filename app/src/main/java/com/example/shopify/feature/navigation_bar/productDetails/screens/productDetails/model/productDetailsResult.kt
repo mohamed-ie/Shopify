@@ -32,6 +32,7 @@ data class VariantItem(
     val image: String?,
     val price: String?,
     val title: String?,
+    val availableQuantity:Int,
     val id: ID? = null
 )
 

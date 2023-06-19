@@ -2,6 +2,8 @@ package com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -35,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.utils.shopifyLoading
@@ -54,9 +55,9 @@ fun CartCouponCard(
     val focusManager = LocalFocusManager.current
     Column {
         OutlinedCard(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
             shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = cartElevation),
+//            elevation = CardDefaults.elevatedCardElevation(defaultElevation = cartElevation),
             border = BorderStroke(
                 width = .8.dp, color = if (textFieldFocused) MaterialTheme.colorScheme.primary
                 else Color.Transparent
@@ -79,7 +80,11 @@ fun CartCouponCard(
                         )
                     },
                     trailingIcon = {
-                        AnimatedVisibility(visible = state.errorVisible) {
+                        AnimatedVisibility(
+                            visible = state.errorVisible,
+                            enter = scaleIn(),
+                            exit = scaleOut()
+                        ) {
                             IconButton(onClick = {
                                 clearCoupon()
                                 focusManager.clearFocus()
@@ -105,7 +110,12 @@ fun CartCouponCard(
                     )
                 )
                 //apply
-                TextButton(contentPadding = PaddingValues(end = 12.dp), onClick = applyCoupon) {
+                TextButton(
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp, horizontal = 8.dp),
+                    onClick = applyCoupon,
+                    enabled = !state.isLoading
+                ) {
                     Text(
                         modifier = Modifier.shopifyLoading(enabled = state.isLoading),
                         text = stringResource(id = R.string.apply),
@@ -123,7 +133,7 @@ fun CartCouponCard(
             exit = shrinkVertically(shrinkTowards = Alignment.Top),
         ) {
             Text(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
                 text = stringResource(id = R.string.coupon_code_invalid),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium

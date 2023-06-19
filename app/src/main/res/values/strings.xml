@@ -153,9 +153,21 @@
     <string name="complete_your_purchase">Complete your purchase</string>
     <string name="order_summery">Order Summery</string>
     <string name="not_selected">Not selected yet</string>
+    <string name="edit_info">Edit info</string>
+    <string name="security_information">Security Information</string>
+    <string name="change_password">Change password</string>
+    <string name="change_phone_number">Change phone number</string>
+    <string name="this_phone_number_is_your_primary_phone_number_and_is_unique_across_shopify">This phone number is your primary phone number and is unique across shopify</string>
     <string name="ship_address">Shipping Address</string>
     <string name="cash_on_delivary">Cash On Delivery</string>
     <string name="payment_Method">Payment Method</string>
     <string name="order_summary">Order Summary</string>
+    <string name="password_changed">Password Changed</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="passwords_dont_match">Passwords don\'t match</string>
+    <string name="phone_number_changed">Phone number changed</string>
+    <string name="phone_number">Phone number</string>
+    <string name="change_name">Change Name</string>
+    <string name="name_changed">Name changed</string>
 
 </resources>

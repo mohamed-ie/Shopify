@@ -14,10 +14,12 @@ import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -37,19 +39,22 @@ import com.shopify.graphql.support.ID
 fun CategoryProductCard(product: BrandProduct, onItemClick: (ID) -> Unit) {
     Card(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(4.dp)
             .clickable { onItemClick(product.id) },
         shape = RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column(
-            modifier = Modifier.background(Color.White),
+            modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             SubcomposeAsyncImage(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .background(Color.White)
+                    .padding(vertical = 8.dp)
                     .aspectRatio(1.5f),
                 model = product.images[0],
                 contentScale = ContentScale.Fit,
@@ -76,7 +81,7 @@ fun CategoryProductCard(product: BrandProduct, onItemClick: (ID) -> Unit) {
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Normal,
-                modifier = Modifier.padding(bottom = 16.dp, top = 8.dp, start = 20.dp, end = 20.dp)
+                modifier = Modifier.padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
             )
         }
     }

@@ -8,6 +8,7 @@ import com.example.shopify.feature.navigation_bar.model.repository.shopify.Shopi
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.AddToCardState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.ReviewsState
@@ -89,17 +90,32 @@ class ProductDetailsViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        _addToCardState.value = _addToCardState.value.copy(
-                            availableQuantity = if (resource.data.totalInventory in 2..5) resource.data.totalInventory else resource.data.totalInventory
-                        )
                         _variantState.value = _variantState.value.copy(
-                            variants = resource.data.variants,
+                            variants = mapAnyNegativeQuantity(resource.data.variants),
                             isLowStock = resource.data.totalInventory <= 5
                         )
                         _productState.value = resource.data.copy(
                             discount = calDiscount(resource.data.price.amount),
-                            variants = listOf()
+                            variants = listOf(),
+                            totalInventory = resource.data.totalInventory.let { totalInventory ->
+                                if (totalInventory < 0)
+                                    return@let totalInventory * (-1)
+                                return@let totalInventory
+                            }
                         )
+                        _addToCardState.update {addToCardState ->
+
+                            _variantState.value.let {variantsState ->
+                                addToCardState.copy(
+                                    availableQuantity =
+                                    if (variantsState.variants[variantsState.selectedVariant - 1].availableQuantity in 2..5)
+                                        variantsState.variants[variantsState.selectedVariant - 1].availableQuantity - 1
+                                    else
+                                        variantsState.variants[variantsState.selectedVariant - 1].availableQuantity
+                                )
+                            }
+
+                        }
                         getProductReview(productId)
                         checkIsLoggedIn()
                         toStableScreenState()
@@ -145,12 +161,12 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun addProductToCart() {
-        _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
         _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let { variantId ->
             viewModelScope.launch {
                 when (repository.addToCart(variantId.toString(), _addToCardState.value.selectedQuantity)) {
-                    is Resource.Error -> {}
+                    is Resource.Error -> toErrorScreenState()
                     is Resource.Success -> {
+                        _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
                         _addToCardState.value = _addToCardState.value.copy(isAdded = true)
                         sendTotalCart(repository.getCart())
                     }
@@ -158,6 +174,14 @@ class ProductDetailsViewModel @Inject constructor(
             }
         }
     }
+
+    private fun mapAnyNegativeQuantity(variants:List<VariantItem>) : List<VariantItem> =
+        variants.map{variantItem ->
+            if (variantItem.availableQuantity < 0 )
+                return@map variantItem.copy(availableQuantity = variantItem.availableQuantity * (-1))
+            return@map variantItem
+        }
+
 
     private fun sendTotalCart(response: Resource<Cart?>) {
         when (response) {
@@ -173,8 +197,19 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun sendSelectedVariant(variantIndex: Int) {
-        _variantState.value = _variantState.value.copy(selectedVariant = variantIndex)
-        //getProduct(_variantState.value.variants[variantIndex - 1].index ?: "")
+        _addToCardState.update {addToCardState ->
+            _variantState.value.let {variantsState ->
+                _variantState.value = variantsState.copy(selectedVariant = variantIndex)
+                addToCardState.copy(
+                    availableQuantity =
+                    if (variantsState.variants[variantIndex - 1].availableQuantity in 2..5)
+                        variantsState.variants[variantIndex - 1].availableQuantity - 1
+                    else
+                        variantsState.variants[variantIndex - 1].availableQuantity
+                )
+            }
+
+        }
     }
 
     private fun dismissBottomSheet() {

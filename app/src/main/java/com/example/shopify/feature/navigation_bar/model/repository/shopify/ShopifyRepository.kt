@@ -36,8 +36,8 @@ interface ShopifyRepository {
         productType: String,
         productTag: String
     ): Flow<Resource<List<BrandProduct>>>
-    fun getProductsTag(): Flow<Resource<List<String>>>
-    fun getProductsType(): Flow<Resource<List<String>>>
+    suspend fun getProductsTag(): Resource<List<String>>
+    suspend fun getProductsType(): Resource<List<String>>
     suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<Boolean>
     suspend fun deleteAddress(addressId: ID): Resource<Boolean>
     fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>>
@@ -61,4 +61,8 @@ interface ShopifyRepository {
     suspend fun changeCartLineQuantity(merchandiseId: String, quantity: Int): Resource<Cart?>
     suspend fun completeOrder(paymentPending: Boolean) :Resource<String?>
     suspend fun sendCompletePayment(): Resource<Pair<String?, String?>?>
+    suspend fun changePassword(password: String): Resource<String?>
+    suspend fun changePhoneNumber(phone: String): Resource<String?>
+    suspend fun changeName(firstName: String, lastName: String): Resource<String?>
+    suspend fun createUserEmail(email: String): Resource<Unit>
 }
