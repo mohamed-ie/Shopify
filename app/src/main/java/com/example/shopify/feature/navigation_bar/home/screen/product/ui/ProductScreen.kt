@@ -59,7 +59,7 @@ fun ProductScreen(
         }
     }
 
-    val state by viewModel.productList.collectAsState()
+    val state by viewModel.productState.collectAsState()
     when (viewModel.screenState.collectAsState().value) {
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> ProductScreenContent(

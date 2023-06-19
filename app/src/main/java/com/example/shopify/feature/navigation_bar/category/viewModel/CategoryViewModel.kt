@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 @HiltViewModel
@@ -98,10 +96,6 @@ class CategoryViewModel @Inject constructor(
             oldState.copy(selectedProductTagIndex = tagIndex)
         }
         getProductByQuery()
-    }
-
-    fun encodeProductID(productId: String): String {
-        return URLEncoder.encode(productId, StandardCharsets.UTF_8.toString())
     }
 
 }
