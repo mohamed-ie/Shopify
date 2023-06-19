@@ -1,10 +1,9 @@
-package com.example.shopify.feature.navigtion_bar.screen.home.viewModel
+package com.example.shopify.feature.navigation_bar.home.screen.home.viewModel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.feature.navigation_bar.home.screen.home.viewModel.BrandViewModel
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.navigtion_bar.screen.shopify.FakeShopifyRepositoryImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -36,9 +35,5 @@ class BrandViewModelTest {
         val result = brandViewModel.brandList.first()
         Assert.assertThat(result.size, CoreMatchers.`is`(1))
 
-    }
-
-    @Test
-    fun testGetBrandList() {
     }
 }
