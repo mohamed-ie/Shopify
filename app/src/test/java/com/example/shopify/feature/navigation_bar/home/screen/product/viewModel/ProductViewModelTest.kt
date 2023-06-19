@@ -4,14 +4,18 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.navigtion_bar.screen.shopify.FakeShopifyRepositoryImpl
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.After
@@ -54,23 +58,21 @@ class ProductViewModelTest {
                 isFavourite = true
             )
         )
-        //   val testDispatcher = TestCoroutineDispatcher()
-        // Dispatchers.setMain(testDispatcher)
+        val testDispatcher = TestCoroutineDispatcher()
+        Dispatchers.setMain(testDispatcher)
 
     }
 
     @After
     fun end() {
-        // Dispatchers.resetMain()
+        Dispatchers.resetMain()
     }
 
     @Test
     fun getProductList_makeSureBrandProductListNOTNULL() = runTest {
-        // given brand name
         // when get the products of brand
         productViewModel.getProduct()
-
-        val result = productViewModel.productList.first().brandProducts
+        val result = productViewModel.productState.first().brandProducts
 
         // assert that brandList is not null
         Assert.assertThat(result.toList(), `is`(notNullValue()))
@@ -78,38 +80,42 @@ class ProductViewModelTest {
     }
 
     @Test
-    fun updateSliderValue() {
+    fun updateSliderValue_newValue_checkUpdatedValue() {
+        // given new slider value
+        val newSliderValue = 3f
+
+        // when update the slider value
+        productViewModel.updateSliderValue(newSliderValue)
+
+        // then check that slider value is updated
+        val result = productViewModel.productState.value.sliderValue
+        Assert.assertThat(result, `is`(newSliderValue))
     }
 
     @Test
     fun onFavourite_addProductToFav_assertTrue() = runTest {
         // given product not in the wish list
         val product = products[0]
-        productViewModel.productList.first().brandProducts.add(product)
+        productViewModel.productState.first().brandProducts.add(product)
 
         // when add product to favourite List
         productViewModel.onFavourite(
-            products.indexOf(
-                product
-            )
+            products.indexOf(product)
         )
         // assert that it added on wishList
-        assertEquals(true, productViewModel.productList.first().brandProducts[0].isFavourite)
+        assertEquals(true, productViewModel.productState.first().brandProducts[0].isFavourite)
     }
 
     @Test
-    fun onFavourite_removeProductToFav_assertTrue() = runTest {
+    fun onFavourite_removeProductToFav_assertFalse() = runTest {
         // given product is in the wish list
         val product = products[1]
-        productViewModel.productList.first().brandProducts.add(product)
+        productViewModel.productState.first().brandProducts.add(product)
 
-        // when remove product to favourite List
-        productViewModel.onFavourite(
-            products.indexOf(
-                product
-            )
-        )
+        // when remove product from favourite List
+        productViewModel.onFavourite(0)
+
         // assert that it removed from wishList
-        assertEquals(true, productViewModel.productList.first().brandProducts[1].isFavourite)
+        assertEquals(false, productViewModel.productState.first().brandProducts[0].isFavourite)
     }
 }
