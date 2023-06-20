@@ -12,21 +12,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
+import com.example.shopify.feature.Graph
+import com.example.shopify.feature.navigation_bar.NavigationBarGraph
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.common.ConfirmationDialog
 import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.state.ScreenState
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.OrderUIEvent
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.OrderViewModel
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.CheckoutViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun CheckoutScreen(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    viewModel: OrderViewModel,
-    navigateTo: (String) -> Unit,
+    viewModel: CheckoutViewModel,
+    navigatePopUpTo: (route: String, pop: String?) -> Unit,
     back: () -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
@@ -48,9 +50,10 @@ fun CheckoutScreen(
         viewModel.uiEvent.onEach {
             when (it) {
                 OrderUIEvent.NavigateToCreditCardInfoScreen ->
-                    navigateTo(CartGraph.CREDIT_CARD_INFO)
+                    navigatePopUpTo(CartGraph.CREDIT_CARD_INFO, null)
 
-                OrderUIEvent.NavigateToOrdersScreen -> {}
+                OrderUIEvent.NavigateToOrdersScreen ->
+                    navigatePopUpTo(Graph.ORDERS, NavigationBarGraph.CART)
             }
         }.launchIn(this)
     })
@@ -59,7 +62,7 @@ fun CheckoutScreen(
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> CheckoutContent(
             state = state,
-            navigateTo = navigateTo,
+            navigateTo = { navigatePopUpTo(it, null) },
             back = back,
             onEvent = viewModel::onCheckoutEvent
         )

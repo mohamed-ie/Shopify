@@ -155,8 +155,8 @@
     <string name="not_selected">Not selected yet</string>
     <string name="edit_info">Edit info</string>
     <string name="security_information">Security Information</string>
-    <string name="change_password">Change password</string>
-    <string name="change_phone_number">Change phone number</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_phone_number">Change Phone Number</string>
     <string name="this_phone_number_is_your_primary_phone_number_and_is_unique_across_shopify">This phone number is your primary phone number and is unique across shopify</string>
     <string name="ship_address">Shipping Address</string>
     <string name="cash_on_delivary">Cash On Delivery</string>
@@ -177,5 +177,7 @@
     <string name="submit_review">Submit Review</string>
     <string name="add_rating">Add rating</string>
     <string name="please_select_shipping_address">Please select Shipping Address</string>
+    <string name="shopify">Shopify</string>
+    <string name="edit_information">Edit Information</string>
 
 </resources>

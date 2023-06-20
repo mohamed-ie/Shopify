@@ -1,6 +1,5 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.apollographql.apollo3.api.ApolloResponse
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
@@ -34,7 +33,7 @@ interface ShopifyMapper {
     fun map(error: GraphError): UIError
     fun mapToPaymentCompletionAvailability(result: GraphResponse<Storefront.Mutation>): ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability
     fun mapToPaymentResult(result: GraphCallResult.Success<Storefront.QueryRoot>): ShopifyCreditCardPaymentStrategy.PaymentResult
-    fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean
+    fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): String?
     fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean
     fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product

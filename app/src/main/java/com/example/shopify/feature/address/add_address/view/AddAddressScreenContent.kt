@@ -3,6 +3,7 @@ package com.example.shopify.feature.address.add_address.view
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
+import com.example.shopify.feature.navigation_bar.common.component.RemoteErrorHeader
 import com.example.shopify.feature.navigation_bar.common.component.ShopifyTextField
 import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
 import com.example.shopify.theme.ShopifyTheme
@@ -48,8 +50,13 @@ fun AddAddressScreenContent(
     onEvent: (AddAddressEvent) -> Unit,
     back: () -> Unit
 ) {
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxSize()) {
         NamedTopAppBar(back = back)
+
+        RemoteErrorHeader(error = state.remoteError?.asString())
 
         Column(
             modifier = Modifier
@@ -213,8 +220,9 @@ fun AddAddressScreenContent(
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onEvent(AddAddressEvent.Save)},
-                shape = MaterialTheme.shapes.small
+                onClick = { onEvent(AddAddressEvent.Save) },
+                shape = MaterialTheme.shapes.small,
+                enabled = !state.isLoading
             ) {
                 Text(
                     modifier = Modifier.shopifyLoading(state.isLoading),
@@ -274,7 +282,7 @@ fun PreviewAddAddressScreenContent() {
                 TextFieldState("Smith"),
                 TextFieldState("1-123-456-7890"),
 
-                ), {},{}
+                ), {}, {}
         )
     }
 
@@ -284,6 +292,6 @@ fun PreviewAddAddressScreenContent() {
 @Composable
 fun PreviewAddAddressScreenEmptyContent() {
     ShopifyTheme {
-        AddAddressScreenContent(AddAddressState(), {},{})
+        AddAddressScreenContent(AddAddressState(), {}, {})
     }
 }

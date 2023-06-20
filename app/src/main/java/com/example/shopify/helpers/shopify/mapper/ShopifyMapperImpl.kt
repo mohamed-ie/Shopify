@@ -213,8 +213,11 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         } ?: listOf()
     }
 
-    override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean =
-        response.hasErrors
+    override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): String? =
+        response.run {
+            data?.customerAddressCreate?.customerUserErrors?.getOrNull(0)?.message
+                ?: errors.getOrNull(0)?.message()
+        }
 
     override fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean {
         return response.data?.customerAddressDelete?.customerUserErrors?.isEmpty() ?: false

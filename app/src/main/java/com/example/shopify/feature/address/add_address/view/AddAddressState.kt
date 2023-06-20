@@ -1,6 +1,7 @@
 package com.example.shopify.feature.address.add_address.view
 
 import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
+import com.example.shopify.helpers.UIText
 
 data class AddAddressState(
     val street: TextFieldState = TextFieldState(),
@@ -15,4 +16,5 @@ data class AddAddressState(
     val organization: TextFieldState = TextFieldState(),
     val isHomeAddress: Boolean = true,
     val isLoading: Boolean = false,
+    val remoteError: UIText? = null
 )

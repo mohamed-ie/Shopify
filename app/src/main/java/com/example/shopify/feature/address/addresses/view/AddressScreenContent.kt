@@ -45,6 +45,7 @@ fun AddressesScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 itemsIndexed(addresses) { index, address ->
+                    Spacer(modifier = Modifier.height(8.dp))
                     MyAccountAddressCard(
                         address = address.formattedArea,
                         phone = address.phone,

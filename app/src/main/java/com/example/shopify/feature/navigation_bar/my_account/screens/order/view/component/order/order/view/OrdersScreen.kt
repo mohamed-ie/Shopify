@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import com.example.shopify.feature.navigation_bar.common.ErrorScreen
 import com.example.shopify.feature.navigation_bar.common.LoadingScreen
 import com.example.shopify.feature.navigation_bar.common.state.ScreenState
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.OrderViewModel
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.CheckoutViewModel
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.ReviewUIEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.reviews.view.components.ReviewInputBottomSheet
@@ -19,7 +19,7 @@ import com.example.shopify.ui.screen.order.OrdersScreenContent
 
 @Composable
 fun OrdersScreen(
-    viewModel: OrderViewModel,
+    viewModel: CheckoutViewModel,
     navigateTo: (String) -> Unit,
     back: () -> Unit
 ) {

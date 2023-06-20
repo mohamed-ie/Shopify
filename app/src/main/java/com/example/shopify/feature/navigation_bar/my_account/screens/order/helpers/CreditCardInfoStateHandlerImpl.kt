@@ -35,12 +35,12 @@ class CreditCardInfoStateHandlerImpl @Inject constructor() : CreditCardInfoState
 
     override fun isValid(): Boolean {
         validate()
-        return lastNameState.isError
-                && firstNameState.isError
-                && cardNumberState.isError
-                && expireMonthState.isError
-                && expireYearState.isError
-                && ccvState.isError
+        return !lastNameState.isError
+                && !firstNameState.isError
+                && !cardNumberState.isError
+                && !expireMonthState.isError
+                && !expireYearState.isError
+                && !ccvState.isError
     }
 
     private fun validate() {
@@ -73,6 +73,9 @@ class CreditCardInfoStateHandlerImpl @Inject constructor() : CreditCardInfoState
     override fun updateCCV(newValue: String) =
         stateUpdater.updateCCV(newValue)
 
+    override fun updateRemoteError(remoteError: UIText.DynamicString?) {
+        _creditCardInfoState.update { it.copy(remoteError = remoteError) }
+    }
 
     private inner class StateUpdater {
         private val nameRegex by lazy { Regex("[a-zA-Z]*") }

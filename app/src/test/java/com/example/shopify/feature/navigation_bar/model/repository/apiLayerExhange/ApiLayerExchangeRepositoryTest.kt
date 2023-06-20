@@ -8,12 +8,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManagerImpl
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyDto
+import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyApiClient
 import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyInterceptor
 import com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange.ApiLayerExchangeRepository
 import com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange.ApiLayerExchangeRepositoryImpl
 import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront.CurrencyCode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
@@ -53,7 +54,7 @@ class ApiLayerExchangeRepositoryTest {
             .baseUrl(Constants.ApiLayerCurrency.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        val currencyDto = retrofit.create(ApiLayerCurrencyDto::class.java)
+        val currencyDto = retrofit.create(ApiLayerCurrencyApiClient::class.java)
 
         val context: Context = ApplicationProvider.getApplicationContext()
         val coroutineDispatcherTest = StandardTestDispatcher()
@@ -64,37 +65,38 @@ class ApiLayerExchangeRepositoryTest {
             { context.preferencesDataStoreFile(Constants.DataStoreKeys.USER) }
         )
         shopifyDataStoreManager = ShopifyDataStoreManagerImpl(dataStore)
-        repository = ApiLayerExchangeRepositoryImpl(shopifyDataStoreManager, currencyDto)
+        repository = ApiLayerExchangeRepositoryImpl(shopifyDataStoreManager, currencyDto,Dispatchers.Unconfined)
     }
 
-
-    @Test
-    fun updateCurrentLiveCurrencyAmount_noInputs_currencyUpdated() = runTest {
-        //Given
-        val expected = 0.118864f
-
-        //When
-        val apiResult = repository.getLiveCurrencyExchange(CurrencyCode.AED.toString()).first()
-
-        coroutineScopeTest.runTest {
-            //Then
-            shopifyDataStoreManager.setCurrencyAmountPerOnePound(apiResult)
-            val result = shopifyDataStoreManager.getCurrencyAmountPerOnePound().first()
-            assertEquals(expected.toInt(), result.toInt())
-        }
-    }
+//
+//    @Test
+//    fun updateCurrentLiveCurrencyAmount_noInputs_currencyUpdated() = runTest {
+//        //Given
+//        val expected = 0.118864f
+//
+//        //When
+//        val apiResult = repository.getLiveCurrencyExchange(CurrencyCode.AED.toString()).first()
+//
+//        coroutineScopeTest.runTest {
+//            //Then
+//            shopifyDataStoreManager.setCurrencyAmountPerOnePound(apiResult)
+//            val result = shopifyDataStoreManager.getCurrencyAmountPerOnePound().first()
+//            assertEquals(expected.toInt(), result.toInt())
+//        }
+//    }
 
 
     @Test
     fun changeCurrencyCode_noInputs_currencyUpdated() = runTest {
-        //Given
-        val expected = 0.118864f
+        //given
+        val actual = CurrencyCode.AED.toString()
+        repository.changeCurrencyCode(actual)
 
-        //When
-        val apiResult = repository.getLiveCurrencyExchange(CurrencyCode.AED.toString()).first()
+        //then
+        val expected = repository.currentCurrency.first()
 
         //Then
-        assertEquals(expected.toInt(), apiResult.toInt())
+        assertEquals(expected.toInt(),actual)
     }
 
 

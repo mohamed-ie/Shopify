@@ -1,16 +1,21 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order
 
 import androidx.lifecycle.viewModelScope
+import com.example.shopify.R
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.ReviewState
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutState
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OrderViewModel @Inject constructor(
+class CheckoutViewModel @Inject constructor(
     private val creditCardInfoStateHandler: CreditCardInfoStateHandler,
     private val repository: ShopifyRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
@@ -68,9 +73,25 @@ class OrderViewModel @Inject constructor(
             is CreditCardInfoEvent.CCVChanged ->
                 creditCardInfoStateHandler.updateCCV(event.newValue)
 
-            CreditCardInfoEvent.Checkout -> {}
-//                if (creditCardInfoStateHandler.isValid())
-//                    processPayment()
+            CreditCardInfoEvent.Checkout ->
+                if (creditCardInfoStateHandler.isValid())
+                    processCreditCardPayment()
+        }
+    }
+
+    private fun processCreditCardPayment() = viewModelScope.launch(defaultDispatcher) {
+        toLoadingScreenState()
+        when (val resource = repository.completeOrder(paymentPending = false)) {
+            is Resource.Error -> toErrorScreenState()
+            is Resource.Success -> {
+                creditCardInfoStateHandler.updateRemoteError(resource.data?.let {
+                    UIText.DynamicString(
+                        it
+                    )
+                })
+                _uiEvent.emit(OrderUIEvent.NavigateToOrdersScreen)
+                toStableScreenState()
+            }
         }
     }
 
@@ -141,6 +162,7 @@ class OrderViewModel @Inject constructor(
 
             CheckoutEvent.HideInvoiceDialog -> {
                 _checkoutState.update { it.copy(isInvoiceDialogVisible = false) }
+            }
         }
     }
 
@@ -159,14 +181,15 @@ class OrderViewModel @Inject constructor(
             }
         }
 
-    private fun placeOrder() {
+    private fun placeOrder() = viewModelScope.launch {
         when (_checkoutState.value.selectedPaymentMethod) {
             PaymentMethod.CashOnDelivery -> processCashOnDelivery()
-            PaymentMethod.CreditCard -> completePaymentWithCreditCard()
+            PaymentMethod.CreditCard -> _uiEvent.emit(OrderUIEvent.NavigateToCreditCardInfoScreen)
+            PaymentMethod.Shopify -> completePaymentWithShopify()
         }
     }
 
-    private fun completePaymentWithCreditCard() = viewModelScope.launch(defaultDispatcher) {
+    private fun completePaymentWithShopify() = viewModelScope.launch(defaultDispatcher) {
         toLoadingScreenState()
         when (val resource = repository.sendCompletePayment()) {
             is Resource.Error -> toErrorScreenState()
@@ -188,14 +211,12 @@ class OrderViewModel @Inject constructor(
         when (val resource = repository.completeOrder(paymentPending = true)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {
-                _checkoutState.update {
-                    it.copy(remoteError = resource.data?.let { it1 ->
-                        UIText.DynamicString(
-                            it1
-                        )
-                    })
+                if (resource.data == null)
+                    _uiEvent.emit(OrderUIEvent.NavigateToOrdersScreen)
+                else {
+                    _checkoutState.update { it.copy(remoteError = UIText.DynamicString(resource.data)) }
+                    toStableScreenState()
                 }
-                toStableScreenState()
             }
         }
     }

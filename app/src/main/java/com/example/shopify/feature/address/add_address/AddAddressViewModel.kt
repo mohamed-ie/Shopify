@@ -1,14 +1,20 @@
 package com.example.shopify.feature.address.add_address
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.address.add_address.view.AddAddressEvent
 import com.example.shopify.feature.address.add_address.view.AddAddressState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIText
+import com.example.shopify.helpers.handle
 import com.example.shopify.helpers.validator.TextFieldStateValidator
 import com.shopify.buy3.Storefront
+import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,7 +26,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AddAddressViewModel @Inject constructor(
     private val textFieldStateValidator: TextFieldStateValidator,
-    private val repository: ShopifyRepository
+    private val repository: ShopifyRepository,
+    private val savedStateHandle: SavedStateHandle,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
     private val _state = MutableStateFlow(AddAddressState())
     val state = _state.asStateFlow()
@@ -28,9 +36,19 @@ class AddAddressViewModel @Inject constructor(
     private val _back = MutableSharedFlow<Boolean>()
     val back = _back.asSharedFlow()
 
+    private val addressId = savedStateHandle.get<String>("addressId")
+
     init {
         toStableScreenState()
+        addressId?.let {
+            loadAddress()
+        }
     }
+
+    private fun loadAddress() = viewModelScope.launch(defaultDispatcher){
+
+    }
+
 
     fun onEvent(event: AddAddressEvent) {
         when (event) {
@@ -110,13 +128,20 @@ class AddAddressViewModel @Inject constructor(
             AddAddressEvent.WorkAddressSelected ->
                 _state.update { it.copy(isHomeAddress = false) }
 
-            AddAddressEvent.Save -> {
+            is AddAddressEvent.Save -> {
                 updateFields()
                 if (isFieldsValid())
-                    save()
+                    addressId?.let {
+                        edit(it)
+                    } ?: save()
             }
 
         }
+    }
+
+    private fun edit(addressId: String) = viewModelScope.launch(defaultDispatcher) {
+        toLoadingScreenState()
+        handleAddressError(repository.updateAddress(ID(addressId), getAddress()))
     }
 
     private fun updateFields() {
@@ -150,31 +175,32 @@ class AddAddressViewModel @Inject constructor(
 
     }
 
-    private fun save() {
+    private fun save() = viewModelScope.launch {
         toLoadingScreenState()
-        val address = Storefront.MailingAddressInput().apply {
-            this.address1 = state.value.street.value
-            this.address2 = state.value.apartment.value
-            this.province = state.value.state.value
-            this.city = state.value.city.value
-            this.country = state.value.country.value
-            this.firstName = state.value.firstName.value
-            this.lastName = state.value.lastName.value
-            this.phone = state.value.phone.value
-            this.zip = state.value.zip.value
-            this.company = state.value.organization.value
-        }
-        viewModelScope.launch {
-            when (repository.saveAddress(address)) {
-                is Resource.Error -> {
-                    toErrorScreenState()
-                }
-
-                is Resource.Success -> {
-                    _back.emit(true)
-                }
-            }
-        }
+        handleAddressError(repository.saveAddress(getAddress()))
     }
 
+
+    private fun handleAddressError(resource: Resource<String?>) = resource.handle(
+        onError = ::toErrorScreenState,
+        onSuccess = { data ->
+            if (data == null)
+                suspend { _back.emit(true) }
+            else
+                _state.update { it.copy(remoteError = UIText.DynamicString(data)) }
+            toStableScreenState()
+        })
+
+    private fun getAddress() = Storefront.MailingAddressInput().apply {
+        this.address1 = state.value.street.value
+        this.address2 = state.value.apartment.value
+        this.province = state.value.state.value
+        this.city = state.value.city.value
+        this.country = state.value.country.value
+        this.firstName = state.value.firstName.value
+        this.lastName = state.value.lastName.value
+        this.phone = state.value.phone.value
+        this.zip = state.value.zip.value
+        this.company = state.value.organization.value
+    }
 }
