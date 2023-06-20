@@ -30,7 +30,7 @@ fun PaymentMethodChooser(paymentStatue: Storefront.OrderFinancialStatus) {
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(Color.White)
     ) {
-        if (paymentStatue == Storefront.OrderFinancialStatus.PENDING) {
+        if (paymentStatue != Storefront.OrderFinancialStatus.PAID) {
             PaymentElement(payMethod = PaymentMethod.CashOnDelivery)
         } else {
             PaymentElement(payMethod = PaymentMethod.CreditCard)
@@ -58,6 +58,6 @@ fun PaymentElement(payMethod: PaymentMethod) {
 @Composable
 fun PreviewPaymentMethodChooser() {
     ShopifyTheme() {
-        PaymentMethodChooser(Storefront.OrderFinancialStatus.PENDING)
+        PaymentMethodChooser(Storefront.OrderFinancialStatus.PAID)
     }
 }

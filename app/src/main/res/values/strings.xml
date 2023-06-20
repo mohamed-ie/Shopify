@@ -143,7 +143,7 @@
     <string name="results">Results:</string>
     <string name="credit_card">Credit Card</string>
     <string name="cash_on_delivery">Cash on Delivery</string>
-    <string name="order_id">Order ID</string>
+    <string name="order_id">Order Number:</string>
     <string name="placed_on_date">Placed On</string>
     <string name="view_details">View Details</string>
     <string name="review_seller">Review Seller</string>
@@ -169,5 +169,12 @@
     <string name="phone_number">Phone number</string>
     <string name="change_name">Change Name</string>
     <string name="name_changed">Name changed</string>
+    <string name="write_a_product_review">Write a product review</string>
+    <string name="add_a_title">Add a title</string>
+    <string name="what_would_you_like_to_highlight">What would you like to highlight?</string>
+    <string name="add_a_review">Add a review</string>
+    <string name="reivew_place_holder">How was your experience with the product? What should others know before buying? How did you use the product?</string>
+    <string name="submit_review">Submit Review</string>
+    <string name="add_rating">Add rating</string>
 
 </resources>

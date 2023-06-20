@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order
 
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.MailingAddress
 import com.shopify.buy3.Storefront.MoneyV2
@@ -16,6 +17,8 @@ data class Order(
     val totalPrice: MoneyV2 = MoneyV2(),
     val billingAddress: MailingAddress? = MailingAddress(),
     val lineItems: List<LineItems> = listOf(),
-    val fulfillment: Storefront.OrderFulfillmentStatus = Storefront.OrderFulfillmentStatus.ON_HOLD,
-    val financialStatus: Storefront.OrderFinancialStatus = Storefront.OrderFinancialStatus.PAID
+    val fulfillment: OrderItemState = OrderItemState.Delivered(),
+    val financialStatus: Storefront.OrderFinancialStatus = Storefront.OrderFinancialStatus.PAID,
+    val firstName:String = "",
+    val lastName:String = ""
 ) : Serializable

@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.common.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -19,14 +20,21 @@ fun RatingBar(
     rating: Double = 0.0,
     stars: Int = 5,
     filedStarsColor: Color = Color.Yellow,
-    nonFiledStarsColor: Color = MaterialTheme.shopifyColors.ServerColor
+    nonFiledStarsColor: Color = MaterialTheme.shopifyColors.ServerColor,
+    selectedReview:((Int)->Unit)? = null
 ) {
     val filledStars = kotlin.math.floor(rating).toInt()
     val unfilledStars = (stars - kotlin.math.ceil(rating)).toInt()
     val halfStar = !(rating.rem(1).equals(0.0))
     Row(modifier = modifier) {
-        repeat(filledStars) {
-            Icon(imageVector = Icons.Rounded.Star, contentDescription = null, tint = filedStarsColor)
+        repeat(filledStars) {index ->
+            Icon(
+                imageVector = Icons.Rounded.Star,
+                contentDescription = null,
+                tint = filedStarsColor,
+                modifier = Modifier
+                    .clickable { selectedReview?.let { it(index) } }
+            )
         }
         if (halfStar) {
             Box {
@@ -48,6 +56,8 @@ fun RatingBar(
                 imageVector = Icons.Rounded.Star,
                 contentDescription = null,
                 tint = nonFiledStarsColor,
+                modifier = Modifier
+                    .clickable { selectedReview?.let { index -> index(it + filledStars+1) } }
             )
         }
     }

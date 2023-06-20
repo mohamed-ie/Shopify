@@ -35,6 +35,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.cartElevation
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.getFullAddress
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.theme.shopifyColors
 import com.shopify.buy3.Storefront
@@ -174,7 +175,7 @@ fun PreviewOrderDetailsInfo() {
                         description = "The forefather of the Vans family, the Vans Authentic was introduced in 1966 and nearly 4 decades later is still going strong, its popularity extending from the original fans - skaters and surfers to all sorts. The Vans Authentic is constructed from canvas and Vans' signature waffle outsole construction."
                     )
                 ),
-                fulfillment = Storefront.OrderFulfillmentStatus.FULFILLED,
+                fulfillment = OrderItemState.Delivered(),
                 financialStatus = Storefront.OrderFinancialStatus.PAID
             )
         )

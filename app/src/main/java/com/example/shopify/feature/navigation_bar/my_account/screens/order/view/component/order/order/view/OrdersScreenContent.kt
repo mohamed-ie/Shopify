@@ -50,12 +50,13 @@ import org.joda.time.DateTime
 fun OrdersScreenContent(
     orders: List<Order>?,
     back: () -> Unit,
-    viewOrderDetails: (Int) -> Unit
+    viewOrderDetails: (Int) -> Unit,
+    viewAddReview: (Int, Int) -> Unit,
 ) {
     Scaffold(topBar = { NamedTopAppBar(back = back) }) { innerPadding ->
         if (orders == null)
             NoOrders()
-        else
+        else {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -69,10 +70,15 @@ fun OrdersScreenContent(
                 itemsIndexed(orders) { index, order ->
                     OrderCard(
                         order = order,
-                        viewDetails = { viewOrderDetails(index) }
+                        viewDetails = { viewOrderDetails(index) },
+                        addReview = { lineIndex ->
+                            viewAddReview(index, lineIndex)
+                        }
                     )
                 }
             }
+
+        }
     }
 }
 
@@ -242,7 +248,7 @@ fun PreviewOrderContent() {
                 ),
 
                 ),
-            {}, {}
+            {}, {}, { _, _ -> }
         )
     }
 }

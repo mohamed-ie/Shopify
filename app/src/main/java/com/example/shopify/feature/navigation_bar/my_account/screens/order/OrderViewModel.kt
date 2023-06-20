@@ -7,10 +7,14 @@ import com.example.shopify.feature.navigation_bar.model.repository.shopify.Shopi
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.ReviewState
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutState
+import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.firestore.mapper.encodeProductId
+import com.shopify.buy3.Storefront
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +29,7 @@ import javax.inject.Inject
 class OrderViewModel @Inject constructor(
     private val creditCardInfoStateHandler: CreditCardInfoStateHandler,
     private val defaultDispatcher: CoroutineDispatcher,
-    private val repository: ShopifyRepository
+    private val repository: ShopifyRepository,
 ) : BaseScreenViewModel() {
     val creditCardInfoState = creditCardInfoStateHandler.creditCardInfoState
     private val _uiEvent = MutableSharedFlow<OrderUIEvent>()
@@ -36,6 +40,9 @@ class OrderViewModel @Inject constructor(
     private var _orderList = MutableStateFlow<List<Order>>(emptyList())
     val orderList = _orderList.asStateFlow()
     var orderIndex: Int = 0
+
+    private val _reviewState = MutableStateFlow(ReviewState())
+    val reviewState = _reviewState.asStateFlow()
 
     init {
         getOrders()
@@ -68,6 +75,56 @@ class OrderViewModel @Inject constructor(
             CreditCardInfoEvent.Checkout -> {}
 //                if (creditCardInfoStateHandler.isValid())
 //                    processPayment()
+        }
+    }
+
+    fun onReviewEvent(event: ReviewUIEvent) {
+        when (event) {
+            is ReviewUIEvent.SendContent ->
+                _reviewState.update { it.copy(reviewContent = event.value) }
+
+            is ReviewUIEvent.SendRate ->
+                _reviewState.update { it.copy(rating = event.value.toDouble()) }
+
+            is ReviewUIEvent.SendTitle ->
+                _reviewState.update { it.copy(title = event.value) }
+
+            ReviewUIEvent.Submit ->
+                saveReview()
+            ReviewUIEvent.Close ->
+                _reviewState.value = ReviewState()
+
+            is ReviewUIEvent.View -> {
+                _reviewState.update { it.copy(visible = true, orderIndex = event.orderIndex, lineIndex = event.lineIndex) }
+            }
+
+        }
+    }
+
+
+    private fun saveReview() {
+        viewModelScope.launch {
+            _reviewState.update { it.copy(isLoading = true) }
+            _reviewState.value.let {
+                _orderList.value[it.orderIndex].let { order ->
+                    order.lineItems[it.lineIndex].let { lineItems ->
+                        when (repository.setProductReview(
+                            lineItems.id, Review(
+                                reviewer = order.firstName + " " + order.lastName,
+                                rate = it.rating,
+                                review = it.title,
+                                description = it.reviewContent
+                            )
+                        )) {
+                            is Resource.Error -> toErrorScreenState()
+                            is Resource.Success -> {
+                                onReviewEvent(ReviewUIEvent.Close)
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -137,7 +194,7 @@ class OrderViewModel @Inject constructor(
             repository.getOrders().collect {
                 when (it) {
                     is Resource.Success -> {
-                        _orderList.emit(it.data)
+                        _orderList.emit(it.data.reversed())
                         toStableScreenState()
                     }
 

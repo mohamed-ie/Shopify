@@ -17,6 +17,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
@@ -174,8 +175,10 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
         return response.data?.customer?.orders?.edges?.map {
             Order(
+                firstName = response.data?.customer?.firstName ?: "",
+                lastName = response.data?.customer?.lastName ?: "",
                 financialStatus = it.node.financialStatus,
-                fulfillment = it.node.fulfillmentStatus,
+                fulfillment = mapFulfillmentToOrderItemState(it.node.fulfillmentStatus),
                 orderNumber = it.node.orderNumber,
                 processedAt = it.node.processedAt,
                 subTotalPrice = it.node.subtotalPrice,
@@ -317,6 +320,15 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
 
     override fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String? =
         response.data?.cartBuyerIdentityUpdate?.userErrors?.getOrNull(0)?.message
+
+
+    private fun mapFulfillmentToOrderItemState(fulfillment: Storefront.OrderFulfillmentStatus) :OrderItemState =
+        when(fulfillment){
+            Storefront.OrderFulfillmentStatus.FULFILLED -> OrderItemState.Delivered()
+            Storefront.OrderFulfillmentStatus.UNFULFILLED -> OrderItemState.Progress()
+            else ->{
+                OrderItemState.Canceled()}
+        }
 
 
     private operator fun Storefront.MoneyV2?.minus(money: Storefront.MoneyV2?): Storefront.MoneyV2? {

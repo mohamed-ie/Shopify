@@ -6,7 +6,7 @@ import com.shopify.graphql.support.ID
 
 interface FireStoreManager {
     suspend fun getReviewsByProductId(id: ID, reviewsCount: Int? = null): Resource<List<Review>>
-    suspend fun setProductReviewByProductId(productId: ID, review: Review)
+    suspend fun setProductReviewByProductId(productId: ID, review: Review):Resource<Unit>
     suspend fun updateCurrency(customerId: String, currency: String)
     suspend fun getCurrency(customerId: String):  Resource<String>
     suspend fun updateWishList(customerId: String, productId: ID)
