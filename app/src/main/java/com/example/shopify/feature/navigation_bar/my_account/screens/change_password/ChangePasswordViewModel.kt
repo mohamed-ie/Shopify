@@ -3,6 +3,7 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.change_pas
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.R
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIText
@@ -18,8 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChangePasswordViewModel @Inject constructor(
-    val repository: ShopifyRepository,
-    val defaultDispatcher: CoroutineDispatcher
+    private val repository: ShopifyRepository,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChangePasswordState())
@@ -27,7 +28,6 @@ class ChangePasswordViewModel @Inject constructor(
 
     private val _back = MutableSharedFlow<Boolean>()
     val back = _back.asSharedFlow()
-
 
     fun onEvent(event: ChangePasswordEvent) {
         when (event) {
@@ -48,7 +48,7 @@ class ChangePasswordViewModel @Inject constructor(
                     _state.update { it.copy(remoteError = null) }
                     if (confirmPassword.value == password.value && password.value.isNotBlank())
                         changePassword()
-                     else
+                    else
                         _state.update { it.copy(remoteError = UIText.StringResource(R.string.passwords_dont_match)) }
                 }
         }

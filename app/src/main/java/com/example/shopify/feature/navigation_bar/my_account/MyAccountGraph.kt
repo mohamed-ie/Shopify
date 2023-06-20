@@ -2,7 +2,8 @@ package com.example.shopify.feature.navigation_bar.my_account
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.twotone.Person
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -67,7 +68,8 @@ object MyAccountGraph {
     object MyAccount : NavigationBarScreen(
         route = "MY_ACCOUNT",
         name = R.string.my_account,
-        icon = Icons.Rounded.Person
+        unSelectedIcon = Icons.TwoTone.Person,
+        selectedIcon = Icons.Outlined.Person
     )
 
     const val CHANGE_PASSWORD = "CHANGE_PASSWORD"

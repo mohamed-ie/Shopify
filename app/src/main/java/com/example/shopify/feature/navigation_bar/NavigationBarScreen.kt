@@ -6,5 +6,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 open class NavigationBarScreen(
     val route: String,
     @StringRes val name: Int,
-    val icon: ImageVector
+    val unSelectedIcon: ImageVector,
+    val selectedIcon : ImageVector
 )

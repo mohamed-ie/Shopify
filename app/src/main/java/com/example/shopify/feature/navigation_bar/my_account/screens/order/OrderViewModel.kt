@@ -1,7 +1,9 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order
 
 import androidx.lifecycle.viewModelScope
+import com.example.shopify.R
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
@@ -11,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutState
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,8 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val creditCardInfoStateHandler: CreditCardInfoStateHandler,
-    private val defaultDispatcher: CoroutineDispatcher,
-    private val repository: ShopifyRepository
+    private val repository: ShopifyRepository,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
     val creditCardInfoState = creditCardInfoStateHandler.creditCardInfoState
     private val _uiEvent = MutableSharedFlow<OrderUIEvent>()
@@ -33,6 +36,7 @@ class OrderViewModel @Inject constructor(
 
     private val _checkoutState = MutableStateFlow(CheckoutState(Cart()))
     val checkoutState = _checkoutState.asStateFlow()
+
     private var _orderList = MutableStateFlow<List<Order>>(emptyList())
     val orderList = _orderList.asStateFlow()
     var orderIndex: Int = 0
@@ -76,9 +80,19 @@ class OrderViewModel @Inject constructor(
             is CheckoutEvent.PaymentMethodChanged ->
                 _checkoutState.update { it.copy(selectedPaymentMethod = event.method) }
 
-            CheckoutEvent.PlaceOrder -> placeOrder()
-            CheckoutEvent.HideInvoiceDialog ->
+            CheckoutEvent.PlaceOrder ->
+                if (_checkoutState.value.cart.address.id == null)
+                    _checkoutState.update {
+                        it.copy(remoteError = UIText.StringResource(R.string.please_select_shipping_address))
+                    }
+                else {
+                    _checkoutState.update { it.copy(remoteError = null) }
+                    placeOrder()
+                }
+
+            CheckoutEvent.HideInvoiceDialog -> {
                 _checkoutState.update { it.copy(isInvoiceDialogVisible = false) }
+            }
         }
     }
 
@@ -90,7 +104,7 @@ class OrderViewModel @Inject constructor(
                     _checkoutState.update {
                         it.copy(
                             cart = resource.data,
-                            remoteError = resource.data.error
+                            remoteError = resource.data.error?.let { it1 -> UIText.DynamicString(it1) }
                         )
                     }
                 toStableScreenState()
@@ -112,7 +126,7 @@ class OrderViewModel @Inject constructor(
                 _checkoutState.update {
                     it.copy(
                         invoiceUrl = resource.data?.first,
-                        remoteError = resource.data?.second,
+                        remoteError = resource.data?.second?.let { it1 -> UIText.DynamicString(it1) },
                         isInvoiceDialogVisible = resource.data?.first != null
                     )
                 }
@@ -126,7 +140,13 @@ class OrderViewModel @Inject constructor(
         when (val resource = repository.completeOrder(paymentPending = true)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {
-                _checkoutState.update { it.copy(remoteError = resource.data) }
+                _checkoutState.update {
+                    it.copy(remoteError = resource.data?.let { it1 ->
+                        UIText.DynamicString(
+                            it1
+                        )
+                    })
+                }
                 toStableScreenState()
             }
         }

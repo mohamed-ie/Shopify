@@ -1,7 +1,8 @@
 package com.example.shopify.feature.navigation_bar.cart
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ShoppingCart
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.twotone.ShoppingCart
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,5 +57,10 @@ object CartGraph {
     const val CREDIT_CARD_INFO = "CREDIT_CARD"
 
     object Cart :
-        NavigationBarScreen(route = "CART", name = R.string.cart, icon = Icons.Rounded.ShoppingCart)
+        NavigationBarScreen(
+            route = "CART",
+            name = R.string.cart,
+            unSelectedIcon = Icons.TwoTone.ShoppingCart,
+            selectedIcon = Icons.Outlined.ShoppingCart
+        )
 }

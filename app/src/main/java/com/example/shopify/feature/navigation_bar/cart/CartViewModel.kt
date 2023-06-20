@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartLineState
@@ -27,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CartViewModel @Inject constructor(
     private val repository: ShopifyRepository,
-    private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
     private val _state = MutableStateFlow(Cart())
     val state = _state.asStateFlow()
@@ -37,12 +38,13 @@ class CartViewModel @Inject constructor(
 
     private val _couponState = MutableStateFlow(CartCouponState())
     val couponState = _couponState.asStateFlow()
+    init {
+        checkIsLoggedIn()
+    }
 
     fun loadCart() = viewModelScope.launch(defaultDispatcher) {
-        //(repository as? ShopifyRepositoryImpl)?.fireStoreManager?.getCurrentCartId("mohammedie98@gmail.com")
         toLoadingScreenState()
         handleCartResource(repository.getCart())
-        checkIsLoggedIn()
     }
 
     private fun handleCartResource(resource: Resource<Cart?>) =

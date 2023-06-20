@@ -6,5 +6,4 @@ data class MyAccountState(
     val currency: String = "EGP",
     val isSignOutDialogVisible: Boolean = false,
     val isRadioGroupModalBottomSheetVisible: Boolean = false
-
 )
