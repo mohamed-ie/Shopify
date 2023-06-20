@@ -2,7 +2,7 @@ package com.example.shopify.feature.navigation_bar.productDetails.details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.data.repository.shopify.FakeShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.viewModel.ProductDetailsViewModel
 import junit.framework.Assert.assertEquals
@@ -24,7 +24,7 @@ class ProductDetailsViewModelTest {
 
     @Before
     fun init() {
-        val repository: ShopifyRepository = FakeShopifyRepository()
+        val repository: ShopifyRepository = FakeShopifyRepositoryImpl()
         viewModel = ProductDetailsViewModel(
             repository = repository,
             SavedStateHandle()

@@ -1,10 +1,8 @@
 package com.example.shopify.feature.navigation_bar.wishList
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.data.repository.shopify.FakeShopifyRepository
+import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.viewModel.ProductDetailsViewModel
 import com.example.shopify.feature.wishList.viewModel.WishListViewModel
 import com.shopify.graphql.support.ID
 import junit.framework.Assert.assertEquals
@@ -26,7 +24,7 @@ class WishListViewModelTest {
 
     @Before
     fun init() {
-        val repository: ShopifyRepository = FakeShopifyRepository()
+        val repository: ShopifyRepository = FakeShopifyRepositoryImpl()
         viewModel = WishListViewModel(
             repository = repository
         )
