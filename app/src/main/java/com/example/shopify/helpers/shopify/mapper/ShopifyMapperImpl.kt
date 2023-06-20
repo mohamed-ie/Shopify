@@ -1,6 +1,5 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.apollographql.apollo3.api.ApolloResponse
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
@@ -22,17 +21,15 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.helpers.UIError
-import com.example.shopify.type.CurrencyCode
 import com.example.shopify.helpers.UIText
+import com.example.shopify.type.CurrencyCode
 import com.shopify.buy3.GraphCallResult
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.ImageConnection
 import com.shopify.buy3.Storefront.MoneyV2
-import com.shopify.buy3.Storefront.ProductConnection
 import com.shopify.graphql.support.ID
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
@@ -105,7 +102,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         if (liveCurrencyCode != CurrencyCode.EGP.toString()
         )
             return Price(
-                (liveAmount * price.amount.toFloat()).toString(),
+                String.format("%.2f",liveAmount * price.amount.toFloat()),
                 liveCurrencyCode
             )
         return price
@@ -118,11 +115,8 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     ): MoneyV2 {
         if (liveCurrencyCode != CurrencyCode.EGP.toString()
         )
-            return MoneyV2().setAmount(
-                (liveAmount * price.amount.toFloat()).toString()
-            )
+            return MoneyV2().setAmount(String.format("%.2f",liveAmount * price.amount.toFloat()))
                 .setCurrencyCode(Storefront.CurrencyCode.valueOf(liveCurrencyCode))
-
         return price
     }
 

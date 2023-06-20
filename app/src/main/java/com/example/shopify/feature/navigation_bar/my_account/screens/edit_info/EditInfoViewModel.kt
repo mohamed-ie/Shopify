@@ -3,6 +3,7 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.edit_info
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.R
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIText
@@ -20,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditInfoViewModel @Inject constructor(
     val repository: ShopifyRepository,
-    val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val _state = MutableStateFlow(EditInfoState())
     val state = _state.asStateFlow()

@@ -4,7 +4,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-interface ApiLayerCurrencyDto {
+interface ApiLayerCurrencyApiClient {
     @GET("live")
     suspend fun getLiveCurrencyExChange(
         @Query("source") source:String,

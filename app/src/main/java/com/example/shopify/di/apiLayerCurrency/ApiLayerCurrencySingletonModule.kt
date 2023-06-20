@@ -1,6 +1,6 @@
 package com.example.shopify.di.apiLayerCurrency
 
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyDto
+import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyApiClient
 import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyInterceptor
 import com.example.shopify.utils.Constants
 import dagger.Module
@@ -30,13 +30,13 @@ object ApiLayerCurrencySingletonModule {
     @Singleton
     fun provideOkHttpClient(interceptor: ApiLayerCurrencyInterceptor): OkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(interceptor)
+            .addNetworkInterceptor(interceptor)
             .build()
 
     @Provides
     @Singleton
-    fun provideOneCallDto(retrofit: Retrofit): ApiLayerCurrencyDto =
-        retrofit.create(ApiLayerCurrencyDto::class.java)
+    fun provideOneCallDto(retrofit: Retrofit): ApiLayerCurrencyApiClient =
+        retrofit.create(ApiLayerCurrencyApiClient::class.java)
 
 
 }

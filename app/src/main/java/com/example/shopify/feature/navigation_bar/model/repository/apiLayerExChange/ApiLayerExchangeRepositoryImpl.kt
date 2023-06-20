@@ -1,38 +1,49 @@
 package com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange
 
+import com.example.shopify.di.IODispatcher
 import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyDto
+import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyApiClient
+import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIError
+import com.example.shopify.helpers.mapSuspendResource
 import com.shopify.buy3.Storefront.CurrencyCode
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 class ApiLayerExchangeRepositoryImpl @Inject constructor(
     private val dataStoreManager: ShopifyDataStoreManager,
-    private val currencyDto: ApiLayerCurrencyDto
+    private val currencyApiClient: ApiLayerCurrencyApiClient,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ApiLayerExchangeRepository {
 
-    override suspend fun updateCurrentLiveCurrencyAmount(){
-        val currentCurrencyCode =  dataStoreManager.getCurrency().first()
+    override val currentCurrency: Flow<String> = dataStoreManager.getCurrency()
+
+    override suspend fun updateCurrentLiveCurrencyAmount() {
+        val currentCurrencyCode = dataStoreManager.getCurrency().first()
         setCurrencyAmountPerPound(currentCurrencyCode)
     }
 
-    override suspend fun changeCurrencyCode(currencyCode: String){
-        dataStoreManager.setCurrency(currencyCode)
-        setCurrencyAmountPerPound(currencyCode)
-    }
-
-    private suspend fun setCurrencyAmountPerPound(currencyCode: String){
-        val liveAmountPerOnePound = getLiveCurrencyExchange(currencyCode).first()
-        dataStoreManager.setCurrencyAmountPerOnePound(liveAmountPerOnePound)
-    }
-
-    override suspend fun getLiveCurrencyExchange(currencyCode: String) = flow {
-        val liveAmountPerOnePound = currencyDto
-            .getLiveCurrencyExChange(CurrencyCode.EGP.toString(),currencyCode).let {currency ->
-                currency.quotes?.get(CurrencyCode.EGP.toString() + currencyCode) ?: 0f
+    override suspend fun changeCurrencyCode(currencyCode: String): Resource<Unit> {
+        return setCurrencyAmountPerPound(currencyCode)
+            .mapSuspendResource {
+                dataStoreManager.setCurrency(currencyCode)
             }
-        emit(liveAmountPerOnePound)
+    }
+
+    private suspend fun setCurrencyAmountPerPound(currencyCode: String): Resource<Unit> {
+        val response = withContext(ioDispatcher) {
+            currencyApiClient.getLiveCurrencyExChange(CurrencyCode.EGP.toString(), currencyCode)
+        }
+
+        val liveAmount = response.quotes?.get(CurrencyCode.EGP.toString() + currencyCode)
+            ?: return Resource.Error(UIError.Unexpected)
+
+        dataStoreManager.setCurrencyAmountPerOnePound(liveAmount)
+
+        return Resource.Success(Unit)
     }
 }

@@ -169,5 +169,6 @@
     <string name="phone_number">Phone number</string>
     <string name="change_name">Change Name</string>
     <string name="name_changed">Name changed</string>
+    <string name="please_select_shipping_address">Please select Shipping Address</string>
 
 </resources>

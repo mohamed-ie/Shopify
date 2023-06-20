@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -28,6 +29,7 @@ import com.example.shopify.feature.navigation_bar.cart.CartGraph
 import com.example.shopify.feature.navigation_bar.category.CategoryGraph
 import com.example.shopify.feature.navigation_bar.home.screen.HomeGraph
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
+import com.example.shopify.theme.ShopifyTheme
 
 
 private val items = listOf<NavigationBarScreen>(
@@ -48,7 +50,7 @@ fun HomeNavigationBarScreen(navController: NavHostController = rememberNavContro
 }
 
 @Composable
-private fun HomeNavigationBar(navController: NavController) {
+private fun HomeNavigationBar(navController: NavController= rememberNavController()) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -68,6 +70,14 @@ private fun HomeNavigationBar(navController: NavController) {
 
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewHomeNavigationBar() {
+    ShopifyTheme {
+        HomeNavigationBar()
+    }
+}
+
 @Composable
 private fun RowScope.NavigationItem(
     screen: NavigationBarScreen,
@@ -78,7 +88,7 @@ private fun RowScope.NavigationItem(
     NavigationBarItem(
         icon = {
             Icon(
-                imageVector = screen.icon,
+                imageVector = if (selected) screen.selectedIcon else screen.unSelectedIcon,
                 contentDescription = null,
                 tint = if (selected) MaterialTheme.colorScheme.primary else LocalContentColor.current
             )

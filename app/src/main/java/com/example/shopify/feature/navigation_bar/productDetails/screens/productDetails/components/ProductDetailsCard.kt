@@ -7,58 +7,42 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.rounded.BrokenImage
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ImageCardScrollHorizontally
-import com.example.shopify.feature.navigation_bar.home.screen.product.ui.PreviewImageCardScrollHorizontally
 import com.example.shopify.theme.Gray
 import com.example.shopify.theme.shopifyColors
-import com.example.shopify.utils.shopifyLoading
 
 @Composable
 fun ProductDetailsCard(
-    vendor:String,
-    title:String,
-    thumbnails:List<String>,
-    currencyCode:String,
-    price:String,
-    realPrice:String,
-    discountPercent:String,
-    quantity:String,
-    isLowStock:Boolean,
-    isFavourite:Boolean,
-    onFavouriteClick:(Boolean) -> Unit
+    vendor: String,
+    title: String,
+    thumbnails: List<String>,
+    currencyCode: String,
+    price: String,
+    realPrice: String,
+    discountPercent: String,
+    quantity: String,
+    isLowStock: Boolean,
+    isFavourite: Boolean,
+    onFavouriteClick: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -81,13 +65,14 @@ fun ProductDetailsCard(
             fontWeight = FontWeight.Medium
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Box(modifier = Modifier.fillMaxWidth(),
+        Box(
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
-            ){
+        ) {
             ImageCardScrollHorizontally(
                 images = thumbnails,
                 isFavourite = isFavourite,
-                addToFavourite = {onFavouriteClick(isFavourite)}
+                addToFavourite = { onFavouriteClick(isFavourite) }
             )
         }
         Spacer(modifier = Modifier.height(25.dp))
@@ -102,6 +87,7 @@ fun ProductDetailsCard(
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.padding(top = 8.dp)
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = price,
                         style = MaterialTheme.typography.titleLarge,
@@ -132,10 +118,10 @@ fun ProductDetailsCard(
                         fontWeight = FontWeight.Medium
                     )
                 }
-                if (isLowStock){
+                if (isLowStock) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = stringResource(R.string.low_stock_only_4_left,quantity),
+                        text = stringResource(R.string.low_stock_only_4_left, quantity),
                         color = Color.Red,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Normal,
@@ -151,7 +137,11 @@ fun ProductDetailsCard(
                 Button(
                     onClick = { /*TODO*/ },
                     contentPadding = PaddingValues(0.dp),
-                    shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp, bottomEnd = 15.dp),
+                    shape = RoundedCornerShape(
+                        topStart = 20.dp,
+                        bottomStart = 20.dp,
+                        bottomEnd = 15.dp
+                    ),
                     modifier = Modifier.height(25.dp),
                 ) {
                     Text(
@@ -183,7 +173,7 @@ fun PreviewProductDetailsCard() {
         quantity = "4",
         isLowStock = false,
         isFavourite = true,
-    ){
+    ) {
 
     }
 }
