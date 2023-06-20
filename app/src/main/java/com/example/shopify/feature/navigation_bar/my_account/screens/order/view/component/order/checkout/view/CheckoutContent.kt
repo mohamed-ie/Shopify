@@ -20,6 +20,7 @@ import com.example.shopify.R
 import com.example.shopify.feature.address.AddressGraph
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
 import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
+import com.example.shopify.feature.navigation_bar.common.component.RemoteErrorHeader
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component.CheckoutFooterScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component.OrderItemScreen
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.component.PaymentMethodScreen
@@ -34,56 +35,57 @@ fun CheckoutContent(
     back: () -> Unit
 ) {
     val cart = state.cart
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            NamedTopAppBar(back = back)
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                item {
-                    ShipToCard(
-                        name = cart.address.name.asString(),
-                        address = cart.address.address.asString(),
-                        phone = cart.address.phone.asString(),
-                        onChangeClick = {  navigateTo(AddressGraph.Addresses.withArgs("true","ture")) }
-                    )
-                }
-                item {
-                    PaymentMethodScreen(
-                        selected = state.selectedPaymentMethod,
-                        paymentMethodChanged = { onEvent(CheckoutEvent.PaymentMethodChanged(it)) }
-                    )
-                }
-                item {
-                    TotalCostCard(
-                        itemsCount = cart.lines.size,
-                        subTotalsPrice = cart.subTotalsPrice,
-                        shippingFee = cart.shippingFee,
-                        taxes = cart.taxes,
-                        discounts = cart.discounts,
-                        totalPrice = cart.totalPrice
-                    )
-                }
-                item {
-                    Text(
-                        text = stringResource(id = R.string.order_summery),
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        ),
-                        modifier = Modifier.padding(12.dp)
-                    )
-                }
-                items(cart.lines) {
-                    OrderItemScreen(cartLine = it)
-                }
-                item { Spacer(modifier = Modifier.height(8.dp)) }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        NamedTopAppBar(back = back)
+        RemoteErrorHeader(error = state.remoteError?.asString())
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            item {
+                ShipToCard(
+                    name = cart.address.name.asString(),
+                    address = cart.address.address.asString(),
+                    phone = cart.address.phone.asString(),
+                    onChangeClick = { navigateTo(AddressGraph.Addresses.withArgs("true", "ture")) }
+                )
             }
-            CheckoutFooterScreen(
-                totalItems = cart.lines.size,
-                totalPrice = cart.totalPrice,
-                onPlaceOrderClick = { onEvent(CheckoutEvent.PlaceOrder) }
-            )
+            item {
+                PaymentMethodScreen(
+                    selected = state.selectedPaymentMethod,
+                    paymentMethodChanged = { onEvent(CheckoutEvent.PaymentMethodChanged(it)) }
+                )
+            }
+            item {
+                TotalCostCard(
+                    itemsCount = cart.lines.size,
+                    subTotalsPrice = cart.subTotalsPrice,
+                    shippingFee = cart.shippingFee,
+                    taxes = cart.taxes,
+                    discounts = cart.discounts,
+                    totalPrice = cart.totalPrice
+                )
+            }
+            item {
+                Text(
+                    text = stringResource(id = R.string.order_summery),
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    ),
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
+            items(cart.lines) {
+                OrderItemScreen(cartLine = it)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
+        CheckoutFooterScreen(
+            totalItems = cart.lines.size,
+            totalPrice = cart.totalPrice,
+            onPlaceOrderClick = { onEvent(CheckoutEvent.PlaceOrder) }
+        )
+    }
 }
 
 @Preview(showBackground = true)

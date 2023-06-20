@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Visibility
@@ -19,8 +20,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -46,14 +50,19 @@ fun ChangePasswordScreenContent(
         RemoteErrorHeader(error = state.remoteError?.asString())
         Spacer(modifier = Modifier.height(16.dp))
 
+       val focusManager = LocalFocusManager.current
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             value = passwordState.value,
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
             onValueChange = { onEvent(ChangePasswordEvent.PasswordChanged(it)) },
             label = { Text(text = stringResource(id = R.string.password)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password,imeAction = ImeAction.Next),
                     visualTransformation = if (passwordState.triallingIconState) VisualTransformation.None
             else PasswordVisualTransformation(),
             trailingIcon = {

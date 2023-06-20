@@ -2,7 +2,8 @@ package com.example.shopify.feature.navigation_bar.home.screen
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.twotone.Home
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -45,7 +46,12 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController, paddingValues: P
 
 object HomeGraph {
     object Home :
-        NavigationBarScreen(route = "HOME", name = R.string.home, icon = Icons.Rounded.Home)
+        NavigationBarScreen(
+            route = "HOME",
+            name = R.string.home,
+            unSelectedIcon = Icons.TwoTone.Home,
+            selectedIcon = Icons.Outlined.Home
+        )
 
     const val PRODUCTS = "PRODUCTS"
 }

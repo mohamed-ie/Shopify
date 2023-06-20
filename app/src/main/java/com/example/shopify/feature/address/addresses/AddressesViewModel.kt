@@ -2,6 +2,7 @@ package com.example.shopify.feature.address.addresses
 
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.address.addresses.view.AddressesEvent
 import com.example.shopify.feature.address.addresses.view.AddressesState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
@@ -19,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddressesViewModel @Inject constructor(
     val repository: ShopifyRepository,
-    val defaultDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
 ) : BaseScreenViewModel() {
     private val _state = MutableStateFlow(AddressesState())
     val state = _state.asStateFlow()

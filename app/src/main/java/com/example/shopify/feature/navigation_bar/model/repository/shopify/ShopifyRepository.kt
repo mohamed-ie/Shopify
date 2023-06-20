@@ -40,7 +40,7 @@ interface ShopifyRepository {
     suspend fun getProductsType(): Resource<List<String>>
     suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<Boolean>
     suspend fun deleteAddress(addressId: ID): Resource<Boolean>
-    fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>>
+    suspend fun getMinCustomerInfo(): Resource<MinCustomerInfo>
     suspend fun updateCurrency(currency: String)
     suspend fun signOut()
     suspend fun getAddresses(): Resource<List<MailingAddress>>

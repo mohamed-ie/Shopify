@@ -117,7 +117,6 @@ class AddAddressViewModel @Inject constructor(
             }
 
         }
-
     }
 
     private fun updateFields() {

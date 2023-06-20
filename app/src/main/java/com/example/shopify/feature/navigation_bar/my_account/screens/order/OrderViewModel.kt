@@ -7,14 +7,10 @@ import com.example.shopify.feature.navigation_bar.model.repository.shopify.Shopi
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment.CreditCardInfoEvent
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.ReviewState
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.PaymentMethod
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutState
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
-import com.example.shopify.helpers.firestore.mapper.encodeProductId
-import com.shopify.buy3.Storefront
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val creditCardInfoStateHandler: CreditCardInfoStateHandler,
-    private val defaultDispatcher: CoroutineDispatcher,
     private val repository: ShopifyRepository,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
     val creditCardInfoState = creditCardInfoStateHandler.creditCardInfoState
     private val _uiEvent = MutableSharedFlow<OrderUIEvent>()
@@ -133,8 +129,17 @@ class OrderViewModel @Inject constructor(
             is CheckoutEvent.PaymentMethodChanged ->
                 _checkoutState.update { it.copy(selectedPaymentMethod = event.method) }
 
-            CheckoutEvent.PlaceOrder -> placeOrder()
-            CheckoutEvent.HideInvoiceDialog ->
+            CheckoutEvent.PlaceOrder ->
+                if (_checkoutState.value.cart.address.id == null)
+                    _checkoutState.update {
+                        it.copy(remoteError = UIText.StringResource(R.string.please_select_shipping_address))
+                    }
+                else {
+                    _checkoutState.update { it.copy(remoteError = null) }
+                    placeOrder()
+                }
+
+            CheckoutEvent.HideInvoiceDialog -> {
                 _checkoutState.update { it.copy(isInvoiceDialogVisible = false) }
         }
     }
@@ -147,7 +152,7 @@ class OrderViewModel @Inject constructor(
                     _checkoutState.update {
                         it.copy(
                             cart = resource.data,
-                            remoteError = resource.data.error
+                            remoteError = resource.data.error?.let { it1 -> UIText.DynamicString(it1) }
                         )
                     }
                 toStableScreenState()
@@ -169,7 +174,7 @@ class OrderViewModel @Inject constructor(
                 _checkoutState.update {
                     it.copy(
                         invoiceUrl = resource.data?.first,
-                        remoteError = resource.data?.second,
+                        remoteError = resource.data?.second?.let { it1 -> UIText.DynamicString(it1) },
                         isInvoiceDialogVisible = resource.data?.first != null
                     )
                 }
@@ -183,7 +188,13 @@ class OrderViewModel @Inject constructor(
         when (val resource = repository.completeOrder(paymentPending = true)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {
-                _checkoutState.update { it.copy(remoteError = resource.data) }
+                _checkoutState.update {
+                    it.copy(remoteError = resource.data?.let { it1 ->
+                        UIText.DynamicString(
+                            it1
+                        )
+                    })
+                }
                 toStableScreenState()
             }
         }

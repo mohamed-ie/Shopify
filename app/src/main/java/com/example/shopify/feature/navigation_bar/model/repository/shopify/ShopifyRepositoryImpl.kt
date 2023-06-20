@@ -11,6 +11,7 @@ import com.example.shopify.DraftOrderInvoiceSendMutation
 import com.example.shopify.DraftOrderLineItemsQuery
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
@@ -47,7 +48,6 @@ import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -62,10 +62,11 @@ class ShopifyRepositoryImpl @Inject constructor(
     private val mapper: ShopifyMapper,
     private val dataStoreManager: ShopifyDataStoreManager,
     private val fireStoreManager: FireStoreManager,
-    private val defaultDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val apolloClient: ApolloClient
 ) : ShopifyRepository {
     private val adminManager = AdminManager()
+    private val storeFrontManager = StoreFrontManager()
 
     override fun signUp(userInfo: SignUpUserInfo): Flow<Resource<SignUpUserResponseInfo>> {
         return queryGenerator.generateSingUpQuery(userInfo)
@@ -122,8 +123,7 @@ class ShopifyRepositoryImpl @Inject constructor(
         val email = dataStoreManager.getEmail().first()
 
         val cartId = fireStoreManager.getCurrentCartId(email)
-            .getOrNull() ?: return Resource.Success(null)
-
+            .getOrNull() ?: return Resource.Success(Cart())
         return adminManager.getDraftOrder(cartId)
     }
 
@@ -214,16 +214,17 @@ class ShopifyRepositoryImpl @Inject constructor(
             .mapResource(mapper::isAddressDeleted)
     }
 
-    override fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>> = channelFlow {
+    override suspend fun getMinCustomerInfo(): Resource<MinCustomerInfo> {
         val accessToken = dataStoreManager.getAccessToken().first()
+        return storeFrontManager.getMinCustomerInfo(accessToken)
+    }
 
-        val minCustomerInfoResource =
-            queryGenerator.generateGetMinCustomerInfoQuery(accessToken)
+    private inner class StoreFrontManager() {
+
+        suspend fun getMinCustomerInfo(accessToken: String): Resource<MinCustomerInfo> {
+            return queryGenerator.generateGetMinCustomerInfoQuery(accessToken)
                 .enqueue1()
                 .mapResource(mapper::mapToMinCustomerInfo)
-
-        dataStoreManager.getCurrency().collect { currency ->
-            send(minCustomerInfoResource.mapResource { it.copy(currency = currency) })
         }
     }
 
@@ -477,12 +478,9 @@ class ShopifyRepositoryImpl @Inject constructor(
             variantId: String,
             quantity: Int
         ): Resource<Pair<String, String>?> {
-//            val purchasingEntityInput = PurchasingEntityInput(customerId = customerId.present())
-            val newLine =
-                DraftOrderLineItemInput(variantId = variantId.present(), quantity = quantity)
+            val newLine = DraftOrderLineItemInput(variantId = variantId.present(), quantity = quantity)
             val lines = listOf(newLine)
             val input = DraftOrderInput(
-//                purchasingEntity = purchasingEntityInput.present(),
                 customerId = customerId.present(),
                 lineItems = lines.present()
             )

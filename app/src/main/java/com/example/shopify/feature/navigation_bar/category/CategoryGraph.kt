@@ -2,7 +2,8 @@ package com.example.shopify.feature.navigation_bar.category
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Category
+import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.twotone.Category
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -40,7 +41,8 @@ object CategoryGraph {
     object Category : NavigationBarScreen(
         route = "CATEGORY",
         name = R.string.category,
-        icon = Icons.Rounded.Category
+        unSelectedIcon = Icons.TwoTone.Category,
+        selectedIcon = Icons.Outlined.Category
     )
 
     const val PRODUCT_DETAILS = "PRODUCT_DETAILS"

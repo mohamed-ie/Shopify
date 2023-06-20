@@ -176,5 +176,6 @@
     <string name="reivew_place_holder">How was your experience with the product? What should others know before buying? How did you use the product?</string>
     <string name="submit_review">Submit Review</string>
     <string name="add_rating">Add rating</string>
+    <string name="please_select_shipping_address">Please select Shipping Address</string>
 
 </resources>

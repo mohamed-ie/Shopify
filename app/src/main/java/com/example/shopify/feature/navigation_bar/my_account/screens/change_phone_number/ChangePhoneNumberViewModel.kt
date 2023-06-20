@@ -3,6 +3,7 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.change_pho
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.R
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
 import com.example.shopify.helpers.UIText
@@ -19,9 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChangePhoneNumberViewModel @Inject constructor(
-    val repository: ShopifyRepository,
-    val defaultDispatcher: CoroutineDispatcher,
-    val inputValidator: TextFieldStateValidator
+    private val repository: ShopifyRepository,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val inputValidator: TextFieldStateValidator
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChangePhoneNumberState())
