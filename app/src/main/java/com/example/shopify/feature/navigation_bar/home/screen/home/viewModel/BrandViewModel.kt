@@ -23,7 +23,7 @@ class BrandViewModel @Inject constructor(
         getBrandList()
     }
 
-    fun getBrandList() {
+    private fun getBrandList() {
         viewModelScope.launch(Dispatchers.Default) {
             repository.getBrands().collect {
                 when (it) {

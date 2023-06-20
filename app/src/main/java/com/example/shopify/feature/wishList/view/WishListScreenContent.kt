@@ -97,7 +97,7 @@ fun WishListScreenContent(
 @Composable
 private fun WishListScreenContentPreview() {
 //    WishListScreenContent(
-//        productList = listOf(
+//        productState = listOf(
 //            Product(
 //                image = "https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800",
 //                description = "The Stan Smith owned the tennis court in the '70s." +

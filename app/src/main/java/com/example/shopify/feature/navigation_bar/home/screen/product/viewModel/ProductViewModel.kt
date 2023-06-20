@@ -24,7 +24,7 @@ class ProductViewModel @Inject constructor(
     private val state: SavedStateHandle,
 ) : BaseScreenViewModel() {
     private var _productState = MutableStateFlow(ProductsState())
-    val productList = _productState.asStateFlow()
+    val productState = _productState.asStateFlow()
     private var brandProducts: List<BrandProduct> = listOf()
 
     init {
@@ -56,7 +56,8 @@ class ProductViewModel @Inject constructor(
     }
 
     private fun setProductBrandId() {
-        state.get<String>("brandName")?.also {
+        val brandName: String = state.get<String>("brandName") ?: "VANS"
+        brandName.also {
             _productState.update { productsState ->
                 productsState.copy(brandProductId = it)
             }

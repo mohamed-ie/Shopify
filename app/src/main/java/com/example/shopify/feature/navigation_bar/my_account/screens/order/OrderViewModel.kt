@@ -13,7 +13,6 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.helpers.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -134,7 +133,7 @@ class OrderViewModel @Inject constructor(
     }
 
     private fun getOrders() {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(defaultDispatcher) {
             repository.getOrders().collect {
                 when (it) {
                     is Resource.Success -> {
