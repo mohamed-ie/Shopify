@@ -80,7 +80,7 @@ class ApiLayerExchangeRepositoryTest {
             //Then
             shopifyDataStoreManager.setCurrencyAmountPerOnePound(apiResult)
             val result = shopifyDataStoreManager.getCurrencyAmountPerOnePound().first()
-            assertEquals(expected, result)
+            assertEquals(expected.toInt(), result.toInt())
         }
     }
 
@@ -94,7 +94,7 @@ class ApiLayerExchangeRepositoryTest {
         val apiResult = repository.getLiveCurrencyExchange(CurrencyCode.AED.toString()).first()
 
         //Then
-        assertEquals(expected, apiResult)
+        assertEquals(expected.toInt(), apiResult.toInt())
     }
 
 

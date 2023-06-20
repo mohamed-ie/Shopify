@@ -39,7 +39,7 @@ class ShopifyDataStoreManagerTest {
         )
         shopifyDataStoreManager = ShopifyDataStoreManagerImpl(dataStore)
     }
-
+    
     @Test
     fun saveUserInfo_SignInUserInfoResultInstance_insertedData() = coroutineScopeTest.runTest{
         //Given
