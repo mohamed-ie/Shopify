@@ -55,7 +55,7 @@ class FireStoreManagerImpl @Inject constructor(
 
 
 
-    override suspend fun setProductReviewByProductId(productId: ID, review: Review) {
+    override suspend fun setProductReviewByProductId(productId: ID, review: Review):Resource<Unit> =
         fireStore.collection(PATH)
             .document(productId.encodeProductId())
             .collection(REVIEW_PATH)
@@ -63,7 +63,7 @@ class FireStoreManagerImpl @Inject constructor(
             .set(review.copy(createdAt = FieldValue.serverTimestamp(), time = null))
             .awaitResource {}
 
-    }
+
 
     override suspend fun updateCurrency(customerId: String, currency: String) {
         customerId.ifEmpty { return  }

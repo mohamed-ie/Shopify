@@ -41,6 +41,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.ui.screen.order.component.OrdersFilledTonalButton
 import com.shopify.buy3.Storefront.OrderFulfillmentStatus
@@ -48,7 +49,11 @@ import org.joda.time.DateTime
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun OrderCard(order: Order, viewDetails: () -> Unit) {
+fun OrderCard(
+    order: Order,
+    viewDetails: () -> Unit,
+    addReview:(Int)->Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RectangleShape,
@@ -96,85 +101,88 @@ fun OrderCard(order: Order, viewDetails: () -> Unit) {
         Divider(modifier = Modifier.padding(horizontal = 16.dp))
 
         LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
-            items(order.lineItems) { orderItem ->
-                OrderItemContent(orderItem = orderItem, order.fulfillment)
+            items(order.lineItems.count()) { orderIndex ->
+                OrderItemContent(
+                    orderItem = order.lineItems[orderIndex],
+                    fulfillmentStatus = order.fulfillment,
+                    addReview = {addReview(orderIndex)}
+                )
             }
         }
 
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            OrdersFilledTonalButton(
-                text = stringResource(id = R.string.review_product),
-                onClick = { /*TODO*/ }
-            )
 
-        }
     }
 }
 
 
 @Composable
 private fun OrderItemContent(
-    orderItem: LineItems, fulfillmentStatus: OrderFulfillmentStatus
+    orderItem: LineItems,
+    fulfillmentStatus: OrderItemState,
+    addReview:()->Unit
 ) {
-    Row(
-        modifier = Modifier
-            .padding(start = 24.dp, top = 16.dp)
-            .padding(vertical = 8.dp)
-            .width(300.dp)
-    ) {
-        SubcomposeAsyncImage(
-            modifier = Modifier
-                .height(80.dp)
-                .aspectRatio(1f),
-            contentScale = ContentScale.Crop,
-            model = orderItem.thumbnail,
-            contentDescription = null,
-            loading = {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                )
-            },
-            error = {
-                Icon(
-                    modifier = Modifier.fillMaxSize(),
-                    imageVector = Icons.Rounded.BrokenImage,
-                    tint = Color.Gray,
-                    contentDescription = null
-                )
-            }
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            //name
-            Text(
-                text = orderItem.name,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            //description
-            Text(
-                text = orderItem.description,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            //status
-            Text(
-                text = fulfillmentStatus.name,
-                style = MaterialTheme.typography.labelMedium,
-                color = Color.Green
-            )
-        }
-    }
+   Column {
+       Row(
+           modifier = Modifier
+               .padding(start = 24.dp, top = 16.dp)
+               .padding(vertical = 8.dp)
+               .width(300.dp)
+       ) {
+           SubcomposeAsyncImage(
+               modifier = Modifier
+                   .height(80.dp)
+                   .aspectRatio(1f),
+               contentScale = ContentScale.Crop,
+               model = orderItem.thumbnail,
+               contentDescription = null,
+               loading = {
+                   Box(
+                       Modifier
+                           .fillMaxSize()
+                   )
+               },
+               error = {
+                   Icon(
+                       modifier = Modifier.fillMaxSize(),
+                       imageVector = Icons.Rounded.BrokenImage,
+                       tint = Color.Gray,
+                       contentDescription = null
+                   )
+               }
+           )
+           Spacer(modifier = Modifier.width(16.dp))
+           Column {
+               //name
+               Text(
+                   text = orderItem.name,
+                   style = MaterialTheme.typography.bodyMedium,
+                   maxLines = 1,
+                   overflow = TextOverflow.Ellipsis
+               )
+               Spacer(modifier = Modifier.height(4.dp))
+               //description
+               Text(
+                   text = orderItem.description,
+                   style = MaterialTheme.typography.bodyMedium,
+                   maxLines = 2,
+                   overflow = TextOverflow.Ellipsis
+               )
+               Spacer(modifier = Modifier.height(16.dp))
+               //status
+               Text(
+                   text = fulfillmentStatus.state,
+                   style = MaterialTheme.typography.labelMedium,
+                   color = fulfillmentStatus.color()
+               )
+           }
+       }
+       if(fulfillmentStatus != OrderItemState.Delivered()){
+           OrdersFilledTonalButton(
+               text = stringResource(id = R.string.review_product),
+               onClick = addReview
+           )
+       }
+   }
 }
 
 @Preview
@@ -208,6 +216,7 @@ fun PreviewOrderCard() {
                     )
                 )
             ),
+            {}
         ) {}
     }
 }

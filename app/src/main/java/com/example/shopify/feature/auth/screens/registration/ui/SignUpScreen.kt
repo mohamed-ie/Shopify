@@ -214,11 +214,12 @@ private fun SignUpScreenContent(
                         .fillMaxWidth()
                         .padding(horizontal = 5.dp)
                         .height(50.dp),
+                    enabled = !loadingUiState,
                     shape = RoundedCornerShape(5.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.sign_up),
-                        modifier = Modifier.shopifyLoading(loadingUiState, Color.White)
+                        modifier = Modifier.shopifyLoading(loadingUiState, MaterialTheme.colorScheme.primary)
                     )
                 }
 

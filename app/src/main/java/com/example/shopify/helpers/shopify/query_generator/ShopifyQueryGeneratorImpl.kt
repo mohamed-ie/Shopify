@@ -103,7 +103,8 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
     override fun generateUserOrdersQuery(accessToken: String): QueryRootQuery =
         Storefront.query { root: QueryRootQuery ->
             root.customer(accessToken) { customer ->
-                customer.orders({ arg -> arg.first(10) }) { connection ->
+                customer.firstName().lastName()
+                customer.orders({ arg -> arg.first(250) }) { connection ->
                     connection.edges() { edge: OrderEdgeQuery ->
                         edge.node() { node: OrderQuery ->
                             node.financialStatus()

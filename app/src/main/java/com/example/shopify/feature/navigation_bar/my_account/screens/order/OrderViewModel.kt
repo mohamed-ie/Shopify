@@ -1,9 +1,7 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order
 
 import androidx.lifecycle.viewModelScope
-import com.example.shopify.R
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
@@ -13,7 +11,6 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutState
 import com.example.shopify.helpers.Resource
-import com.example.shopify.helpers.UIText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,10 +33,12 @@ class OrderViewModel @Inject constructor(
 
     private val _checkoutState = MutableStateFlow(CheckoutState(Cart()))
     val checkoutState = _checkoutState.asStateFlow()
-
     private var _orderList = MutableStateFlow<List<Order>>(emptyList())
     val orderList = _orderList.asStateFlow()
     var orderIndex: Int = 0
+
+    private val _reviewState = MutableStateFlow(ReviewState())
+    val reviewState = _reviewState.asStateFlow()
 
     init {
         getOrders()
@@ -75,6 +74,56 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    fun onReviewEvent(event: ReviewUIEvent) {
+        when (event) {
+            is ReviewUIEvent.SendContent ->
+                _reviewState.update { it.copy(reviewContent = event.value) }
+
+            is ReviewUIEvent.SendRate ->
+                _reviewState.update { it.copy(rating = event.value.toDouble()) }
+
+            is ReviewUIEvent.SendTitle ->
+                _reviewState.update { it.copy(title = event.value) }
+
+            ReviewUIEvent.Submit ->
+                saveReview()
+            ReviewUIEvent.Close ->
+                _reviewState.value = ReviewState()
+
+            is ReviewUIEvent.View -> {
+                _reviewState.update { it.copy(visible = true, orderIndex = event.orderIndex, lineIndex = event.lineIndex) }
+            }
+
+        }
+    }
+
+
+    private fun saveReview() {
+        viewModelScope.launch {
+            _reviewState.update { it.copy(isLoading = true) }
+            _reviewState.value.let {
+                _orderList.value[it.orderIndex].let { order ->
+                    order.lineItems[it.lineIndex].let { lineItems ->
+                        when (repository.setProductReview(
+                            lineItems.id, Review(
+                                reviewer = order.firstName + " " + order.lastName,
+                                rate = it.rating,
+                                review = it.title,
+                                description = it.reviewContent
+                            )
+                        )) {
+                            is Resource.Error -> toErrorScreenState()
+                            is Resource.Success -> {
+                                onReviewEvent(ReviewUIEvent.Close)
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
     fun onCheckoutEvent(event: CheckoutEvent) {
         when (event) {
             is CheckoutEvent.PaymentMethodChanged ->
@@ -92,7 +141,6 @@ class OrderViewModel @Inject constructor(
 
             CheckoutEvent.HideInvoiceDialog -> {
                 _checkoutState.update { it.copy(isInvoiceDialogVisible = false) }
-            }
         }
     }
 
@@ -157,7 +205,7 @@ class OrderViewModel @Inject constructor(
             repository.getOrders().collect {
                 when (it) {
                     is Resource.Success -> {
-                        _orderList.emit(it.data)
+                        _orderList.emit(it.data.reversed())
                         toStableScreenState()
                     }
 

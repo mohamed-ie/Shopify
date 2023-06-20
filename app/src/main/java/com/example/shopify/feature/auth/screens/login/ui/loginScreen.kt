@@ -151,10 +151,11 @@ fun LoginScreenContent(
                     .padding(horizontal = 5.dp)
                     .height(50.dp),
                 shape = RoundedCornerShape(5.dp),
+                enabled = !loadingUiState
             ){
                 Text(
                     text = stringResource(R.string.signin),
-                    modifier = Modifier.shopifyLoading(loadingUiState, Color.White)
+                    modifier = Modifier.shopifyLoading(loadingUiState, MaterialTheme.colorScheme.primary)
                 )
             }
 
