@@ -74,7 +74,7 @@ fun OrderDetails(
                     shippingFee = "${order.totalShippingPrice.currencyCode} ${order.totalShippingPrice.amount}",
                     taxes = "${order.totalTax.currencyCode} ${order.totalTax.amount}",
                     totalPrice = "${order.totalPrice.currencyCode} ${order.totalPrice.amount}",
-                    discounts = "${order.discountApplications.currencyCode} ${order.discountApplications.amount}"
+                    discounts = null
                 )
             }
         }

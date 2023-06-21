@@ -376,7 +376,7 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(
     rate: Float,
     error: String? = null
 ): Cart {
-    val rate = if(rate == 0.0f) 1f else rate
+    val rate = if (rate == 0.0f) 1f else rate
     val lines = this?.lineItems?.nodes?.map {
         val product = it.product
 
@@ -399,8 +399,6 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(
         )
     }?.sortedBy { it.cartProduct.name }
 
-    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
-        ?.run { "$currencyCode ${String.format("%.2f", amount.toString().toFloat() * rate)}" }
 
     val shippingAddress = this?.shippingAddress?.run {
         MyAccountMinAddress(
@@ -411,19 +409,22 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(
         )
     }
 
+    val discounts = this?.appliedDiscount
+        ?.amountV2?.amount?.toString()?.toFloat()?.times(rate)
+
     val totalTax = (this?.totalTax?.toString()?.toFloat() ?: 0f) * rate
     val subtotalPrice = (this?.subtotalPrice?.toString()?.toFloat() ?: 0f) * rate
     val totalShippingPrice = (this?.totalShippingPrice?.toString()?.toFloat() ?: 0f) * rate
-    val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate - (discounts ?: 0f)
 
     return Cart(
         lines = lines ?: emptyList(),
         taxes = String.format("%.2f", totalTax),
         currencyCode = currencyCode,
         subTotalsPrice = String.format("%.2f", subtotalPrice),
-        shippingFee =String.format("%.2f", totalShippingPrice),
+        shippingFee = String.format("%.2f", totalShippingPrice),
         totalPrice = String.format("%.2f", totalPrice),
-        discounts = discounts,
+        discounts = String.format("%.2f", discounts),
         address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
@@ -436,7 +437,7 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
     rate: Float,
     error: String? = null
 ): Cart {
-    val rate = if(rate == 0.0f) 1f else rate
+    val rate = if (rate == 0.0f) 1f else rate
     val lines = this?.lineItems?.nodes?.map {
         val product = it.product
 
@@ -459,8 +460,6 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
         )
     }?.sortedBy { it.cartProduct.name }
 
-    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
-        ?.run { "$currencyCode ${String.format("%.2f", amount.toString().toFloat() * rate)}" }
 
     val shippingAddress = this?.shippingAddress?.run {
         MyAccountMinAddress(
@@ -471,39 +470,25 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
         )
     }
 
+    val discounts = this?.appliedDiscount
+        ?.amountV2?.amount?.toString()?.toFloat()?.times(rate)
+
     val totalTax = (this?.totalTax?.toString()?.toFloat() ?: 0f) * rate
     val subtotalPrice = (this?.subtotalPrice?.toString()?.toFloat() ?: 0f) * rate
     val totalShippingPrice = (this?.totalShippingPrice?.toString()?.toFloat() ?: 0f) * rate
-    val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate
-    val shippingFee = if(totalShippingPrice == 0.0f) "FREE" else String.format("%.2f", totalShippingPrice)
+    val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate - (discounts ?: 0f)
 
     return Cart(
         lines = lines ?: emptyList(),
         taxes = String.format("%.2f", totalTax),
         currencyCode = currencyCode,
         subTotalsPrice = String.format("%.2f", subtotalPrice),
-        shippingFee =shippingFee,
+        shippingFee = String.format("%.2f", totalShippingPrice),
         totalPrice = String.format("%.2f", totalPrice),
-        discounts = discounts,
+        discounts = String.format("%.2f", discounts),
         address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
         endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
     )
-}
-
-private fun DraftOrderQuery.DraftOrder?.mapPriceToLivePrice(
-    error: String? = null,
-    liveCurrencyCode: String,
-    liveAmount: Float,
-    price: Price,
-): Price {
-    if (liveCurrencyCode != CurrencyCode.EGP.toString()
-    )
-        return Price(
-            (liveAmount * price.amount.toFloat()).toString(),
-            liveCurrencyCode
-        )
-    return price
-
 }

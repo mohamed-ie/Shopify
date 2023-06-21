@@ -27,6 +27,13 @@ class FireStoreManagerImpl @Inject constructor(
         }
     }
 
+    object Coupons{
+        const val PATH = "coupons"
+        object Field{
+            const val VALUE ="value"
+        }
+    }
+
     companion object Product {
         const val PATH = "product"
         const val REVIEW_PATH = "Review"
@@ -157,6 +164,16 @@ class FireStoreManagerImpl @Inject constructor(
                 (documentSnapshot.get(Customer.Fields.WISH_LIST) as? List<*>)
                 ?.map { it as String }
                 ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+            }
+    }
+
+    override suspend fun redeemCoupon(coupon: String): Resource<Double?> {
+        return fireStore.collection(Coupons.PATH)
+            .document(coupon)
+            .get()
+            .awaitResource {
+            val value = it.get(Coupons.Field.VALUE)
+                        value as Double?
             }
     }
 

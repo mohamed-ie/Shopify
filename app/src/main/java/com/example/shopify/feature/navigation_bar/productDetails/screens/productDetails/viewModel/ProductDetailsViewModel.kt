@@ -185,20 +185,6 @@ class ProductDetailsViewModel @Inject constructor(
             return@map variantItem
         }
 
-
-//    private fun sendTotalCart(response: Resource<Cart?>) {
-//        when (response) {
-//            is Resource.Error -> {}
-//            is Resource.Success -> {
-//                _addToCardState.value = _addToCardState.value.copy(
-//                    isTotalPriceLoaded = true,
-//                    totalCartPrice = response.data?.totalPrice ?: ""
-//                )
-//
-//            }
-//        }
-//    }
-
     private fun sendSelectedVariant(variantIndex: Int) {
         _addToCardState.update {addToCardState ->
             _variantState.value.let {variantsState ->
