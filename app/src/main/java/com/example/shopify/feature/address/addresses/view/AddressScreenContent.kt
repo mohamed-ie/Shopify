@@ -27,9 +27,10 @@ import com.shopify.buy3.Storefront.MailingAddress
 fun AddressesScreenContent(
     back: () -> Unit,
     allowPick: Boolean,
+    addresses: List<MailingAddress>,
     onEvent: (AddressesEvent) -> Unit,
     navigateTo: (String) -> Unit,
-    addresses: List<MailingAddress>
+    setAddress: (MailingAddress) -> Unit
 ) {
     Scaffold(
         modifier = Modifier
@@ -45,12 +46,14 @@ fun AddressesScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 itemsIndexed(addresses) { index, address ->
+                    Spacer(modifier = Modifier.height(8.dp))
                     MyAccountAddressCard(
                         address = address.formattedArea,
                         phone = address.phone,
                         name = "${address.firstName} ${address.lastName}",
                         clickable = allowPick,
                         onClick = {
+                            setAddress(address)
                             onEvent(AddressesEvent.UpdateAddress(index))
                         },
                         onDelete = {
@@ -59,7 +62,8 @@ fun AddressesScreenContent(
                             )
                         },
                         onEdit = {
-                            /*   navigateTo(address.index)*/
+                            setAddress(address)
+                            navigateTo(AddressGraph.ADD_ADDRESS)
                         },
                         isDefault = index != 0
                     )

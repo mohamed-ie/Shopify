@@ -30,6 +30,7 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.theme.ShopifyTheme
 
 private val paymentMethods = listOf(
+    PaymentMethod.Shopify,
     PaymentMethod.CreditCard,
     PaymentMethod.CashOnDelivery
 )

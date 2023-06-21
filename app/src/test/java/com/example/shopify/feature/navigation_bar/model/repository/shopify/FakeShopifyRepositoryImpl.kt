@@ -5,12 +5,15 @@ import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
 import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
 import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.cart.model.CartLine
+import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
 import com.example.shopify.feature.navigation_bar.common.model.Pageable
 import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
 import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
@@ -29,6 +32,28 @@ import org.joda.time.chrono.ISOChronology
 class FakeShopifyRepositoryImpl(
 ) : ShopifyRepository {
     private val wishList: MutableList<ID> = mutableListOf()
+    private var cart =
+        Cart(
+            lines = listOf(
+                CartLine(
+                    ID(""),
+                    ID(""),
+                    "EGP 1500",
+                    "",
+                    5,
+                    9,
+                    CartProduct(
+                        ID(""),
+                        "",
+                        "",
+                        "",
+                        ""
+                    )
+                )
+            )
+        )
+
+    private var minCustomerInfo = MinCustomerInfo("ahmed", "ahmed@gmail.com")
 
     override fun signUp(userInfo: SignUpUserInfo): Flow<Resource<SignUpUserResponseInfo>> = flow {
         emit(
@@ -78,7 +103,7 @@ class FakeShopifyRepositoryImpl(
 
 
     override suspend fun getCart(): Resource<Cart?> {
-        TODO("Not yet implemented")
+        return Resource.Success(cart)
     }
 
     override suspend fun getProductsByBrandName(brandName: String): Resource<List<BrandProduct>> {
@@ -143,7 +168,7 @@ class FakeShopifyRepositoryImpl(
         )
 
 
-    override suspend fun setProductReview(productId: ID, review: Review) {
+    override suspend fun setProductReview(productId: ID, review: Review): Resource<Unit> {
         TODO("Not yet implemented")
     }
 
@@ -181,12 +206,12 @@ class FakeShopifyRepositoryImpl(
         return Resource.Success(tags)
     }
 
-    override suspend fun getProductsType(): Resource<List<String>>  {
+    override suspend fun getProductsType(): Resource<List<String>> {
         val types: List<String> = listOf("men", "women")
         return Resource.Success(types)
     }
 
-    override suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<Boolean> {
+    override suspend fun saveAddress(address: Storefront.MailingAddressInput): Resource<String?> {
         TODO("Not yet implemented")
     }
 
@@ -194,8 +219,8 @@ class FakeShopifyRepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override fun getMinCustomerInfo(): Flow<Resource<MinCustomerInfo>> {
-        TODO("Not yet implemented")
+    override suspend fun getMinCustomerInfo(): Resource<MinCustomerInfo> {
+        return Resource.Success(minCustomerInfo)
     }
 
     override suspend fun updateCurrency(currency: String) {
@@ -270,7 +295,8 @@ class FakeShopifyRepositoryImpl(
                         title = "Ultima show Running Shoes Pink",
                         images = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
                         isFavourite = wishList.contains(ID("hamed")),
-                        price = Storefront.MoneyV2().setAmount("200").setCurrencyCode(Storefront.CurrencyCode.SDG)
+                        price = Storefront.MoneyV2().setAmount("200")
+                            .setCurrencyCode(Storefront.CurrencyCode.SDG)
                     )
                 ),
                 hasNext = true,
@@ -309,7 +335,7 @@ class FakeShopifyRepositoryImpl(
                         description = "The forefather of the Vans family, the Vans Authentic was introduced in 1966 and nearly 4 decades later is still going strong, its popularity extending from the original fans - skaters and surfers to all sorts. The Vans Authentic is constructed from canvas and Vans' signature waffle outsole construction."
                     )
                 ),
-                fulfillment = Storefront.OrderFulfillmentStatus.FULFILLED,
+                fulfillment = OrderItemState.Progress(),
                 financialStatus = Storefront.OrderFinancialStatus.PAID
             ),
             Order(
@@ -340,7 +366,7 @@ class FakeShopifyRepositoryImpl(
                         description = "The forefather of the Vans family, the Vans Authentic was introduced in 1966 and nearly 4 decades later is still going strong, its popularity extending from the original fans - skaters and surfers to all sorts. The Vans Authentic is constructed from canvas and Vans' signature waffle outsole construction."
                     )
                 ),
-                fulfillment = Storefront.OrderFulfillmentStatus.FULFILLED,
+                fulfillment = OrderItemState.Delivered(),
                 financialStatus = Storefront.OrderFinancialStatus.PAID
             )
         )
@@ -348,37 +374,53 @@ class FakeShopifyRepositoryImpl(
     }
 
     override suspend fun removeCartLines(productVariantId: String): Resource<Cart?> {
-        TODO("Not yet implemented")
+        val lines = cart.lines.toMutableList().apply {
+            removeIf { productVariantId == it.productVariantID.toString() }
+        }
+        cart = cart.copy(lines = lines)
+        return Resource.Success(cart)
     }
 
     override suspend fun changeCartLineQuantity(
         merchandiseId: String,
         quantity: Int
     ): Resource<Cart?> {
-        TODO("Not yet implemented")
+        val lines = cart.lines.toMutableList().apply {
+            val line = find { it.productVariantID.toString() == merchandiseId }
+            remove(line)
+            line?.copy(quantity = quantity)?.let { add(it) }
+        }
+        cart = cart.copy(lines = lines)
+        return Resource.Success(cart)
     }
 
     override suspend fun completeOrder(paymentPending: Boolean): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun sendCompletePayment(): Resource<Pair<String?, String?>?> {
-        TODO("Not yet implemented")
+        return Resource.Success(Pair("", null))
     }
 
     override suspend fun changePassword(password: String): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun changePhoneNumber(phone: String): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun changeName(firstName: String, lastName: String): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun createUserEmail(email: String): Resource<Unit> =
         Resource.Success(Unit)
 
+    override suspend fun updateAddress(
+        addressId: ID,
+        address: Storefront.MailingAddressInput
+    ): Resource<String?> {
+        TODO("Not yet implemented")
+    }
 }

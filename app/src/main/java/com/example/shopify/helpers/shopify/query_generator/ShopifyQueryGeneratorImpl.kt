@@ -418,7 +418,6 @@ class ShopifyQueryGeneratorImpl @Inject constructor() : ShopifyQueryGenerator {
             query.customer(accessToken) { customer ->
                 customer.firstName()
                     .email()
-                    .metafield("settings", "currency") { it.value() }
             }
         }
 

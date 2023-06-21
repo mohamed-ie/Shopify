@@ -1,6 +1,7 @@
 package com.example.shopify.feature.address.addresses.view.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.PinDrop
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -40,7 +40,7 @@ fun MyAccountAddressCard(
     phone: String,
     address: String,
     name: String,
-    isDefault: Boolean ,
+    isDefault: Boolean,
     clickable: Boolean,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
@@ -61,21 +61,19 @@ fun MyAccountAddressCard(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.PinDrop,
-                    tint = MaterialTheme.shopifyColors.Gray,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.weight(1f))
                 Row(
-                    Modifier.clickable(role = Role.Button, onClick = onEdit),
+                    Modifier
+                        .clickable(role = Role.Button, onClick = onEdit)
+                        .padding(horizontal = 4.dp)
+                        .padding(top=4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(20.dp),
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = null,
                         tint = MaterialTheme.shopifyColors.Gray

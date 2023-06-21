@@ -128,7 +128,7 @@ fun CartItemCard(
 
                 //price
                 Text(
-                    text = cartLine.price?:"",
+                    text = "${cartLine.currencyCode} ${cartLine.price}",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )

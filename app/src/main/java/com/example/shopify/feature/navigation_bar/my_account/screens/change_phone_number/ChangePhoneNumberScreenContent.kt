@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.change_phone_number
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,9 +33,11 @@ fun ChangePhoneNumberScreenContent(
     back: () -> Unit
 ) {
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .background(MaterialTheme.colorScheme.surface)
+        .fillMaxSize()) {
         NamedTopAppBar(
-            stringResource(id = R.string.change_password),
+            stringResource(id = R.string.change_phone_number),
             back = back
         )
         RemoteErrorHeader(error = state.remoteError?.asString())

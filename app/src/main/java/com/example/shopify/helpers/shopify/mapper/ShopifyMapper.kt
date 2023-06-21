@@ -1,6 +1,5 @@
 package com.example.shopify.helpers.shopify.mapper
 
-import com.apollographql.apollo3.api.ApolloResponse
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
 import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
@@ -34,7 +33,7 @@ interface ShopifyMapper {
     fun map(error: GraphError): UIError
     fun mapToPaymentCompletionAvailability(result: GraphResponse<Storefront.Mutation>): ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability
     fun mapToPaymentResult(result: GraphCallResult.Success<Storefront.QueryRoot>): ShopifyCreditCardPaymentStrategy.PaymentResult
-    fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean
+    fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): String?
     fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean
     fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product
@@ -47,7 +46,7 @@ interface ShopifyMapper {
     fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MailingAddress>
     fun mapToCartId(response: GraphResponse<Storefront.Mutation>): Pair<String?, String?>?
     fun mapToAddCartLine(response: GraphResponse<Storefront.Mutation>): String?
-    fun mapMutationToCart(data: DraftOrderUpdateMutation.Data): Cart?
+    fun mapMutationToCart(data: DraftOrderUpdateMutation.Data, currency: String, rate: Float): Cart?
     fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String?
     fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?
     //fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart?
@@ -57,6 +56,6 @@ interface ShopifyMapper {
         liveAmount: Float,
         price: Storefront.MoneyV2
     ): Storefront.MoneyV2
-    fun mapQueryToCart(data: DraftOrderQuery.Data): Cart?
+    fun mapQueryToCart(data: DraftOrderQuery.Data,currency: String, rate: Float): Cart?
     fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String?
 }

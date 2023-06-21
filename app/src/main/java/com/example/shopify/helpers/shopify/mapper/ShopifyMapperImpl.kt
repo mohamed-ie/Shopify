@@ -103,7 +103,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         if (liveCurrencyCode != CurrencyCode.EGP.toString()
         )
             return Price(
-                String.format("%.2f",liveAmount * price.amount.toFloat()),
+                String.format("%.2f", liveAmount * price.amount.toFloat()),
                 liveCurrencyCode
             )
         return price
@@ -116,7 +116,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
     ): MoneyV2 {
         if (liveCurrencyCode != CurrencyCode.EGP.toString()
         )
-            return MoneyV2().setAmount(String.format("%.2f",liveAmount * price.amount.toFloat()))
+            return MoneyV2().setAmount(String.format("%.2f", liveAmount * price.amount.toFloat()))
                 .setCurrencyCode(Storefront.CurrencyCode.valueOf(liveCurrencyCode))
         return price
     }
@@ -144,13 +144,16 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             )
         }
 
-    override fun mapQueryToCart(data: DraftOrderQuery.Data): Cart =
-        data.draftOrder.toCart()
+    override fun mapQueryToCart(data: DraftOrderQuery.Data, currency: String, rate: Float): Cart =
+        data.draftOrder.toCart(
+            currencyCode = currency,
+            rate = rate
+        )
 
     override fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String? =
         response.run {
-            data?.customerUpdate?.customerUserErrors?.getOrNull(0)?.message?:
-            errors.getOrNull(0)?.message()
+            data?.customerUpdate?.customerUserErrors?.getOrNull(0)?.message ?: errors.getOrNull(0)
+                ?.message()
         }
 
     private fun mapProductConnectionToProductsBrand(productConnection: Storefront.ProductConnection): List<BrandProduct> =
@@ -213,8 +216,11 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         } ?: listOf()
     }
 
-    override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): Boolean =
-        response.hasErrors
+    override fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): String? =
+        response.run {
+            data?.customerAddressCreate?.customerUserErrors?.getOrNull(0)?.message
+                ?: errors.getOrNull(0)?.message()
+        }
 
     override fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean {
         return response.data?.customerAddressDelete?.customerUserErrors?.isEmpty() ?: false
@@ -309,19 +315,30 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         )
     }
 
-    override fun mapMutationToCart(data: DraftOrderUpdateMutation.Data): Cart? =
-        data.draftOrderUpdate?.run { draftOrder.toCart(userErrors.getOrNull(0)?.message) }
+    override fun mapMutationToCart(
+        data: DraftOrderUpdateMutation.Data,
+        currency: String,
+        rate: Float
+    ): Cart? =
+        data.draftOrderUpdate?.run {
+            draftOrder.toCart(
+                currencyCode = currency,
+                rate = rate,
+                error = userErrors.getOrNull(0)?.message
+            )
+        }
 
     override fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String? =
         response.data?.cartBuyerIdentityUpdate?.userErrors?.getOrNull(0)?.message
 
 
-    private fun mapFulfillmentToOrderItemState(fulfillment: Storefront.OrderFulfillmentStatus) :OrderItemState =
-        when(fulfillment){
+    private fun mapFulfillmentToOrderItemState(fulfillment: Storefront.OrderFulfillmentStatus): OrderItemState =
+        when (fulfillment) {
             Storefront.OrderFulfillmentStatus.FULFILLED -> OrderItemState.Delivered()
             Storefront.OrderFulfillmentStatus.UNFULFILLED -> OrderItemState.Progress()
-            else ->{
-                OrderItemState.Canceled()}
+            else -> {
+                OrderItemState.Canceled()
+            }
         }
 
 
@@ -354,62 +371,12 @@ private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection)
     }
 
 
-private fun DraftOrderUpdateMutation.DraftOrder?.toCart(error: String?): Cart {
-    val lines = this?.lineItems?.nodes?.map {
-        val product = it.product
-
-        val cartProduct = CartProduct(
-            id = ID(product?.id),
-            name = it.name,
-            thumbnail = it.image?.url as String,
-            collection = product?.productType ?: "",
-            vendor = it.vendor ?: ""
-        )
-        CartLine(
-            id = ID(it.id),
-            productVariantID = ID(it.variant?.id),
-            price = it.variant?.price.run { "$currencyCode ${this ?: "0.00"}" },
-            quantity = it.quantity,
-            availableQuantity = it.variant?.inventoryQuantity!!,
-            cartProduct = cartProduct
-        )
-    }
-
-    val taxes = "${this?.currencyCode} ${this?.totalTax ?: "0.00"}"
-    val subTotalPrice = "${this?.currencyCode} ${this?.subtotalPrice ?: "0.00"}"
-    val shippingFee = if (this?.totalShippingPrice?.toString() == "0.00") "FREE"
-    else "${this?.currencyCode} ${this?.totalShippingPrice ?: "0.00"}"
-    val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
-    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
-        ?.run { "$currencyCode $amount" }
-
-    val shippingAddress = this?.shippingAddress?.run {
-        MyAccountMinAddress(
-            id = id,
-            name = UIText.DynamicString("$firstName $lastName"),
-            address = UIText.DynamicString(formattedArea!!),
-            phone = UIText.DynamicString(phone!!)
-        )
-    }
-
-    return Cart(
-        lines = lines ?: emptyList(),
-        taxes = taxes,
-        subTotalsPrice = subTotalPrice,
-        shippingFee = shippingFee,
-        totalPrice = totalPrice,
-        discounts = discounts,
-//        address = this?.shippingAddress?.formattedArea ?: "",
-        hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
-        error = error,
-        endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
-    )
-}
-
-private fun DraftOrderQuery.DraftOrder?.toCart(
+private fun DraftOrderUpdateMutation.DraftOrder?.toCart(
+    currencyCode: String,
+    rate: Float,
     error: String? = null
 ): Cart {
-
+    val rate = if(rate == 0.0f) 1f else rate
     val lines = this?.lineItems?.nodes?.map {
         val product = it.product
 
@@ -420,23 +387,20 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
             collection = product?.productType ?: "",
             vendor = it.vendor ?: ""
         )
+        val price = (it.variant?.price?.toString()?.toFloat() ?: 0f) * rate
         CartLine(
             id = ID(it.id),
             productVariantID = ID(it.variant?.id),
-            price = it.variant?.price.run { "$currencyCode ${this ?: "0.00"}" },
+            price = String.format("%.2f", price),
             quantity = it.quantity,
+            currencyCode = currencyCode,
             availableQuantity = it.variant?.inventoryQuantity!!,
             cartProduct = cartProduct
         )
-    }
+    }?.sortedBy { it.cartProduct.name }
 
-    val taxes = "${this?.currencyCode} ${this?.totalTax ?: "0.00"}"
-    val subTotalPrice = "${this?.currencyCode} ${this?.subtotalPrice ?: "0.00"}"
-    val shippingFee = if (this?.totalShippingPrice?.toString() == "0.00") "FREE"
-    else "${this?.currencyCode} ${this?.totalShippingPrice ?: "0.00"}"
-    val totalPrice = "${this?.currencyCode} ${this?.totalPrice ?: "0.00"}"
     val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
-        ?.run { "$currencyCode $amount" }
+        ?.run { "$currencyCode ${String.format("%.2f", amount.toString().toFloat() * rate)}" }
 
     val shippingAddress = this?.shippingAddress?.run {
         MyAccountMinAddress(
@@ -446,12 +410,80 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
             phone = UIText.DynamicString(phone!!)
         )
     }
+
+    val totalTax = (this?.totalTax?.toString()?.toFloat() ?: 0f) * rate
+    val subtotalPrice = (this?.subtotalPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalShippingPrice = (this?.totalShippingPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate
+
     return Cart(
         lines = lines ?: emptyList(),
-        taxes = taxes,
-        subTotalsPrice = subTotalPrice,
-        shippingFee = shippingFee,
-        totalPrice = totalPrice,
+        taxes = String.format("%.2f", totalTax),
+        currencyCode = currencyCode,
+        subTotalsPrice = String.format("%.2f", subtotalPrice),
+        shippingFee =String.format("%.2f", totalShippingPrice),
+        totalPrice = String.format("%.2f", totalPrice),
+        discounts = discounts,
+        address = shippingAddress ?: MyAccountMinAddress(),
+        hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
+        error = error,
+        endCursor = this?.lineItems?.pageInfo?.endCursor ?: "",
+    )
+}
+
+private fun DraftOrderQuery.DraftOrder?.toCart(
+    currencyCode: String,
+    rate: Float,
+    error: String? = null
+): Cart {
+    val rate = if(rate == 0.0f) 1f else rate
+    val lines = this?.lineItems?.nodes?.map {
+        val product = it.product
+
+        val cartProduct = CartProduct(
+            id = ID(product?.id),
+            name = it.name,
+            thumbnail = it.image?.url as String?,
+            collection = product?.productType ?: "",
+            vendor = it.vendor ?: ""
+        )
+        val price = (it.variant?.price?.toString()?.toFloat() ?: 0f) * rate
+        CartLine(
+            id = ID(it.id),
+            productVariantID = ID(it.variant?.id),
+            price = String.format("%.2f", price),
+            quantity = it.quantity,
+            currencyCode = currencyCode,
+            availableQuantity = it.variant?.inventoryQuantity!!,
+            cartProduct = cartProduct
+        )
+    }?.sortedBy { it.cartProduct.name }
+
+    val discounts = (this?.appliedDiscount as DraftOrderUpdateMutation.AmountV2?)
+        ?.run { "$currencyCode ${String.format("%.2f", amount.toString().toFloat() * rate)}" }
+
+    val shippingAddress = this?.shippingAddress?.run {
+        MyAccountMinAddress(
+            id = id,
+            name = UIText.DynamicString("$firstName $lastName"),
+            address = UIText.DynamicString(formattedArea!!),
+            phone = UIText.DynamicString(phone!!)
+        )
+    }
+
+    val totalTax = (this?.totalTax?.toString()?.toFloat() ?: 0f) * rate
+    val subtotalPrice = (this?.subtotalPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalShippingPrice = (this?.totalShippingPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate
+    val shippingFee = if(totalShippingPrice == 0.0f) "FREE" else String.format("%.2f", totalShippingPrice)
+
+    return Cart(
+        lines = lines ?: emptyList(),
+        taxes = String.format("%.2f", totalTax),
+        currencyCode = currencyCode,
+        subTotalsPrice = String.format("%.2f", subtotalPrice),
+        shippingFee =shippingFee,
+        totalPrice = String.format("%.2f", totalPrice),
         discounts = discounts,
         address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,

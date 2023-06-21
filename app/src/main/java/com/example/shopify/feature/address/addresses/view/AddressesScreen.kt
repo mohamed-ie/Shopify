@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
+import com.example.shopify.feature.address.AddressViewModel
 import com.example.shopify.feature.address.addresses.AddressesViewModel
 import com.example.shopify.feature.navigation_bar.common.ConfirmationDialog
 import com.example.shopify.feature.navigation_bar.common.ErrorScreen
@@ -22,6 +23,7 @@ fun AddressesScreen(
     pickShipping: Boolean = false,
     pickBilling: Boolean = false,
     viewModel: AddressesViewModel,
+    addressViewModel: AddressViewModel,
     back: () -> Unit,
     navigateTo: (String) -> Unit
 ) {
@@ -44,7 +46,8 @@ fun AddressesScreen(
             allowPick = pickShipping||pickBilling,
             back = back,
             onEvent = viewModel::onEvent,
-            addresses = state.addresses
+            addresses = state.addresses,
+            setAddress= addressViewModel::setAddress
         )
 
         ScreenState.ERROR -> ErrorScreen {viewModel.loadAddresses()}

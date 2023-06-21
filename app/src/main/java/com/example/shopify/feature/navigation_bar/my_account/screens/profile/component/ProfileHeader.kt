@@ -1,7 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.profile.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -28,19 +27,24 @@ fun ProfileHeader(name: String, email: String, onEditInfoClick: () -> Unit) {
     ) {
         Column(
             modifier = Modifier
-                .padding(top = 24.dp, bottom = 12.dp, start = 16.dp, end = 16.dp)
+                .padding(top = 24.dp, bottom = 12.dp)
         ) {
             Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 text = name,
                 style = MaterialTheme.typography.titleLarge
             )
-            Text(text = email)
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = email
+            )
 
-            TextButton(
-                contentPadding = PaddingValues(),
-                onClick = onEditInfoClick
-            ) {
-                Text(text = stringResource(id = R.string.edit_info))
+            TextButton(onClick = onEditInfoClick, shape = RectangleShape) {
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(id = R.string.edit_info))
             }
         }
     }

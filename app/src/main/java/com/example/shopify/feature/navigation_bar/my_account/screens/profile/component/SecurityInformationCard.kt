@@ -1,7 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.profile.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,41 +30,58 @@ fun SecurityInformationCard(onChangePasswordClick: () -> Unit, onChangePhoneNumb
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(vertical = 16.dp)
         ) {
             //security information
             Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(id = R.string.security_information),
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.height(8.dp))
             //password
-            Text(text = stringResource(id = R.string.password))
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = stringResource(id = R.string.password)
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
             //
             Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 text = "* * * * * * * * * * * * *",
                 style = MaterialTheme.typography.titleLarge
             )
             //change password
             TextButton(
-                contentPadding = PaddingValues(),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RectangleShape,
                 onClick = onChangePasswordClick
             ) {
-                Text(text = stringResource(id = R.string.change_password))
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(id = R.string.change_password)
+                )
             }
             Divider(modifier = Modifier.height(.5.dp))
 
             //change phone number
             TextButton(
-                contentPadding = PaddingValues(),
+                shape = RectangleShape,
                 onClick = onChangePhoneNumber
             ) {
-                Text(text = stringResource(id = R.string.change_phone_number))
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(id = R.string.change_phone_number)
+                )
             }
 
             Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(id = R.string.this_phone_number_is_your_primary_phone_number_and_is_unique_across_shopify),
                 style = MaterialTheme.typography.labelSmall
             )

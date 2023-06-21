@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers
 import org.junit.After
@@ -32,10 +33,9 @@ class OrderViewModelTest {
 
     @Before
     fun setup() {
-        val testDispatcher = TestCoroutineDispatcher()
+        val testDispatcher = runTest {
         fakerepository = FakeShopifyRepositoryImpl()
-        orderViewModel =
-            OrderViewModel(CreditCardInfoStateHandlerImpl(), testDispatcher, fakerepository)
+        orderViewModel = OrderViewModel(CreditCardInfoStateHandlerImpl(), testDispatcher, fakerepository)
         Dispatchers.setMain(testDispatcher)
     }
 

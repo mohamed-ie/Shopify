@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.edit_info
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,9 +33,11 @@ fun EditInfoScreenContent(
     val firstNameState = state.firstName
     val lastNameState = state.lastName
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.surface)) {
         NamedTopAppBar(
-            stringResource(id = R.string.change_password),
+            stringResource(id = R.string.edit_information),
             back = back
         )
         RemoteErrorHeader(error = state.remoteError?.asString())
@@ -52,6 +55,7 @@ fun EditInfoScreenContent(
                 focusedContainerColor = Color.Transparent
             )
         )
+        Spacer(modifier = Modifier.height(16.dp))
         TextField(
             modifier = Modifier
                 .fillMaxWidth()

@@ -24,7 +24,7 @@ fun NamedTopAppBar(
 ) {
     TopAppBar(
         modifier = Modifier.background(Color.White),
-        title = { Text(text = stringResource(id = R.string.app_name)) },
+        title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = back) {
                 Icon(

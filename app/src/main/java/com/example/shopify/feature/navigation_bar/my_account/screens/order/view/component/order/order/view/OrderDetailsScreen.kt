@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.total_cost.TotalCostCard
 import com.example.shopify.feature.navigation_bar.common.NamedTopAppBar
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.OrderViewModel
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.CheckoutViewModel
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.component.OrderDetailsInfoCard
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.component.OrderDetailsProducts
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.order.component.PaymentMethodChooser
@@ -29,7 +29,7 @@ import com.example.shopify.theme.ShopifyTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun OrderDetails(
-    viewModel: OrderViewModel,
+    viewModel: CheckoutViewModel,
     back: () -> Unit
 ) {
     val order = viewModel.orderList.collectAsState().value[viewModel.orderIndex]

@@ -1,6 +1,7 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.credit_card_payment
 
 import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
+import com.example.shopify.helpers.UIText
 
 data class CreditCardInfoState(
     val firstNameState: TextFieldState = TextFieldState(),
@@ -9,4 +10,5 @@ data class CreditCardInfoState(
     val expireMonthState: TextFieldState = TextFieldState(),
     val expireYearState: TextFieldState = TextFieldState(),
     val ccvState: TextFieldState = TextFieldState(),
+    val remoteError: UIText? = null
 )

@@ -2,13 +2,19 @@ package com.example.shopify.feature.address.add_address
 
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
+import com.example.shopify.di.DefaultDispatcher
 import com.example.shopify.feature.address.add_address.view.AddAddressEvent
 import com.example.shopify.feature.address.add_address.view.AddAddressState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.UIText
+import com.example.shopify.helpers.handle
 import com.example.shopify.helpers.validator.TextFieldStateValidator
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.MailingAddress
+import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AddAddressViewModel @Inject constructor(
     private val textFieldStateValidator: TextFieldStateValidator,
-    private val repository: ShopifyRepository
+    private val repository: ShopifyRepository,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
     private val _state = MutableStateFlow(AddAddressState())
     val state = _state.asStateFlow()
@@ -28,9 +35,30 @@ class AddAddressViewModel @Inject constructor(
     private val _back = MutableSharedFlow<Boolean>()
     val back = _back.asSharedFlow()
 
+    private var addressId: ID? = null
+
     init {
         toStableScreenState()
     }
+
+     fun loadAddress(address: MailingAddress) {
+        onEvent(AddAddressEvent.StreetChanged(address.address1))
+        onEvent(AddAddressEvent.ApartmentChanged(address.address2))
+        onEvent(AddAddressEvent.CityChanged(address.city))
+        onEvent(AddAddressEvent.CountryChanged(address.country))
+        onEvent(AddAddressEvent.StateChanged(address.province))
+        onEvent(AddAddressEvent.ZIPChanged(address.zip))
+        onEvent(AddAddressEvent.FirstNameChanged(address.firstName))
+        onEvent(AddAddressEvent.LastNameChanged(address.lastName))
+        onEvent(AddAddressEvent.PhoneChanged(address.phone))
+
+        if (address.company != null && address.company.isNotBlank()) {
+            onEvent(AddAddressEvent.WorkAddressSelected)
+            onEvent(AddAddressEvent.OrganizationChanged(address.company))
+        }
+        addressId= address.id
+    }
+
 
     fun onEvent(event: AddAddressEvent) {
         when (event) {
@@ -110,13 +138,18 @@ class AddAddressViewModel @Inject constructor(
             AddAddressEvent.WorkAddressSelected ->
                 _state.update { it.copy(isHomeAddress = false) }
 
-            AddAddressEvent.Save -> {
+            is AddAddressEvent.Save -> {
                 updateFields()
                 if (isFieldsValid())
-                    save()
+                    addressId?.let { edit(it) } ?: save()
             }
 
         }
+    }
+
+    private fun edit(addressId: ID) = viewModelScope.launch(defaultDispatcher) {
+        toLoadingScreenState()
+        handleAddressResource(repository.updateAddress(addressId, getAddress()))
     }
 
     private fun updateFields() {
@@ -128,7 +161,6 @@ class AddAddressViewModel @Inject constructor(
                 state = textFieldStateValidator.emptyValidation(oldState.state),
                 organization = textFieldStateValidator.emptyValidation(oldState.organization),
                 country = textFieldStateValidator.emptyValidation(oldState.country),
-                zip = textFieldStateValidator.validateZip(oldState.zip),
                 phone = textFieldStateValidator.validatePhone(oldState.phone),
                 firstName = textFieldStateValidator.validateName(oldState.firstName),
                 lastName = textFieldStateValidator.validateName(oldState.lastName),
@@ -150,31 +182,32 @@ class AddAddressViewModel @Inject constructor(
 
     }
 
-    private fun save() {
+    private fun save() = viewModelScope.launch {
         toLoadingScreenState()
-        val address = Storefront.MailingAddressInput().apply {
-            this.address1 = state.value.street.value
-            this.address2 = state.value.apartment.value
-            this.province = state.value.state.value
-            this.city = state.value.city.value
-            this.country = state.value.country.value
-            this.firstName = state.value.firstName.value
-            this.lastName = state.value.lastName.value
-            this.phone = state.value.phone.value
-            this.zip = state.value.zip.value
-            this.company = state.value.organization.value
-        }
-        viewModelScope.launch {
-            when (repository.saveAddress(address)) {
-                is Resource.Error -> {
-                    toErrorScreenState()
-                }
-
-                is Resource.Success -> {
-                    _back.emit(true)
-                }
-            }
-        }
+        handleAddressResource(repository.saveAddress(getAddress()))
     }
 
+
+    private fun handleAddressResource(resource: Resource<String?>) = resource.handle(
+        onError = ::toErrorScreenState,
+        onSuccess = { data ->
+            if (data == null)
+                viewModelScope.launch { _back.emit(true) }
+            else
+                _state.update { it.copy(remoteError = UIText.DynamicString(data)) }
+            toStableScreenState()
+        })
+
+    private fun getAddress() = Storefront.MailingAddressInput().apply {
+        this.address1 = state.value.street.value
+        this.address2 = state.value.apartment.value
+        this.province = state.value.state.value
+        this.city = state.value.city.value
+        this.country = state.value.country.value
+        this.firstName = state.value.firstName.value
+        this.lastName = state.value.lastName.value
+        this.phone = state.value.phone.value
+        this.zip = state.value.zip.value
+        this.company = state.value.organization.value
+    }
 }

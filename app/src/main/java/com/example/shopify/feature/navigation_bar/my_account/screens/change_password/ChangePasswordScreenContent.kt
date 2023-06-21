@@ -1,5 +1,6 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.change_password
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +44,9 @@ fun ChangePasswordScreenContent(
     val confirmPasswordState = state.confirmPassword
     val passwordState = state.password
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .background(MaterialTheme.colorScheme.surface)
+        .fillMaxSize()) {
         NamedTopAppBar(
             stringResource(id = R.string.change_password), back = back
         )
@@ -81,6 +84,8 @@ fun ChangePasswordScreenContent(
                 focusedContainerColor = Color.Transparent
             )
         )
+        Spacer(modifier = Modifier.height(16.dp))
+
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
