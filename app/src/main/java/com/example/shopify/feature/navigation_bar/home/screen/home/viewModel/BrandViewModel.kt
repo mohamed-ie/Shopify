@@ -19,11 +19,8 @@ class BrandViewModel @Inject constructor(
     private var _brandList = MutableStateFlow<List<Brand>>(emptyList())
     val brandList = _brandList.asStateFlow()
 
-    init {
-        getBrandList()
-    }
 
-    private fun getBrandList() {
+    fun getBrandList() {
         viewModelScope.launch(Dispatchers.Default) {
             repository.getBrands().collect {
                 when (it) {

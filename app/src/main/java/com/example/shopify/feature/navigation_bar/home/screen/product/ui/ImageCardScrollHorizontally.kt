@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -44,6 +41,7 @@ import com.example.shopify.utils.shopifyLoading
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageCardScrollHorizontally(
+    isAvailable:Boolean = true,
     images: List<String>,
     isFavourite: Boolean,
     addToFavourite: () -> Unit
@@ -86,34 +84,35 @@ fun ImageCardScrollHorizontally(
                     }
                 )
             }
-            IconButton(
-                onClick = addToFavourite,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 8.dp, end = 12.dp)
-                    .shadow(1.dp, shape = CircleShape, spotColor = Color.Black)
-                    .clip(CircleShape)
-                    .size(35.dp)
-                    .background(Color.White)
+            if (isAvailable)
+                IconButton(
+                    onClick = addToFavourite,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 12.dp)
+                        .shadow(1.dp, shape = CircleShape, spotColor = Color.Black)
+                        .clip(CircleShape)
+                        .size(35.dp)
+                        .background(Color.White)
 
-            ) {
-                if (isFavourite) {
-                    Icon(
-                        imageVector = Icons.Rounded.Favorite,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.Gray
-                    )
+                ) {
+                    if (isFavourite) {
+                        Icon(
+                            imageVector = Icons.Rounded.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.Gray
+                        )
+                    }
+
                 }
-
-            }
         }
         DotIndicator(
             pageCount = images.size, currentPage = pagerState.currentPage

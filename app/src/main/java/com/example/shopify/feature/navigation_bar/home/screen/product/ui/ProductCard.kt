@@ -44,7 +44,11 @@ fun ProductCard(
         onClick = onProductItemClick
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ImageCardScrollHorizontally(product.images, product.isFavourite, onFavouriteClick)
+            ImageCardScrollHorizontally(
+                images = product.images,
+                isFavourite = product.isFavourite,
+                addToFavourite = onFavouriteClick
+            )
             Text(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -22,13 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
 import com.example.shopify.feature.navigation_bar.home.screen.product.ui.ImageCardScrollHorizontally
-import com.example.shopify.theme.Gray
-import com.example.shopify.theme.shopifyColors
 
 @Composable
 fun ProductDetailsCard(
@@ -37,9 +34,8 @@ fun ProductDetailsCard(
     thumbnails: List<String>,
     currencyCode: String,
     price: String,
-    realPrice: String,
-    discountPercent: String,
     quantity: String,
+    isAvailable:Boolean,
     isLowStock: Boolean,
     isFavourite: Boolean,
     onFavouriteClick: (Boolean) -> Unit
@@ -70,6 +66,7 @@ fun ProductDetailsCard(
             contentAlignment = Alignment.Center
         ) {
             ImageCardScrollHorizontally(
+                isAvailable = isAvailable,
                 images = thumbnails,
                 isFavourite = isFavourite,
                 addToFavourite = { onFavouriteClick(isFavourite) }
@@ -78,47 +75,47 @@ fun ProductDetailsCard(
         Spacer(modifier = Modifier.height(25.dp))
         Row {
             Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                if(isAvailable){
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = currencyCode,
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = price,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(R.string.inclusive_of_vat),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }else{
                     Text(
-                        text = currencyCode,
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = stringResource(R.string.the_current_product_is_not_available),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
                     Text(
-                        text = price,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(R.string.inclusive_of_vat),
+                        text = stringResource(R.string.please_check_our_other_available_products),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.Gray,
                         fontWeight = FontWeight.Medium
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = realPrice,
-                        color = Gray,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
-                        textDecoration = TextDecoration.LineThrough,
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(id = R.string.discount, "$discountPercent%"),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.shopifyColors.DarkGreenColor,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                if (isLowStock) {
+                if (isLowStock && isAvailable) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.low_stock_only_4_left, quantity),
@@ -168,11 +165,10 @@ fun PreviewProductDetailsCard() {
         thumbnails = listOf("https://www.skechers.com/dw/image/v2/BDCN_PRD/on/demandware.static/-/Sites-skechers-master/default/dw5fb9d39e/images/large/149710_MVE.jpg?sw=800"),
         currencyCode = "AED",
         price = "172.00",
-        realPrice = "249.00",
-        discountPercent = "30%",
         quantity = "4",
         isLowStock = false,
         isFavourite = true,
+        isAvailable = true
     ) {
 
     }
