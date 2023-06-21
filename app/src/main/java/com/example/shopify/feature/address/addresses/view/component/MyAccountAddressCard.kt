@@ -68,7 +68,8 @@ fun MyAccountAddressCard(
                 Row(
                     Modifier
                         .clickable(role = Role.Button, onClick = onEdit)
-                        .padding(4.dp),
+                        .padding(horizontal = 4.dp)
+                        .padding(top=4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(

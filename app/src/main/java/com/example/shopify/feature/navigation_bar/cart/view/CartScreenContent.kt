@@ -31,7 +31,7 @@ import com.example.shopify.feature.Graph
 import com.example.shopify.feature.address.AddressGraph
 import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.navigation_bar.cart.CartGraph
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.feature.navigation_bar.cart.CartState
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemCard
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemEvent
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartLineState
@@ -50,13 +50,14 @@ val cartElevation = .5.dp
 
 @Composable
 fun CartScreenContent(
-    cart: Cart,
+    state: CartState,
     itemsState: List<CartLineState>,
     couponState: CartCouponState,
     onCartItemEvent: (CartItemEvent) -> Unit,
     onCouponEvent: (CartCouponEvent) -> Unit,
     navigateTo: (route: String) -> Unit
 ) {
+    val cart = state.cart
     val itemsCount = cart.lines.size
     Column(Modifier.fillMaxSize()) {
         RemoteErrorHeader(error = cart.error)
@@ -64,12 +65,19 @@ fun CartScreenContent(
             itemsCount = itemsCount,
             address = cart.address.address.asString(),
             navigateToWishlistScreen = {
-                if (cart.isLoggedIn)
+                if (state.isLoggedIn)
                     navigateTo(Graph.WISH_LIST)
                 else
                     navigateTo(Auth.SIGN_IN)
             },
-            navigateToAddressesScreen = { navigateTo(AddressGraph.Addresses.withArgs("true","ture")) }
+            navigateToAddressesScreen = {
+                navigateTo(
+                    AddressGraph.Addresses.withArgs(
+                        "true",
+                        "ture"
+                    )
+                )
+            }
         )
         if (cart.lines.isEmpty())
             EmptyCart()
@@ -116,11 +124,11 @@ fun CartScreenContent(
                 item {
                     TotalCostCard(
                         itemsCount = itemsCount,
-                        subTotalsPrice = cart.subTotalsPrice,
-                        shippingFee = cart.shippingFee,
-                        taxes = cart.taxes,
+                        subTotalsPrice = "${cart.currencyCode} ${cart.subTotalsPrice}",
+                        shippingFee =cart.shippingFee,
+                        taxes ="${cart.currencyCode} ${cart.taxes}",
                         discounts = cart.discounts,
-                        totalPrice = cart.totalPrice
+                        totalPrice = "${cart.currencyCode} ${cart.totalPrice}"
                     )
                 }
 
@@ -157,7 +165,7 @@ fun CartScreenContent(
             }
         CartFooter(
             itemsCount = itemsCount,
-            totalPrice = cart.totalPrice,
+            totalPrice ="${cart.currencyCode} ${cart.totalPrice}",
             checkout = {
                 // navigate to place checkout
                 navigateTo(CartGraph.CHECK_OUT)

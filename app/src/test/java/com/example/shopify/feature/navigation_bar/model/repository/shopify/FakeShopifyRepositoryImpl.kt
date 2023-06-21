@@ -13,6 +13,7 @@ import com.example.shopify.feature.navigation_bar.home.screen.product.model.Bran
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
+import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
@@ -38,8 +39,9 @@ class FakeShopifyRepositoryImpl(
                     ID(""),
                     ID(""),
                     "EGP 1500",
-                    1,
+                    "",
                     5,
+                    9,
                     CartProduct(
                         ID(""),
                         "",
@@ -166,7 +168,7 @@ class FakeShopifyRepositoryImpl(
         )
 
 
-    override suspend fun setProductReview(productId: ID, review: Review) {
+    override suspend fun setProductReview(productId: ID, review: Review): Resource<Unit> {
         TODO("Not yet implemented")
     }
 
@@ -333,7 +335,7 @@ class FakeShopifyRepositoryImpl(
                         description = "The forefather of the Vans family, the Vans Authentic was introduced in 1966 and nearly 4 decades later is still going strong, its popularity extending from the original fans - skaters and surfers to all sorts. The Vans Authentic is constructed from canvas and Vans' signature waffle outsole construction."
                     )
                 ),
-                fulfillment = Storefront.OrderFulfillmentStatus.FULFILLED,
+                fulfillment = OrderItemState.Progress(),
                 financialStatus = Storefront.OrderFinancialStatus.PAID
             ),
             Order(
@@ -364,7 +366,7 @@ class FakeShopifyRepositoryImpl(
                         description = "The forefather of the Vans family, the Vans Authentic was introduced in 1966 and nearly 4 decades later is still going strong, its popularity extending from the original fans - skaters and surfers to all sorts. The Vans Authentic is constructed from canvas and Vans' signature waffle outsole construction."
                     )
                 ),
-                fulfillment = Storefront.OrderFulfillmentStatus.FULFILLED,
+                fulfillment = OrderItemState.Delivered(),
                 financialStatus = Storefront.OrderFinancialStatus.PAID
             )
         )
@@ -397,25 +399,28 @@ class FakeShopifyRepositoryImpl(
     }
 
     override suspend fun sendCompletePayment(): Resource<Pair<String?, String?>?> {
-      return  Resource.Success(Pair("", null))
+        return Resource.Success(Pair("", null))
     }
 
     override suspend fun changePassword(password: String): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun changePhoneNumber(phone: String): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun changeName(firstName: String, lastName: String): Resource<String?> {
-        TODO("Not yet implemented")
+        return Resource.Success(null)
     }
 
     override suspend fun createUserEmail(email: String): Resource<Unit> =
         Resource.Success(Unit)
 
-    override suspend fun updateAddress(addressId: ID, address: Storefront.MailingAddressInput): Resource<String?> {
+    override suspend fun updateAddress(
+        addressId: ID,
+        address: Storefront.MailingAddressInput
+    ): Resource<String?> {
         TODO("Not yet implemented")
     }
 }

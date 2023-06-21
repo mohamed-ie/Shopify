@@ -5,6 +5,7 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponEvent
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.cache
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -51,7 +52,7 @@ class CartViewModelTest {
         cartViewModel.onCartItemEvent(CartItemEvent.QuantityChanged(index, quantity))
 
         //then
-        val result = cartViewModel.state.first().lines[index].quantity
+        val result = cartViewModel.state.first().cart.lines[index].quantity
         assertEquals(result, quantity)
     }
 
@@ -61,11 +62,11 @@ class CartViewModelTest {
         val index = 0
 
         //when
-        val sizeBeforeRemove = cartViewModel.state.first().lines.size
+        val sizeBeforeRemove = cartViewModel.state.first().cart.lines.size
         cartViewModel.onCartItemEvent(CartItemEvent.RemoveLine(index))
 
         //then
-        val sizeAfterRemove = cartViewModel.state.first().lines.size
+        val sizeAfterRemove = cartViewModel.state.first().cart.lines.size
         val expected = sizeBeforeRemove - 1
 
         assertEquals(expected, sizeAfterRemove)
@@ -76,11 +77,11 @@ class CartViewModelTest {
         val index = 0
 
         //when
-        val sizeBeforeRemove = cartViewModel.state.first().lines.size
+        val sizeBeforeRemove = cartViewModel.state.first().cart.lines.size
         cartViewModel.onCartItemEvent(CartItemEvent.MoveToWishlist(index))
 
         //then
-        val sizeAfterRemove = cartViewModel.state.first().lines.size
+        val sizeAfterRemove = cartViewModel.state.first().cart.lines.size
         val expected = sizeBeforeRemove - 1
 
         assertEquals(expected, sizeAfterRemove)
@@ -130,7 +131,7 @@ class CartViewModelTest {
         cartViewModel.onCouponEvent(CartCouponEvent.Apply)
 
         //then
-        val actual =cartViewModel.state.first().couponError
+        val actual =cartViewModel.state.first().cart.couponError
 
         assertNull(actual)
     }

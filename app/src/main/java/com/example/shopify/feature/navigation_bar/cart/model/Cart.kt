@@ -5,10 +5,11 @@ import com.shopify.buy3.Storefront.MoneyV2
 
 data class Cart(
     val lines: List<CartLine> = listOf(),
-    val taxes: String ="" ,
-    val subTotalsPrice: String = "",
-    val shippingFee: String = "",
-    val totalPrice: String="",
+    val taxes: String ="",
+    val subTotalsPrice: String ="",
+    val shippingFee: String ="",
+    val currencyCode: String = "EGP",
+    val totalPrice: String = "",
     val checkoutPrice: String? = null,
     val coupons: Map<String, MoneyV2> = emptyMap(),
     val discounts: String? = null,
@@ -17,5 +18,4 @@ data class Cart(
     val couponError: String? = null,
     val hasNextPage: Boolean = false,
     val endCursor: String = "",
-    val isLoggedIn:Boolean = false
 )

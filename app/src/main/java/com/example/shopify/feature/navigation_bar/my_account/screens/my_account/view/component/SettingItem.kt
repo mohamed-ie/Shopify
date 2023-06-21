@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowRight
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -32,13 +34,18 @@ fun SettingItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = icon, contentDescription = null)
+        Icon(
+            modifier = Modifier.size(22.dp),
+            tint = MaterialTheme.colorScheme.primary,
+            imageVector = icon,
+            contentDescription = null)
 
-        Spacer(modifier = Modifier.width(24.dp))
+        Spacer(modifier = Modifier.width(16.dp))
 
         Text(
             text = text,
             style = MaterialTheme.typography.titleMedium,
+            color = Color.DarkGray,
             fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -47,7 +54,9 @@ fun SettingItem(
         Spacer(modifier = Modifier.width(16.dp))
 
         Icon(
+            modifier = Modifier.size(24.dp),
             imageVector = Icons.Rounded.ArrowRight,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = null
         )
     }

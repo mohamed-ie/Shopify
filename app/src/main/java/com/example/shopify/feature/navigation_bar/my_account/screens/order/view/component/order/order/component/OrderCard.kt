@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
@@ -44,7 +42,6 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.model
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
 import com.example.shopify.theme.ShopifyTheme
 import com.example.shopify.ui.screen.order.component.OrdersFilledTonalButton
-import com.shopify.buy3.Storefront.OrderFulfillmentStatus
 import org.joda.time.DateTime
 
 @OptIn(ExperimentalLayoutApi::class)

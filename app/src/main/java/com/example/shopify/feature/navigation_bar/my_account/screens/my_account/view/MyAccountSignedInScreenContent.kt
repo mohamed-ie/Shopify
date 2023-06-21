@@ -8,11 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.PinDrop
-import androidx.compose.material.icons.rounded.CurrencyExchange
-import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.icons.twotone.Paid
+import androidx.compose.material.icons.twotone.PinDrop
+import androidx.compose.material.icons.twotone.PowerSettingsNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -48,30 +49,31 @@ fun MyAccountSignedInScreenContent(
             .padding(innerPadding)
             .fillMaxSize()
     ) {
-            MyAccountSignedInHeader(
-                name = state.name,
-                mail = state.email,
-                navigateTo = navigateTo
-            )
+        MyAccountSignedInHeader(
+            name = state.name,
+            mail = state.email,
+            navigateTo = navigateTo
+        )
 
         Text(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .padding(top = 8.dp),
             text = stringResource(id = R.string.settings),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.shopifyColors.Gray
+            color =Color.DarkGray
         )
 
         Card(
             modifier = Modifier.padding(vertical = 2.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(2.dp),
             shape = RectangleShape
         ) {
             Column {
                 SettingItem(
                     text = stringResource(id = R.string.currency),
-                    icon = Icons.Rounded.CurrencyExchange,
+                    icon = Icons.TwoTone.Paid,
                     current = { Text(text = state.currency) },
                     onClick = { onEvent(MyAccountEvent.ToggleCurrencyRadioGroupModalSheetVisibility) }
                 )
@@ -79,7 +81,7 @@ fun MyAccountSignedInScreenContent(
 
                 SettingItem(
                     text = stringResource(id = R.string.addresses),
-                    icon = Icons.Outlined.PinDrop,
+                    icon = Icons.TwoTone.PinDrop,
                     onClick = { navigateTo(Graph.ADDRESS) }
                 )
             }
@@ -96,12 +98,13 @@ fun MyAccountSignedInScreenContent(
         ) {
 
             Icon(
-                imageVector = Icons.Rounded.PowerSettingsNew,
+                modifier = Modifier.size(22.dp),
+                imageVector = Icons.TwoTone.PowerSettingsNew,
                 tint = MaterialTheme.shopifyColors.Black,
                 contentDescription = null
             )
 
-            Spacer(modifier = Modifier.width(24.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             Text(
                 text = stringResource(id = R.string.sign_out),

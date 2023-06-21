@@ -30,7 +30,7 @@ class CartViewModel @Inject constructor(
     private val repository: ShopifyRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
-    private val _state = MutableStateFlow(Cart())
+    private val _state = MutableStateFlow(CartState())
     val state = _state.asStateFlow()
 
     private val _cartLinesState = MutableStateFlow(mutableStateListOf<CartLineState>())
@@ -52,7 +52,7 @@ class CartViewModel @Inject constructor(
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> {
                 resource.data?.run {
-                    _state.update { this }
+                    _state.update { it.copy(cart = this) }
                     _cartLinesState.update { List(this.lines.size) { CartLineState() }.toMutableStateList() }
                     _couponState.update { it.copy(errorVisible = this.couponError != null) }
                 }
@@ -62,7 +62,7 @@ class CartViewModel @Inject constructor(
 
     private fun checkIsLoggedIn() {
         repository.isLoggedIn()
-            .onEach { _state.update { cart -> cart.copy(isLoggedIn = it) } }
+            .onEach {isLoggedIn-> _state.update {it.copy(isLoggedIn = isLoggedIn) } }
             .launchIn(viewModelScope)
     }
 
@@ -97,7 +97,7 @@ class CartViewModel @Inject constructor(
                     isChooseQuantityOpen = false
                 )
             }
-            val cartLineId = _state.value.lines[index].productVariantID.toString()
+            val cartLineId = _state.value.cart.lines[index].productVariantID.toString()
             when (val resource = repository.changeCartLineQuantity(cartLineId, quantity)) {
                 is Resource.Error -> toErrorScreenState()
                 is Resource.Success -> handleCartResource(resource)
@@ -106,7 +106,7 @@ class CartViewModel @Inject constructor(
 
     private fun removeCartLine(index: Int) = viewModelScope.launch(defaultDispatcher) {
         _cartLinesState.update(index) { it.copy(isRemoving = it.isRemoving.not()) }
-        val cartLineId = _state.value.lines[index].productVariantID.toString()
+        val cartLineId = _state.value.cart.lines[index].productVariantID.toString()
         when (val resource = repository.removeCartLines(cartLineId)) {
             is Resource.Error -> toErrorScreenState()
             is Resource.Success -> handleCartResource(resource)
@@ -116,11 +116,11 @@ class CartViewModel @Inject constructor(
     private fun removeCartLineAndAddToWishList(index: Int) =
         viewModelScope.launch(defaultDispatcher) {
             _cartLinesState.update(index) { it.copy(isMovingToWishlist = it.isMovingToWishlist.not()) }
-            val cartLineId = _state.value.lines[index].id.toString()
+            val cartLineId = _state.value.cart.lines[index].id.toString()
             when (val resource = repository.removeCartLines(cartLineId)) {
                 is Resource.Error -> toErrorScreenState()
                 is Resource.Success -> {
-                    _state.value.lines[index].cartProduct.id.let { productId ->
+                    _state.value.cart.lines[index].cartProduct.id.let { productId ->
                         addCartItemToWishList(
                             productId
                         )

@@ -1,5 +1,6 @@
 package com.example.shopify.feature.address
 
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -18,19 +19,30 @@ fun NavGraphBuilder.addressGraph(navController: NavController) {
             route = AddressGraph.Addresses.routeWithArgs,
             arguments = AddressGraph.Addresses.args
         ) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Graph.ADDRESS)
+            }
             AddressesScreen(
                 pickShipping = backStackEntry.arguments?.getBoolean(AddressGraph.Addresses.args[0].name)
                     ?: false,
                 pickBilling = backStackEntry.arguments?.getBoolean(AddressGraph.Addresses.args[1].name)
                     ?: false,
                 viewModel = hiltViewModel(),
+                addressViewModel = hiltViewModel(parentEntry),
                 back = { navController.popBackStack() },
                 navigateTo = { navController.navigate(it) }
             )
         }
 
-        composable(route = AddressGraph.ADD_ADDRESS) {
-            AddAddressScreen(viewModel = hiltViewModel(), back = { navController.popBackStack() })
+        composable(route = AddressGraph.ADD_ADDRESS) {backStackEntry->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Graph.ADDRESS)
+            }
+            AddAddressScreen(
+                viewModel = hiltViewModel(),
+                addressViewModel= hiltViewModel(parentEntry),
+                back = { navController.popBackStack() }
+            )
         }
 
     }

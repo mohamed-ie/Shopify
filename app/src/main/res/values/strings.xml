@@ -27,7 +27,7 @@
     <string name="password">"Password"</string>
     <string name="password_place_holder">"Please enter your password"</string>
     <string name="email_place_holder">"Please enter your email address"</string>
-    <string name="signin">sign In</string>
+    <string name="signin">Sign In</string>
     <string name="dont_have_an_account_text">Don\'t have an account?</string>
     <string name="sign_up">Sign up</string>
     <string name="create_a_shopify_account">Create a Shopify account</string>

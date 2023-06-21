@@ -1,6 +1,5 @@
 package com.example.shopify.feature.address.add_address
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
 import com.example.shopify.di.DefaultDispatcher
@@ -12,6 +11,7 @@ import com.example.shopify.helpers.UIText
 import com.example.shopify.helpers.handle
 import com.example.shopify.helpers.validator.TextFieldStateValidator
 import com.shopify.buy3.Storefront
+import com.shopify.buy3.Storefront.MailingAddress
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,7 +27,6 @@ import javax.inject.Inject
 class AddAddressViewModel @Inject constructor(
     private val textFieldStateValidator: TextFieldStateValidator,
     private val repository: ShopifyRepository,
-    private val savedStateHandle: SavedStateHandle,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : BaseScreenViewModel() {
     private val _state = MutableStateFlow(AddAddressState())
@@ -36,17 +35,28 @@ class AddAddressViewModel @Inject constructor(
     private val _back = MutableSharedFlow<Boolean>()
     val back = _back.asSharedFlow()
 
-    private val addressId = savedStateHandle.get<String>("addressId")
+    private var addressId: ID? = null
 
     init {
         toStableScreenState()
-        addressId?.let {
-            loadAddress()
-        }
     }
 
-    private fun loadAddress() = viewModelScope.launch(defaultDispatcher){
+     fun loadAddress(address: MailingAddress) {
+        onEvent(AddAddressEvent.StreetChanged(address.address1))
+        onEvent(AddAddressEvent.ApartmentChanged(address.address2))
+        onEvent(AddAddressEvent.CityChanged(address.city))
+        onEvent(AddAddressEvent.CountryChanged(address.country))
+        onEvent(AddAddressEvent.StateChanged(address.province))
+        onEvent(AddAddressEvent.ZIPChanged(address.zip))
+        onEvent(AddAddressEvent.FirstNameChanged(address.firstName))
+        onEvent(AddAddressEvent.LastNameChanged(address.lastName))
+        onEvent(AddAddressEvent.PhoneChanged(address.phone))
 
+        if (address.company != null && address.company.isNotBlank()) {
+            onEvent(AddAddressEvent.WorkAddressSelected)
+            onEvent(AddAddressEvent.OrganizationChanged(address.company))
+        }
+        addressId= address.id
     }
 
 
@@ -131,17 +141,15 @@ class AddAddressViewModel @Inject constructor(
             is AddAddressEvent.Save -> {
                 updateFields()
                 if (isFieldsValid())
-                    addressId?.let {
-                        edit(it)
-                    } ?: save()
+                    addressId?.let { edit(it) } ?: save()
             }
 
         }
     }
 
-    private fun edit(addressId: String) = viewModelScope.launch(defaultDispatcher) {
+    private fun edit(addressId: ID) = viewModelScope.launch(defaultDispatcher) {
         toLoadingScreenState()
-        handleAddressError(repository.updateAddress(ID(addressId), getAddress()))
+        handleAddressResource(repository.updateAddress(addressId, getAddress()))
     }
 
     private fun updateFields() {
@@ -153,7 +161,6 @@ class AddAddressViewModel @Inject constructor(
                 state = textFieldStateValidator.emptyValidation(oldState.state),
                 organization = textFieldStateValidator.emptyValidation(oldState.organization),
                 country = textFieldStateValidator.emptyValidation(oldState.country),
-                zip = textFieldStateValidator.validateZip(oldState.zip),
                 phone = textFieldStateValidator.validatePhone(oldState.phone),
                 firstName = textFieldStateValidator.validateName(oldState.firstName),
                 lastName = textFieldStateValidator.validateName(oldState.lastName),
@@ -177,15 +184,15 @@ class AddAddressViewModel @Inject constructor(
 
     private fun save() = viewModelScope.launch {
         toLoadingScreenState()
-        handleAddressError(repository.saveAddress(getAddress()))
+        handleAddressResource(repository.saveAddress(getAddress()))
     }
 
 
-    private fun handleAddressError(resource: Resource<String?>) = resource.handle(
+    private fun handleAddressResource(resource: Resource<String?>) = resource.handle(
         onError = ::toErrorScreenState,
         onSuccess = { data ->
             if (data == null)
-                suspend { _back.emit(true) }
+                viewModelScope.launch { _back.emit(true) }
             else
                 _state.update { it.copy(remoteError = UIText.DynamicString(data)) }
             toStableScreenState()

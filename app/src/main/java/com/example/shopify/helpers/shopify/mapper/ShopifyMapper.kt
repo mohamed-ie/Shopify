@@ -46,7 +46,7 @@ interface ShopifyMapper {
     fun mapToAddresses(response: GraphResponse<Storefront.QueryRoot>): List<MailingAddress>
     fun mapToCartId(response: GraphResponse<Storefront.Mutation>): Pair<String?, String?>?
     fun mapToAddCartLine(response: GraphResponse<Storefront.Mutation>): String?
-    fun mapMutationToCart(data: DraftOrderUpdateMutation.Data): Cart?
+    fun mapMutationToCart(data: DraftOrderUpdateMutation.Data, currency: String, rate: Float): Cart?
     fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String?
     fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?
     //fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart?
@@ -56,6 +56,6 @@ interface ShopifyMapper {
         liveAmount: Float,
         price: Storefront.MoneyV2
     ): Storefront.MoneyV2
-    fun mapQueryToCart(data: DraftOrderQuery.Data): Cart?
+    fun mapQueryToCart(data: DraftOrderQuery.Data,currency: String, rate: Float): Cart?
     fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String?
 }
