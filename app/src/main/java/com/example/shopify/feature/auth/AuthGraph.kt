@@ -23,7 +23,7 @@ fun NavGraphBuilder.authGraph(navController: NavController) {
                         popUpTo(Graph.AUTH)
                     }
                 },
-                navigateToHome = { navController.navigate(Graph.HOME) { popUpTo(Graph.ROOT) } },
+                navigateToHome = navController::popBackStack,
                 onCloseScreen = { navController.popBackStack() }
             )
         }

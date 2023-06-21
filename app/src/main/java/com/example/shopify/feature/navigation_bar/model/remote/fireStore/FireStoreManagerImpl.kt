@@ -126,7 +126,7 @@ class FireStoreManagerImpl @Inject constructor(
             .update(
                 Customer.Fields.WISH_LIST,
                 FieldValue.arrayUnion(mapper.mapProductIDToEncodedProductId(productId))
-            ).awaitResource {}
+            ).awaitResource()
     }
 
     override suspend fun removeAWishListProduct(customerId: String, productId: ID) {
@@ -137,7 +137,7 @@ class FireStoreManagerImpl @Inject constructor(
                 Customer.Fields.WISH_LIST,
                 FieldValue.arrayRemove(mapper.mapProductIDToEncodedProductId(productId))
             )
-            .awaitResource {}
+            .awaitResource()
     }
 
     override suspend fun createCustomer(customerId: String) {
@@ -145,7 +145,7 @@ class FireStoreManagerImpl @Inject constructor(
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(customerMap)
-            .awaitResource {}
+            .awaitResource()
     }
 
     override suspend fun getWishList(customerId: String): Resource<List<ID>> {
@@ -163,6 +163,15 @@ class FireStoreManagerImpl @Inject constructor(
     private suspend fun <I,O> Task<I>.awaitResource(block: suspend (I)->O): Resource<O> {
         return try {
             Resource.Success(block(await()))
+        }
+        catch (e: Exception) {
+            Resource.Error(UIError.Unexpected)
+        }
+    }
+
+    private suspend fun <I> Task<I>.awaitResource(): Resource<I> {
+        return try {
+            Resource.Success(await())
         }
         catch (e: Exception) {
             Resource.Error(UIError.Unexpected)

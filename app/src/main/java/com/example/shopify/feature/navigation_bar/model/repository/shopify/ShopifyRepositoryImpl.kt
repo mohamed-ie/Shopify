@@ -261,10 +261,13 @@ class ShopifyRepositoryImpl @Inject constructor(
             is Resource.Success -> {
                 val cartId = resource.data ?: return Resource.Success(Cart())
                 adminManager.removeCartLine(cartId, productVariantId)
-                    .mapSuspendResource {
-                        it?.lines?.isEmpty()?.let { fireStoreManager.clearDraftOrderId(email) }
+                    .mapSuspendResource { data ->
+                        data?.lines?.let {
+                            if (it.isEmpty())
+                                fireStoreManager.clearDraftOrderId(email)
+                        }
                         joinAll()
-                        it
+                        data
                     }
             }
         }
@@ -583,7 +586,7 @@ class ShopifyRepositoryImpl @Inject constructor(
             val updateInput = DraftOrderUpdateMutation(draftOrderId, input, Optional.Absent)
 
             return updateDraftOrder(updateInput)
-                .mapResource { it?.totalPrice }
+                .mapResource { it?.run { "$currencyCode $totalPrice" } }
         }
 
         //return error message if failed
@@ -617,7 +620,13 @@ class ShopifyRepositoryImpl @Inject constructor(
         private suspend fun updateDraftOrder(input: DraftOrderUpdateMutation): Resource<Cart?> {
             return apolloClient.mutation(input)
                 .executeCatching()
-                .mapResource { mapper.mapMutationToCart(it) }
+                .mapSuspendResource {
+                    mapper.mapMutationToCart(
+                        it,
+                        dataStoreManager.getCurrency().first(),
+                        dataStoreManager.getCurrencyAmountPerOnePound().first(),
+                    )
+                }
         }
 
         suspend fun changeDraftOrderLineQuantity(
@@ -713,7 +722,13 @@ class ShopifyRepositoryImpl @Inject constructor(
         suspend fun getDraftOrder(cartId: String): Resource<Cart?> {
             return apolloClient.query(DraftOrderQuery(cartId, Optional.Absent))
                 .executeCatching()
-                .mapResource { mapper.mapQueryToCart(it) }
+                .mapSuspendResource {
+                    mapper.mapQueryToCart(
+                        it,
+                        dataStoreManager.getCurrency().first(),
+                        dataStoreManager.getCurrencyAmountPerOnePound().first()
+                    )
+                }
         }
 
         private suspend fun <D : Operation.Data> ApolloCall<D>.executeCatching(): Resource<D> =

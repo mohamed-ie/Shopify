@@ -32,14 +32,14 @@ fun CartScreen(
         }
     }
     val screenState by viewModel.screenState.collectAsState()
-    val cart by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
     val itemsState by viewModel.cartLinesState.collectAsState()
     val couponState by viewModel.couponState.collectAsState()
 
     when (screenState) {
         ScreenState.LOADING -> LoadingScreen()
         ScreenState.STABLE -> CartScreenContent(
-            cart = cart,
+            state = state,
             itemsState = itemsState,
             couponState = couponState,
             onCartItemEvent = viewModel::onCartItemEvent,

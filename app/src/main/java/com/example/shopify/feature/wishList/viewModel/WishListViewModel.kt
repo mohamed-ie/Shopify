@@ -97,7 +97,7 @@ class WishListViewModel @Inject constructor(
             is Resource.Success -> {
                 _wishedBottomSheetState.value = _wishedBottomSheetState.value.copy(
                     isTotalPriceLoaded = true,
-                    totalCartPrice = response.data?.totalPrice ?: ""
+                    totalCartPrice = "${response.data?.currencyCode} ${response.data?.totalPrice}"
                 )
 
             }

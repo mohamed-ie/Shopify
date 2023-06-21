@@ -58,11 +58,11 @@ fun CheckoutContent(
             item {
                 TotalCostCard(
                     itemsCount = cart.lines.size,
-                    subTotalsPrice = cart.subTotalsPrice,
+                    subTotalsPrice = "${cart.currencyCode} ${cart.subTotalsPrice}",
                     shippingFee = cart.shippingFee,
-                    taxes = cart.taxes,
+                    taxes ="${cart.currencyCode} ${cart.taxes}",
                     discounts = cart.discounts,
-                    totalPrice = cart.totalPrice
+                    totalPrice = "${cart.currencyCode} ${cart.totalPrice}"
                 )
             }
             item {
@@ -82,7 +82,7 @@ fun CheckoutContent(
         }
         CheckoutFooterScreen(
             totalItems = cart.lines.size,
-            totalPrice = cart.totalPrice,
+            totalPrice = "${cart.currencyCode} ${cart.totalPrice}",
             onPlaceOrderClick = { onEvent(CheckoutEvent.PlaceOrder) }
         )
     }

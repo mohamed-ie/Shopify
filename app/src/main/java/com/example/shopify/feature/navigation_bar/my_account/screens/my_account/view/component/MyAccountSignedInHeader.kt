@@ -1,6 +1,7 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.my_account.view.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +39,7 @@ import com.example.shopify.feature.Graph
 import com.example.shopify.feature.auth.Auth
 import com.example.shopify.feature.navigation_bar.my_account.MyAccountGraph
 import com.example.shopify.theme.ShopifyTheme
+import com.example.shopify.theme.shopifyColors
 
 @Composable
 fun MyAccountSignedInHeader(
@@ -47,7 +49,6 @@ fun MyAccountSignedInHeader(
 ) {
     Card(
         modifier = Modifier.padding(bottom = 2.dp),
-        elevation = CardDefaults.cardElevation(2.dp),
         shape = RectangleShape
     ) {
         Column(
@@ -66,7 +67,7 @@ fun MyAccountSignedInHeader(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = mail
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -135,34 +136,33 @@ fun MyAccountHeader(navigateTo: (String) -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    IconButton(
+
+                    Box(
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(Color.Black.copy(alpha = .7f))
-                            .padding(4.dp),
-                        onClick = {navigateTo(Auth.SIGN_UP) }
+                            .background(MaterialTheme.shopifyColors.ServerColor)
+                            .clickable (onClick = {navigateTo(Auth.SIGN_UP)})
+                            .padding(12.dp)
+                            .size(26.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier.size(33.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(32.dp),
-                                imageVector = Icons.Outlined.AccountCircle,
-                                tint = Color.Yellow.copy(alpha = .8f),
-                                contentDescription = null
-                            )
-                            Icon(
-                                modifier = Modifier
-                                    .size(12.dp)
-                                    .align(Alignment.TopEnd),
-                                imageVector = Icons.Outlined.AddCircle,
-                                tint = Color.Yellow.copy(alpha = .8f),
-                                contentDescription = null
-                            )
+                        Icon(
+                            modifier = Modifier.size(26.dp),
+                            imageVector = Icons.Outlined.AccountCircle,
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = null
+                        )
+                        Icon(
+                            modifier = Modifier
+                                .size(9.dp)
+                                .align(Alignment.TopEnd),
+                            imageVector = Icons.Outlined.AddCircle,
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = null
+                        )
 
-                        }
                     }
+
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(id = R.string.sign_up),
@@ -183,20 +183,19 @@ private fun MyHeaderListItem(name: String, icon: ImageVector, onClick: () -> Uni
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        IconButton(
+
+        Icon(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(Color.Black.copy(alpha = .7f))
-                .padding(4.dp),
-            onClick = onClick
-        ) {
-            Icon(
-                modifier = Modifier.size(32.dp),
-                imageVector = icon,
-                tint = Color.Yellow.copy(alpha = .8f),
-                contentDescription = null
-            )
-        }
+                .background(MaterialTheme.shopifyColors.ServerColor)
+                .clickable(onClick = onClick, role = Role.Button)
+                .padding(12.dp)
+                .size(26.dp),
+            imageVector = icon,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = null
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = name,

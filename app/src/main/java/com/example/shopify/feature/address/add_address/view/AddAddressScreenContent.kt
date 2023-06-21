@@ -48,12 +48,13 @@ import com.example.shopify.utils.shopifyLoading
 fun AddAddressScreenContent(
     state: AddAddressState,
     onEvent: (AddAddressEvent) -> Unit,
-    back: () -> Unit
+    back: () -> Unit,
 ) {
     Column(
         Modifier
             .background(MaterialTheme.colorScheme.surface)
-            .fillMaxSize()) {
+            .fillMaxSize()
+    ) {
         NamedTopAppBar(back = back)
 
         RemoteErrorHeader(error = state.remoteError?.asString())
@@ -282,7 +283,7 @@ fun PreviewAddAddressScreenContent() {
                 TextFieldState("Smith"),
                 TextFieldState("1-123-456-7890"),
 
-                ), {}, {}
+                ), {}, {},
         )
     }
 

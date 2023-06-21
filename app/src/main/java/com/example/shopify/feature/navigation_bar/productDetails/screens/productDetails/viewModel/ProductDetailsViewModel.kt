@@ -3,7 +3,6 @@ package com.example.shopify.feature.navigation_bar.productDetails.screens.produc
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.shopify.base.BaseScreenViewModel
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.ProductDetailsGraph
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
@@ -163,12 +162,15 @@ class ProductDetailsViewModel @Inject constructor(
     private fun addProductToCart() {
         _variantState.value.variants[_variantState.value.selectedVariant - 1].id?.let { variantId ->
             viewModelScope.launch {
-                when (repository.addToCart(variantId.toString(), _addToCardState.value.selectedQuantity)) {
+                when (val resource = repository.addToCart(variantId.toString(), _addToCardState.value.selectedQuantity)) {
                     is Resource.Error -> toErrorScreenState()
                     is Resource.Success -> {
                         _addToCardState.value = _addToCardState.value.copy(expandBottomSheet = true)
                         _addToCardState.value = _addToCardState.value.copy(isAdded = true)
-                        sendTotalCart(repository.getCart())
+                        _addToCardState.value = _addToCardState.value.copy(
+                            isTotalPriceLoaded = true,
+                            totalCartPrice = resource.data?:""
+                        )
                     }
                 }
             }
@@ -183,18 +185,18 @@ class ProductDetailsViewModel @Inject constructor(
         }
 
 
-    private fun sendTotalCart(response: Resource<Cart?>) {
-        when (response) {
-            is Resource.Error -> {}
-            is Resource.Success -> {
-                _addToCardState.value = _addToCardState.value.copy(
-                    isTotalPriceLoaded = true,
-                    totalCartPrice = response.data?.totalPrice ?: ""
-                )
-
-            }
-        }
-    }
+//    private fun sendTotalCart(response: Resource<Cart?>) {
+//        when (response) {
+//            is Resource.Error -> {}
+//            is Resource.Success -> {
+//                _addToCardState.value = _addToCardState.value.copy(
+//                    isTotalPriceLoaded = true,
+//                    totalCartPrice = response.data?.totalPrice ?: ""
+//                )
+//
+//            }
+//        }
+//    }
 
     private fun sendSelectedVariant(variantIndex: Int) {
         _addToCardState.update {addToCardState ->
