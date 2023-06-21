@@ -173,7 +173,7 @@ private fun OrderItemContent(
                )
            }
        }
-       if(fulfillmentStatus == OrderItemState.Delivered()){
+       if(fulfillmentStatus != OrderItemState.Delivered()){
            OrdersFilledTonalButton(
                text = stringResource(id = R.string.review_product),
                onClick = addReview

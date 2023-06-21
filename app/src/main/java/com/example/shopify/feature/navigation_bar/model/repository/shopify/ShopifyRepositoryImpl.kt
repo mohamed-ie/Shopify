@@ -33,6 +33,8 @@ import com.example.shopify.helpers.mapResource
 import com.example.shopify.helpers.mapSuspendResource
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
+import com.example.shopify.type.DraftOrderAppliedDiscountInput
+import com.example.shopify.type.DraftOrderAppliedDiscountType
 import com.example.shopify.type.DraftOrderDeleteInput
 import com.example.shopify.type.DraftOrderInput
 import com.example.shopify.type.DraftOrderLineItemInput
@@ -55,7 +57,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.joinAll
 import javax.inject.Inject
-
 
 class ShopifyRepositoryImpl @Inject constructor(
     private val graphClient: GraphClient,
@@ -302,8 +303,11 @@ class ShopifyRepositoryImpl @Inject constructor(
 
     override suspend fun applyCouponToCart(coupon: String): Resource<Cart?> {
         val email = dataStoreManager.getEmail().first()
-//        val cartId = getCartId(email) ?:
-        return Resource.Error(UIError.Unexpected)
+        val couponValue =
+            fireStoreManager.redeemCoupon(coupon).getOrNull() ?: return Resource.Success(null)
+        val cartId = getCartId(email).getOrNull() ?: return Resource.Error(UIError.Unexpected)
+        return adminManager.applyDiscount(cartId, couponValue)
+
 
 //        return queryGenerator.generateApplyCouponQuery(ID(cartId), coupon)
 //            .enqueue1()
@@ -701,6 +705,32 @@ class ShopifyRepositoryImpl @Inject constructor(
                 .mapResource { it?.error }
         }
 
+        suspend fun applyDiscount(draftOrderId: String, discountValue: Double): Resource<Cart?> {
+            val appliedDiscountInput =
+                DraftOrderAppliedDiscountInput(
+                    valueType = DraftOrderAppliedDiscountType.PERCENTAGE,
+                    value = discountValue
+                )
+            val input = DraftOrderInput(appliedDiscount = appliedDiscountInput.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input = input)
+
+            return updateDraftOrder(updateInput)
+        }
+
+
+        suspend fun getDraftOrder(cartId: String): Resource<Cart?> {
+            return apolloClient.query(DraftOrderQuery(cartId, Optional.Absent))
+                .executeCatching()
+                .mapSuspendResource {
+                    mapper.mapQueryToCart(
+                        it,
+                        dataStoreManager.getCurrency().first(),
+                        dataStoreManager.getCurrencyAmountPerOnePound().first()
+                    )
+                }
+        }
+
+
         private suspend fun getDraftOrderLineItems(
             draftOrderId: String
         ): MutableList<DraftOrderLineItemInput>? {
@@ -717,18 +747,6 @@ class ShopifyRepositoryImpl @Inject constructor(
                     )
                 }
                 ?.toMutableList()
-        }
-
-        suspend fun getDraftOrder(cartId: String): Resource<Cart?> {
-            return apolloClient.query(DraftOrderQuery(cartId, Optional.Absent))
-                .executeCatching()
-                .mapSuspendResource {
-                    mapper.mapQueryToCart(
-                        it,
-                        dataStoreManager.getCurrency().first(),
-                        dataStoreManager.getCurrencyAmountPerOnePound().first()
-                    )
-                }
         }
 
         private suspend fun <D : Operation.Data> ApolloCall<D>.executeCatching(): Resource<D> =
@@ -748,7 +766,6 @@ class ShopifyRepositoryImpl @Inject constructor(
 
         @JvmName("null_present")
         private fun <T : Any> T.present(): Optional<T> = Optional.present(this)
-
 
     }
 }

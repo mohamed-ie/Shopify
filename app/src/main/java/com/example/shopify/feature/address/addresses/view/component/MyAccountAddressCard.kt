@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -96,12 +96,15 @@ fun MyAccountAddressCard(
                     )
 
                     Row(
-                        modifier = Modifier.clickable(role = Role.Button, onClick = onDelete),
+                        Modifier
+                            .clickable(role = Role.Button, onClick = onEdit)
+                            .padding(horizontal = 4.dp)
+                            .padding(top=4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            modifier = Modifier.size(22.dp),
-                            imageVector = Icons.Rounded.DeleteOutline,
+                            modifier = Modifier.size(20.dp),
+                            imageVector = Icons.Outlined.DeleteOutline,
                             contentDescription = null,
                             tint = MaterialTheme.shopifyColors.Gray
                         )

@@ -42,7 +42,7 @@
     <string name="first_name_not_formed_error">Hold up, this field requires your first name.</string>
     <string name="second_name_not_formed_error">Hold up, this field requires your second name.</string>
     <string name="phone_not_formed_error">Hold up, it must be like (+201*********)</string>
-    <string name="nothing">must be like (+201558653011)</string>
+    <string name="nothing">must be like (+20**********)</string>
     <string name="phone">Phone</string>
     <string name="category">Category</string>
     <string name="favourite">Favourite</string>

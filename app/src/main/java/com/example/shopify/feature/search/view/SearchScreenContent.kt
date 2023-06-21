@@ -54,7 +54,7 @@ fun SearchScreenContent(
             modifier = Modifier
                 .height(40.dp)
                 .background(Color.White)
-                .padding(start = 16.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically

@@ -13,10 +13,10 @@ import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.Ca
 import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponState
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.Resource
+import com.example.shopify.helpers.handle
 import com.shopify.graphql.support.ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -38,6 +38,7 @@ class CartViewModel @Inject constructor(
 
     private val _couponState = MutableStateFlow(CartCouponState())
     val couponState = _couponState.asStateFlow()
+
     init {
         checkIsLoggedIn()
     }
@@ -62,7 +63,7 @@ class CartViewModel @Inject constructor(
 
     private fun checkIsLoggedIn() {
         repository.isLoggedIn()
-            .onEach {isLoggedIn-> _state.update {it.copy(isLoggedIn = isLoggedIn) } }
+            .onEach { isLoggedIn -> _state.update { it.copy(isLoggedIn = isLoggedIn) } }
             .launchIn(viewModelScope)
     }
 
@@ -145,10 +146,21 @@ class CartViewModel @Inject constructor(
     }
 
     private fun applyCoupon() = viewModelScope.launch(defaultDispatcher) {
-//        handleCartResource(repository.applyCouponToCart(couponState.value.coupon))
         _couponState.update { it.copy(errorVisible = false, isLoading = true) }
-        delay(1500)
-        _couponState.update { it.copy(errorVisible = true, isLoading = false) }
+        repository.applyCouponToCart(couponState.value.coupon).handle(
+            onError = ::toErrorScreenState,
+            onSuccess = { data ->
+                if (data == null)
+                    _couponState.update { it.copy(errorVisible = true, isLoading = false) }
+                else {
+                    _state.update { it.copy(cart = data) }
+                    _cartLinesState.update { List(data.lines.size) { CartLineState() }.toMutableStateList() }
+                }
+                _couponState.update { it.copy(isLoading = false) }
+                toStableScreenState()
+            }
+        )
+
     }
 }
 
