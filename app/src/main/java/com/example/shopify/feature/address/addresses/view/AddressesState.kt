@@ -1,8 +1,0 @@
-package com.example.shopify.feature.address.addresses.view
-
-import com.shopify.buy3.Storefront.MailingAddress
-
-data class AddressesState(
-    val addresses: List<MailingAddress> = emptyList(),
-    val isDeleteDialogVisible: Boolean = false
-)

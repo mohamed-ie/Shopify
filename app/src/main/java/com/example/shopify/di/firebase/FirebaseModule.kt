@@ -1,7 +1,7 @@
 package com.example.shopify.di.firebase
 
-import com.example.shopify.feature.navigation_bar.model.remote.fireStore.FireStoreManager
-import com.example.shopify.feature.navigation_bar.model.remote.fireStore.FireStoreManagerImpl
+import com.example.shopify.data.firestore.FireStoreManager
+import com.example.shopify.data.firestore.FireStoreManagerImpl
 import com.example.shopify.helpers.firestore.mapper.FireStoreMapper
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore

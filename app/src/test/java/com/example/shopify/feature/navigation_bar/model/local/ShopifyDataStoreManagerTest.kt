@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
+import com.example.shopify.data.data_store.DataStoreManagerImpl
+import com.example.shopify.data.data_store.ShopifyDataStoreManager
+import com.example.shopify.model.auth.signin.SignInUserInfoResult
 import com.example.shopify.utils.Constants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -37,7 +39,7 @@ class ShopifyDataStoreManagerTest {
             produceFile =
             { context.preferencesDataStoreFile(Constants.DataStoreKeys.USER) }
         )
-        shopifyDataStoreManager = ShopifyDataStoreManagerImpl(dataStore)
+        shopifyDataStoreManager = DataStoreManagerImpl(dataStore)
     }
     
     @Test

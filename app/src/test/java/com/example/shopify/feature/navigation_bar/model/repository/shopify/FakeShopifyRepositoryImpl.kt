@@ -1,15 +1,7 @@
 package com.example.shopify.feature.navigation_bar.model.repository.shopify
 
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
-import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
-import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.cart.model.CartLine
-import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
-import com.example.shopify.feature.navigation_bar.common.model.Pageable
-import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
-import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
+import com.example.shopify.data.shopify.repository.ShopifyRepository
+import com.example.shopify.model.Pageable
 import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
@@ -20,6 +12,15 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
 import com.example.shopify.helpers.Resource
+import com.example.shopify.model.auth.signin.SignInUserInfo
+import com.example.shopify.model.auth.signin.SignInUserInfoResult
+import com.example.shopify.model.auth.signup.SignUpUserInfo
+import com.example.shopify.model.auth.signup.SignUpUserResponseInfo
+import com.example.shopify.model.cart.cart.Cart
+import com.example.shopify.model.cart.cart.CartLine
+import com.example.shopify.model.cart.cart.CartProduct
+import com.example.shopify.model.home.Brand
+import com.example.shopify.ui.home.product.model.BrandProduct
 import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID

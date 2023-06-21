@@ -9276,7 +9276,7 @@ enum CurrencyCode {
 }
 
 """
-Currency formats configured for the merchant. These formats are available to use within Liquid.
+CurrencyResponse formats configured for the merchant. These formats are available to use within Liquid.
 """
 type CurrencyFormats {
   """
@@ -51274,7 +51274,7 @@ type ShopifyFunctionEdge {
 Balance and payout information for a
 [Shopify Payments](https://help.shopify.com/manual/payments/shopify-payments/getting-paid-with-shopify-payments)
 account. Balance includes all balances for the currencies supported by the shop.
-You can also query for a list of payouts, where each payout includes the corresponding currencyCode field.
+You can also query for a list of payouts, where each payout includes the corresponding currencyResponseCode field.
 """
 type ShopifyPaymentsAccount implements Node {
   """
@@ -55592,7 +55592,7 @@ enum SubscriptionDraftErrorCode {
   STALE_CONTRACT
 
   """
-  Currency is not enabled.
+  CurrencyResponse is not enabled.
   """
   CURRENCY_NOT_ENABLED
 

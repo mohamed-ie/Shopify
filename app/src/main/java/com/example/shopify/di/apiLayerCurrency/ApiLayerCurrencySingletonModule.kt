@@ -1,7 +1,7 @@
 package com.example.shopify.di.apiLayerCurrency
 
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyApiClient
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyInterceptor
+import com.example.shopify.data.api_layer_exchange.api_client.ApiLayerCurrencyApiClient
+import com.example.shopify.data.api_layer_exchange.interceptor.ApiLayerCurrencyInterceptor
 import com.example.shopify.utils.Constants
 import dagger.Module
 import dagger.Provides

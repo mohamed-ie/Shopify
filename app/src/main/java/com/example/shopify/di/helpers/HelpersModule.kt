@@ -1,7 +1,7 @@
 package com.example.shopify.di.helpers
 
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandler
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.helpers.CreditCardInfoStateHandlerImpl
+import com.example.shopify.helpers.cart.CreditCardInfoStateHandler
+import com.example.shopify.helpers.cart.CreditCardInfoStateHandlerImpl
 import com.example.shopify.helpers.validator.TextFieldStateValidator
 import com.example.shopify.helpers.validator.TextFieldStateValidatorImpl
 import com.example.shopify.helpers.validator.auth.UserInputValidator

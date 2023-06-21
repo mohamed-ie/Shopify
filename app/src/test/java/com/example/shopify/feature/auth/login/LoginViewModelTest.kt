@@ -1,13 +1,13 @@
 package com.example.shopify.feature.auth.login
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.feature.auth.screens.common.AuthUIEvent
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
-import com.example.shopify.feature.auth.screens.login.viewModel.LoginViewModel
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.validator.auth.UserInputValidator
 import com.example.shopify.helpers.validator.auth.UserInputValidatorImpl
+import com.example.shopify.model.auth.signin.SignInUserInfo
+import com.example.shopify.ui.auth.common.AuthUIEvent
+import com.example.shopify.ui.auth.login.viewModel.LoginViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

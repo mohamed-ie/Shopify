@@ -1,6 +1,6 @@
 package com.example.shopify.helpers.validator
 
-import com.example.shopify.feature.navigation_bar.common.state.TextFieldState
+import com.example.shopify.ui.common.state.TextFieldState
 import com.example.shopify.helpers.UIText
 import javax.inject.Inject
 

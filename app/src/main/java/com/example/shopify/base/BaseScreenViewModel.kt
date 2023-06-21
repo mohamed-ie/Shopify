@@ -1,7 +1,7 @@
 package com.example.shopify.base
 
 import androidx.lifecycle.ViewModel
-import com.example.shopify.feature.navigation_bar.common.state.ScreenState
+import com.example.shopify.ui.common.state.ScreenState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

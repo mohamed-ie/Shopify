@@ -2,13 +2,13 @@ package com.example.shopify.feature.auth.registration
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.feature.auth.screens.common.AuthUIEvent
-import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
-import com.example.shopify.feature.auth.screens.registration.viewModel.RegistrationViewModel
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.helpers.validator.auth.UserInputValidator
 import com.example.shopify.helpers.validator.auth.UserInputValidatorImpl
+import com.example.shopify.model.auth.signup.SignUpUserInfo
+import com.example.shopify.ui.auth.common.AuthUIEvent
+import com.example.shopify.ui.auth.registration.viewModel.RegistrationViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ class RegistrationViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var viewModel:RegistrationViewModel
+    private lateinit var viewModel: RegistrationViewModel
 
     @Before
     fun init() {

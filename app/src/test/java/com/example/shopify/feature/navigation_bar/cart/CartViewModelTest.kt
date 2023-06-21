@@ -1,11 +1,11 @@
 package com.example.shopify.feature.navigation_bar.cart
 
 import com.example.shopify.MainDispatcherRule
-import com.example.shopify.feature.navigation_bar.cart.view.componenet.cart_item_card.CartItemEvent
-import com.example.shopify.feature.navigation_bar.cart.view.componenet.coupon.CartCouponEvent
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
+import com.example.shopify.ui.shopping_bag.screen.cart.CartViewModel
+import com.example.shopify.ui.shopping_bag.screen.cart.view.componenet.cart_item_card.CartItemEvent
+import com.example.shopify.ui.shopping_bag.screen.cart.view.componenet.coupon.CartCouponEvent
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.cache
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
