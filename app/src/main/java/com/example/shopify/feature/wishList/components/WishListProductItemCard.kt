@@ -45,7 +45,6 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.utils.shopifyLoading
-import com.shopify.graphql.support.ID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,6 +151,7 @@ fun WishListProductCardItem(
                     modifier = Modifier
                         .weight(0.9f)
                         .height(28.dp),
+                    enabled = product.totalInventory != 0,
                     shape = RoundedCornerShape(7.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
@@ -202,7 +202,7 @@ private fun WishListProductCardItemPreview() {
                     " made in leather with punched 3-Stripes," +
                     " heel and tongue logos and lightweight step-in cushioning.",
             totalInventory = 5,
-            variants = listOf(VariantItem("", "", "white/1",0, ID(""))),
+            variants = listOf(VariantItem("", "", "white/1",0, )),
             title = "iPhone 14 Pro 256GB Deep Purple 5G With FaceTime - International Version",
             vendor = "Adidas",
             price = Price(

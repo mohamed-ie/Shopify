@@ -87,12 +87,11 @@ fun ProductDetailsScreenContent(
                     thumbnails = product.images,
                     currencyCode = product.price.currencyCode,
                     price = product.price.amount,
-                    realPrice = product.discount.realPrice,
-                    discountPercent = product.discount.percent.toString(),
                     quantity = product.totalInventory.toString(),
                     isLowStock = variantsState.isLowStock,
                     isFavourite = product.isFavourite,
-                    onFavouriteClick = onFavouriteClick
+                    onFavouriteClick = onFavouriteClick,
+                    isAvailable = variantsState.isAvailable
                 )
 
                 Spacer(modifier = Modifier.height(15.dp))
@@ -148,25 +147,26 @@ fun ProductDetailsScreenContent(
                 Spacer(modifier = Modifier.height(15.dp))
 
             }
-            ProductSnackBar(
-                opened = addToCardState.isOpened,
-                selected = addToCardState.selectedQuantity,
-                availableQuantity = addToCardState.availableQuantity,
-                isChangingQuantity = false,
-                quantitySelected = { selectedQuantity ->
-                    addToCardState.sendSelectedQuantity(
-                        selectedQuantity
-                    )
-                },
-                openQuantity = { addToCardState.openQuantity() },
-                closeQuantity = { addToCardState.closeQuantity() },
-                addToCard = {
-                    if (product.isLogged)
-                        addToCardState.addToCard()
-                    else
-                        navigateToAuth()
-                }
-            )
+            if (variantsState.isAvailable)
+                ProductSnackBar(
+                    opened = addToCardState.isOpened,
+                    selected = addToCardState.selectedQuantity,
+                    availableQuantity = addToCardState.availableQuantity,
+                    isChangingQuantity = false,
+                    quantitySelected = { selectedQuantity ->
+                        addToCardState.sendSelectedQuantity(
+                            selectedQuantity
+                        )
+                    },
+                    openQuantity = { addToCardState.openQuantity() },
+                    closeQuantity = { addToCardState.closeQuantity() },
+                    addToCard = {
+                        if (product.isLogged)
+                            addToCardState.addToCard()
+                        else
+                            navigateToAuth()
+                    }
+                )
         }
         if (addToCardState.expandBottomSheet) {
             val edgeToEdgeEnabled by remember { mutableStateOf(true) }

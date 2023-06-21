@@ -91,7 +91,8 @@ class ProductDetailsViewModel @Inject constructor(
                     is Resource.Success -> {
                         _variantState.value = _variantState.value.copy(
                             variants = mapAnyNegativeQuantity(resource.data.variants),
-                            isLowStock = resource.data.totalInventory <= 5
+                            isLowStock = resource.data.totalInventory <= 5,
+                            isAvailable = resource.data.totalInventory != 0
                         )
                         _productState.value = resource.data.copy(
                             discount = calDiscount(resource.data.price.amount),

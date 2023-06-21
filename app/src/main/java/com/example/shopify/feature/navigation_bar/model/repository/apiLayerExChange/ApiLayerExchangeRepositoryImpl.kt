@@ -34,16 +34,16 @@ class ApiLayerExchangeRepositoryImpl @Inject constructor(
             }
     }
 
-    private suspend fun setCurrencyAmountPerPound(currencyCode: String): Resource<Unit> {
+    private suspend fun setCurrencyAmountPerPound(currencyCode: String): Resource<Unit> = try {
         val response = withContext(ioDispatcher) {
             currencyApiClient.getLiveCurrencyExChange(CurrencyCode.EGP.toString(), currencyCode)
         }
-
         val liveAmount = response.quotes?.get(CurrencyCode.EGP.toString() + currencyCode)
-            ?: return Resource.Error(UIError.Unexpected)
+        liveAmount?.let { dataStoreManager.setCurrencyAmountPerOnePound(it)
+            Resource.Success(Unit)
+        } ?: Resource.Error(UIError.Unexpected)
 
-        dataStoreManager.setCurrencyAmountPerOnePound(liveAmount)
-
-        return Resource.Success(Unit)
+    }catch(e:Exception){
+        Resource.Error(UIError.Unexpected)
     }
 }

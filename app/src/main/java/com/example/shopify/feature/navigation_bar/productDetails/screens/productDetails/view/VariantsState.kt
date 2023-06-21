@@ -7,5 +7,6 @@ data class VariantsState(
     val variants:List<VariantItem> = listOf(),
     val selectedVariant:Int = 1,
     val isLowStock:Boolean = false,
-    val selectVariant:(Int)->Unit
+    val selectVariant:(Int)->Unit,
+    val isAvailable:Boolean = false
 )

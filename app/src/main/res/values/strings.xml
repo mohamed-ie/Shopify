@@ -38,10 +38,10 @@
     <string name="already_have_an_account">Already have an account?</string>
     <string name="phone_place_holder">Please enter your phone number</string>
     <string name="email_not_formed_error">Oh no! Please enter a valid email.</string>
-    <string name="password_not_formed_error">Hold up, this field requires at least 8 characters.</string>
+    <string name="password_not_formed_error">Hold up, this field requires at least 8 characters, one upper case character and symbol.</string>
     <string name="first_name_not_formed_error">Hold up, this field requires your first name.</string>
     <string name="second_name_not_formed_error">Hold up, this field requires your second name.</string>
-    <string name="phone_not_formed_error">Hold up, it must be like (+201558653011)</string>
+    <string name="phone_not_formed_error">Hold up, it must be like (+201*********)</string>
     <string name="nothing">must be like (+201558653011)</string>
     <string name="phone">Phone</string>
     <string name="category">Category</string>
@@ -179,5 +179,7 @@
     <string name="please_select_shipping_address">Please select Shipping Address</string>
     <string name="shopify">Shopify</string>
     <string name="edit_information">Edit Information</string>
+    <string name="the_current_product_is_not_available">The current product is not available</string>
+    <string name="please_check_our_other_available_products">Please check our other available products</string>
 
 </resources>

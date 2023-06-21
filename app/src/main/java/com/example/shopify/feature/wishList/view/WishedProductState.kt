@@ -6,7 +6,7 @@ import com.example.shopify.feature.navigation_bar.productDetails.screens.product
 data class WishedProductState(
     val product: Product = Product(),
     val isAddedToCard:Boolean = false,
-    val isAddingToCard:Boolean = false
+    val isAddingToCard:Boolean = false,
 )
 
 data class WishedBottomSheetState(
