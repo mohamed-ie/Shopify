@@ -29,59 +29,63 @@ class OrderViewModelTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var fakerepository: ShopifyRepository
-    private lateinit var orderViewModel: OrderViewModel
+    private lateinit var orderViewModel: CheckoutViewModel
 
     @Before
     fun setup() {
-        val testDispatcher = runTest {
         fakerepository = FakeShopifyRepositoryImpl()
-        orderViewModel = OrderViewModel(CreditCardInfoStateHandlerImpl(), testDispatcher, fakerepository)
-        Dispatchers.setMain(testDispatcher)
-    }
-
-    @After
-    fun end() {
-        Dispatchers.resetMain()
-    }
+        orderViewModel =
+            CheckoutViewModel(
+                CreditCardInfoStateHandlerImpl(),
+                fakerepository,
+                Dispatchers.Unconfined
+            )
 
 
-    @Test
-    fun getOrderList_checkNotNull() {
-        // given nothing
+        @After
+        fun end() {
+            Dispatchers.resetMain()
+        }
 
-        // when get the orderList
-        val result = orderViewModel.orderList.value
 
-        // then assert that order list is not null
-        Assert.assertThat(result.size, CoreMatchers.notNullValue())
+        @Test
+        fun getOrderList_checkNotNull() {
+            // given nothing
 
-    }
+            // when get the orderList
+            val result = orderViewModel.orderList.value
 
-    @Test
-    fun onCreditCardEvent_changeFirstName_checkTheyEqual() {
-        // given firstName
-        val firstName = "Rafeef"
+            // then assert that order list is not null
+            Assert.assertThat(result.size, CoreMatchers.notNullValue())
 
-        // when change first name
-        orderViewModel.onCreditCardEvent(CreditCardInfoEvent.FirstNameChanged(firstName))
+        }
 
-        // then get the firstName and check they are the same
-        val result = orderViewModel.creditCardInfoState.value.firstNameState.value
-        Assert.assertThat(result, CoreMatchers.`is`(firstName))
+        @Test
+        fun onCreditCardEvent_changeFirstName_checkTheyEqual() {
+            // given firstName
+            val firstName = "Rafeef"
 
-    }
+            // when change first name
+            orderViewModel.onCreditCardEvent(CreditCardInfoEvent.FirstNameChanged(firstName))
 
-    @Test
-    fun onCheckoutEvent_paymentMethod_checkTheyEqual() {
-        // given payment method
-        val paymentMethod = PaymentMethod.CashOnDelivery
+            // then get the firstName and check they are the same
+            val result = orderViewModel.creditCardInfoState.value.firstNameState.value
+            Assert.assertThat(result, CoreMatchers.`is`(firstName))
 
-        // when fire action with the payment method
-        orderViewModel.onCheckoutEvent(CheckoutEvent.PaymentMethodChanged(paymentMethod))
+        }
 
-        // then get the result and check they are the same
-        val result = orderViewModel.checkoutState.value.selectedPaymentMethod
-        Assert.assertThat(result, CoreMatchers.`is`(PaymentMethod.CashOnDelivery))
+        @Test
+        fun onCheckoutEvent_paymentMethod_checkTheyEqual() {
+            // given payment method
+            val paymentMethod = PaymentMethod.CashOnDelivery
 
+            // when fire action with the payment method
+            orderViewModel.onCheckoutEvent(CheckoutEvent.PaymentMethodChanged(paymentMethod))
+
+            // then get the result and check they are the same
+            val result = orderViewModel.checkoutState.value.selectedPaymentMethod
+            Assert.assertThat(result, CoreMatchers.`is`(PaymentMethod.CashOnDelivery))
+
+        }
     }
 }
