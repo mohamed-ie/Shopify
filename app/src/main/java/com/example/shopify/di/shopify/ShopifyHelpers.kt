@@ -3,10 +3,10 @@ package com.example.shopify.di.shopify
 
 import com.example.shopify.helpers.shopify.input_creator.ShopifyInputCreator
 import com.example.shopify.helpers.shopify.input_creator.ShopifyInputCreatorImpl
-import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
-import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGeneratorImpl
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapper
 import com.example.shopify.helpers.shopify.mapper.ShopifyMapperImpl
+import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGenerator
+import com.example.shopify.helpers.shopify.query_generator.ShopifyQueryGeneratorImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

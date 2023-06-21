@@ -7,14 +7,12 @@ import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.
 import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.checkout.view.CheckoutEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import org.junit.After
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 

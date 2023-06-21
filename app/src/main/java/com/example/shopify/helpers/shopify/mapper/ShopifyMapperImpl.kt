@@ -2,29 +2,27 @@ package com.example.shopify.helpers.shopify.mapper
 
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
-import com.example.shopify.feature.address.addresses.model.MyAccountMinAddress
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
-import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.cart.model.CartLine
-import com.example.shopify.feature.navigation_bar.cart.model.CartProduct
-import com.example.shopify.feature.navigation_bar.common.model.Pageable
-import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
-import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
-import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
 import com.example.shopify.helpers.UIError
 import com.example.shopify.helpers.UIText
+import com.example.shopify.model.Pageable
+import com.example.shopify.model.address.MyAccountMinAddress
+import com.example.shopify.model.auth.signin.SignInUserInfo
+import com.example.shopify.model.auth.signin.SignInUserInfoResult
+import com.example.shopify.model.auth.signup.SignUpUserResponseInfo
+import com.example.shopify.model.cart.cart.Cart
+import com.example.shopify.model.cart.cart.CartLine
+import com.example.shopify.model.cart.cart.CartProduct
+import com.example.shopify.model.cart.order.LineItems
+import com.example.shopify.model.cart.order.Order
+import com.example.shopify.model.home.Brand
+import com.example.shopify.model.my_account.MinCustomerInfo
+import com.example.shopify.model.product_details.Discount
+import com.example.shopify.model.product_details.Price
+import com.example.shopify.model.product_details.Product
+import com.example.shopify.model.product_details.VariantItem
 import com.example.shopify.type.CurrencyCode
-import com.shopify.buy3.GraphCallResult
+import com.example.shopify.ui.bottom_bar.home.product.model.BrandProduct
+import com.example.shopify.ui.order.orders.OrderItemState
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
@@ -169,8 +167,9 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
 
 
-    override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order> {
+    override fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>,currencyCode: String,rate: Float): List<Order> {
         return response.data?.customer?.orders?.edges?.map {
+            val discount = it.node.shippingDiscountAllocations.getOrNull(0)?.allocatedAmount
             Order(
                 firstName = response.data?.customer?.firstName ?: "",
                 lastName = response.data?.customer?.lastName ?: "",
@@ -180,7 +179,7 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
                 processedAt = it.node.processedAt,
                 subTotalPrice = it.node.subtotalPrice,
                 totalShippingPrice = it.node.totalShippingPrice,
-                discountApplications = mapToDiscount(it.node.shippingDiscountAllocations),
+                discountApplications = discount?.let { it1 -> mapPriceV2ToLivePrice(currencyCode,rate, it1) },
                 totalTax = it.node.totalTax,
                 totalPrice = it.node.totalPrice,
                 billingAddress = it.node.shippingAddress,
@@ -282,39 +281,6 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
             is GraphError.ParseError, is GraphError.Unknown -> UIError.Unexpected
         }
 
-    override fun mapToPaymentCompletionAvailability(result: GraphResponse<Storefront.Mutation>): ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability {
-        val checkout = result.data?.checkoutCompleteWithCreditCardV2
-        val errors = checkout?.checkoutUserErrors
-            ?.map { it.message }
-            .takeIf { it != null } ?: listOf()
-        val checkoutReady = checkout?.checkout?.ready ?: false
-        val paymentReady = checkout?.payment?.ready ?: false
-        val paymentId = checkout?.payment?.id?.toString()
-
-        return ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability(
-            errors = errors,
-            checkoutReady = checkoutReady,
-            paymentReady = paymentReady,
-            paymentId = paymentId
-        )
-    }
-
-    override fun mapToPaymentResult(result: GraphCallResult.Success<Storefront.QueryRoot>): ShopifyCreditCardPaymentStrategy.PaymentResult {
-        val payment = result.response.data?.node as Storefront.Payment?
-        val orderId = payment?.checkout
-            ?.order
-            ?.id
-            ?.toString()
-
-        return ShopifyCreditCardPaymentStrategy.PaymentResult(
-            error = payment?.errorMessage,
-            orderId = orderId,
-            ready = payment?.ready ?: false,
-            orderNumber = payment?.checkout?.order?.orderNumber,
-            totalPrice = payment?.checkout?.totalPrice?.run { "$currencyCode $amount" }
-        )
-    }
-
     override fun mapMutationToCart(
         data: DraftOrderUpdateMutation.Data,
         currency: String,
@@ -342,19 +308,13 @@ class ShopifyMapperImpl @Inject constructor() : ShopifyMapper {
         }
 
 
-    private operator fun Storefront.MoneyV2?.minus(money: Storefront.MoneyV2?): Storefront.MoneyV2? {
+    private operator fun MoneyV2?.minus(money: MoneyV2?): MoneyV2? {
         val newAmount = ((this?.amount?.toDouble() ?: 0.0) - (money?.amount?.toDouble() ?: 0.0))
         if (newAmount <= 0.0) return null
-        return Storefront.MoneyV2().setAmount(newAmount.toString())
+        return MoneyV2().setAmount(newAmount.toString())
             .setCurrencyCode(this?.currencyCode ?: money?.currencyCode)
     }
 
-    private fun mapToDiscount(response: MutableList<Storefront.DiscountAllocation>): Storefront.MoneyV2 {
-        return if (!response.isEmpty()) {
-            response[0].allocatedAmount
-        } else
-            Storefront.MoneyV2()
-    }
 }
 
 private fun mapToLinesItemResponse(response: Storefront.OrderLineItemConnection): List<LineItems> =
@@ -414,7 +374,7 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(
 
     val totalTax = (this?.totalTax?.toString()?.toFloat() ?: 0f) * rate
     val subtotalPrice = (this?.subtotalPrice?.toString()?.toFloat() ?: 0f) * rate
-    val totalShippingPrice = (this?.totalShippingPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalShippingPrice = this?.totalShippingPrice?.toString()?.toFloat()?.times(rate)
     val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate - (discounts ?: 0f)
 
     return Cart(
@@ -422,9 +382,9 @@ private fun DraftOrderUpdateMutation.DraftOrder?.toCart(
         taxes = String.format("%.2f", totalTax),
         currencyCode = currencyCode,
         subTotalsPrice = String.format("%.2f", subtotalPrice),
-        shippingFee = String.format("%.2f", totalShippingPrice),
+        shippingFee = totalShippingPrice?.takeIf{ it != 0.0f }?.toString()?:"FREE",
         totalPrice = String.format("%.2f", totalPrice),
-        discounts = String.format("%.2f", discounts),
+        discounts = discounts?.run { String.format("%.2f", discounts) },
         address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,
@@ -475,7 +435,7 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
 
     val totalTax = (this?.totalTax?.toString()?.toFloat() ?: 0f) * rate
     val subtotalPrice = (this?.subtotalPrice?.toString()?.toFloat() ?: 0f) * rate
-    val totalShippingPrice = (this?.totalShippingPrice?.toString()?.toFloat() ?: 0f) * rate
+    val totalShippingPrice = this?.totalShippingPrice?.toString()?.toFloat()?.times(rate)
     val totalPrice = (this?.totalPrice?.toString()?.toFloat() ?: 0f) * rate - (discounts ?: 0f)
 
     return Cart(
@@ -483,9 +443,9 @@ private fun DraftOrderQuery.DraftOrder?.toCart(
         taxes = String.format("%.2f", totalTax),
         currencyCode = currencyCode,
         subTotalsPrice = String.format("%.2f", subtotalPrice),
-        shippingFee = String.format("%.2f", totalShippingPrice),
+        shippingFee = totalShippingPrice?.takeIf{ it != 0.0f }?.toString()?:"FREE",
         totalPrice = String.format("%.2f", totalPrice),
-        discounts = String.format("%.2f", discounts),
+        discounts = discounts?.run { String.format("%.2f", discounts) },
         address = shippingAddress ?: MyAccountMinAddress(),
         hasNextPage = this?.lineItems?.pageInfo?.hasNextPage ?: false,
         error = error,

@@ -1,9 +1,9 @@
 package com.example.shopify.feature.navigation_bar.wishList
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.wishList.viewModel.WishListViewModel
+import com.example.shopify.ui.wishList.viewModel.WishListViewModel
 import com.shopify.graphql.support.ID
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi

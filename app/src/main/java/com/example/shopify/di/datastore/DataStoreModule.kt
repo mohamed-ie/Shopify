@@ -8,8 +8,8 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
-import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManagerImpl
+import com.example.shopify.data.data_store.DataStoreManagerImpl
+import com.example.shopify.data.data_store.ShopifyDataStoreManager
 import com.example.shopify.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -42,5 +42,5 @@ class DataStoreModule {
     @Singleton
     @Provides
     fun provideShopifyDataStoreManager(dataStore: DataStore<Preferences>): ShopifyDataStoreManager =
-        ShopifyDataStoreManagerImpl(dataStore)
+        DataStoreManagerImpl(dataStore)
 }

@@ -6,12 +6,12 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManager
-import com.example.shopify.feature.navigation_bar.model.local.ShopifyDataStoreManagerImpl
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyApiClient
-import com.example.shopify.feature.navigation_bar.model.remote.apiLayerCurrency.ApiLayerCurrencyInterceptor
-import com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange.ApiLayerExchangeRepository
-import com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange.ApiLayerExchangeRepositoryImpl
+import com.example.shopify.data.api_layer_exchange.api_client.ApiLayerCurrencyApiClient
+import com.example.shopify.data.api_layer_exchange.interceptor.ApiLayerCurrencyInterceptor
+import com.example.shopify.data.api_layer_exchange.repository.ApiLayerExchangeRepository
+import com.example.shopify.data.api_layer_exchange.repository.ApiLayerExchangeRepositoryImpl
+import com.example.shopify.data.data_store.DataStoreManagerImpl
+import com.example.shopify.data.data_store.ShopifyDataStoreManager
 import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront.CurrencyCode
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +64,7 @@ class ApiLayerExchangeRepositoryTest {
             produceFile =
             { context.preferencesDataStoreFile(Constants.DataStoreKeys.USER) }
         )
-        shopifyDataStoreManager = ShopifyDataStoreManagerImpl(dataStore)
+        shopifyDataStoreManager = DataStoreManagerImpl(dataStore)
         repository = ApiLayerExchangeRepositoryImpl(shopifyDataStoreManager, currencyDto,Dispatchers.Unconfined)
     }
 

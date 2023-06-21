@@ -1,7 +1,7 @@
 package com.example.shopify.di.apiLayerCurrency
 
-import com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange.ApiLayerExchangeRepository
-import com.example.shopify.feature.navigation_bar.model.repository.apiLayerExChange.ApiLayerExchangeRepositoryImpl
+import com.example.shopify.data.api_layer_exchange.repository.ApiLayerExchangeRepository
+import com.example.shopify.data.api_layer_exchange.repository.ApiLayerExchangeRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,5 +15,5 @@ abstract class ApiLayerCurrencyRepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindApiLayerExchangeRepository(apiLayerExchangeRepositoryImpl: ApiLayerExchangeRepositoryImpl):ApiLayerExchangeRepository
+    abstract fun bindApiLayerExchangeRepository(apiLayerExchangeRepositoryImpl: ApiLayerExchangeRepositoryImpl): ApiLayerExchangeRepository
 }

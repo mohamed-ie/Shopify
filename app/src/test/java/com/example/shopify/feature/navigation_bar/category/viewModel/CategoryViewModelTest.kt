@@ -2,8 +2,9 @@ package com.example.shopify.feature.navigation_bar.category.viewModel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
+import com.example.shopify.ui.category.viewModel.CategoryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher

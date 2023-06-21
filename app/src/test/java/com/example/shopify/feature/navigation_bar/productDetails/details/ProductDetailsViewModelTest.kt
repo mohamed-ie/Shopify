@@ -2,8 +2,8 @@ package com.example.shopify.feature.navigation_bar.productDetails.details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.viewModel.ProductDetailsViewModel
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi

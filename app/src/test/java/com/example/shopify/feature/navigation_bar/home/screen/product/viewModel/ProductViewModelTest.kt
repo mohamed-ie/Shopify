@@ -3,9 +3,10 @@ package com.example.shopify.feature.navigation_bar.home.screen.product.viewModel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
+import com.example.shopify.ui.home.product.model.BrandProduct
+import com.example.shopify.ui.home.product.viewModel.ProductViewModel
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
 import junit.framework.TestCase.assertEquals

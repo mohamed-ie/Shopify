@@ -4,11 +4,11 @@ import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeS
 import com.example.shopify.helpers.validator.TextFieldStateValidatorImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import kotlinx.coroutines.test.runTest
 
 
 class ChangePhoneNumberViewModelTest {

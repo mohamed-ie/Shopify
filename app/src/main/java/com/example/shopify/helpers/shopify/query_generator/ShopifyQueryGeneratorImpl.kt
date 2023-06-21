@@ -1,8 +1,8 @@
 package com.example.shopify.helpers.shopify.query_generator
 
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
-import com.example.shopify.feature.auth.screens.registration.model.SignUpUserInfo
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
+import com.example.shopify.model.auth.signin.SignInUserInfo
+import com.example.shopify.model.auth.signup.SignUpUserInfo
+import com.example.shopify.model.cart.cart.Cart
 import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
 import com.shopify.buy3.Storefront.CartBuyerIdentityInput

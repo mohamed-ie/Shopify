@@ -2,10 +2,10 @@ package com.example.shopify.feature.navigation_bar.search
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.shopify.MainDispatcherRule
+import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
-import com.example.shopify.feature.navigation_bar.model.repository.shopify.ShopifyRepository
-import com.example.shopify.feature.search.view.SearchedProductsState
-import com.example.shopify.feature.search.viewModel.SearchViewModel
+import com.example.shopify.ui.search.view.SearchedProductsState
+import com.example.shopify.ui.search.viewModel.SearchViewModel
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay

@@ -1,7 +1,7 @@
 package com.example.shopify.helpers.firestore.mapper
 
-import com.example.shopify.feature.navigation_bar.model.remote.fireStore.FireStoreManagerImpl
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+import com.example.shopify.data.firestore.FireStoreManagerImpl
+import com.example.shopify.ui.product_details.product_details.view.Review
 import com.example.shopify.utils.Constants
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot

@@ -2,20 +2,18 @@ package com.example.shopify.helpers.shopify.mapper
 
 import com.example.shopify.DraftOrderQuery
 import com.example.shopify.DraftOrderUpdateMutation
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfo
-import com.example.shopify.feature.auth.screens.login.model.SignInUserInfoResult
-import com.example.shopify.feature.auth.screens.registration.model.SignUpUserResponseInfo
-import com.example.shopify.feature.navigation_bar.cart.model.Cart
-import com.example.shopify.feature.navigation_bar.common.model.Pageable
-import com.example.shopify.feature.navigation_bar.home.screen.home.model.Brand
-import com.example.shopify.feature.navigation_bar.home.screen.product.model.BrandProduct
-import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.payment.ShopifyCreditCardPaymentStrategy
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
 import com.example.shopify.helpers.UIError
-import com.shopify.buy3.GraphCallResult
+import com.example.shopify.model.Pageable
+import com.example.shopify.model.auth.signin.SignInUserInfo
+import com.example.shopify.model.auth.signin.SignInUserInfoResult
+import com.example.shopify.model.auth.signup.SignUpUserResponseInfo
+import com.example.shopify.model.cart.cart.Cart
+import com.example.shopify.model.cart.order.Order
+import com.example.shopify.model.home.Brand
+import com.example.shopify.model.my_account.MinCustomerInfo
+import com.example.shopify.model.product_details.Price
+import com.example.shopify.model.product_details.Product
+import com.example.shopify.ui.bottom_bar.home.product.model.BrandProduct
 import com.shopify.buy3.GraphError
 import com.shopify.buy3.GraphResponse
 import com.shopify.buy3.Storefront
@@ -31,14 +29,17 @@ interface ShopifyMapper {
     ): SignInUserInfoResult
 
     fun map(error: GraphError): UIError
-    fun mapToPaymentCompletionAvailability(result: GraphResponse<Storefront.Mutation>): ShopifyCreditCardPaymentStrategy.PaymentCompletionAvailability
-    fun mapToPaymentResult(result: GraphCallResult.Success<Storefront.QueryRoot>): ShopifyCreditCardPaymentStrategy.PaymentResult
     fun isAddressSaved(response: GraphResponse<Storefront.Mutation>): String?
     fun isAddressDeleted(response: GraphResponse<Storefront.Mutation>): Boolean
     fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo
     fun mapToProduct(response: GraphResponse<Storefront.QueryRoot>): Product
     fun mapToProductsByBrandResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
-    fun mapToOrderResponse(response: GraphResponse<Storefront.QueryRoot>): List<Order>
+    fun mapToOrderResponse(
+        response: GraphResponse<Storefront.QueryRoot>,
+        currency: String,
+        rate: Float
+    ): List<Order>
+
     fun mapToCheckoutId(result: GraphResponse<Storefront.Mutation>): ID?
     fun mapToProductsCategoryResponse(response: GraphResponse<Storefront.QueryRoot>): List<BrandProduct>
     fun mapToProductsTypeResponse(response: GraphResponse<Storefront.QueryRoot>): List<String>
@@ -49,13 +50,13 @@ interface ShopifyMapper {
     fun mapMutationToCart(data: DraftOrderUpdateMutation.Data, currency: String, rate: Float): Cart?
     fun mapToUpdateCartAddress(response: GraphResponse<Storefront.Mutation>): String?
     fun mapToProductsByQueryResponse(response: GraphResponse<Storefront.QueryRoot>): Pageable<List<BrandProduct>>?
-    //fun mapQueryToCart(response: ApolloResponse<DraftOrderQuery.Data>): Cart?
     fun mapPriceToLivePrice(liveCurrencyCode: String, liveAmount: Float, price: Price): Price
     fun mapPriceV2ToLivePrice(
         liveCurrencyCode: String,
         liveAmount: Float,
         price: Storefront.MoneyV2
     ): Storefront.MoneyV2
-    fun mapQueryToCart(data: DraftOrderQuery.Data,currency: String, rate: Float): Cart?
+
+    fun mapQueryToCart(data: DraftOrderQuery.Data, currency: String, rate: Float): Cart?
     fun mapToUpdateCustomerInfo(response: GraphResponse<Storefront.Mutation>): String?
 }

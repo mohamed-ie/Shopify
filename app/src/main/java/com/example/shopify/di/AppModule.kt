@@ -1,19 +1,18 @@
 package com.example.shopify.di
 
-import android.content.Context
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
+import java.util.Calendar
 
 @Module
-@InstallIn(SingletonComponent::class)
-abstract class AppModule {
+@InstallIn(ViewModelComponent::class)
+object AppModule {
 
-    @Binds
-    @Singleton
-    abstract fun bindsContext(@ApplicationContext context: Context) : Context
+    @Provides
+    @ViewModelScoped
+    fun provideCalender():Calendar = Calendar.getInstance()
 
 }
