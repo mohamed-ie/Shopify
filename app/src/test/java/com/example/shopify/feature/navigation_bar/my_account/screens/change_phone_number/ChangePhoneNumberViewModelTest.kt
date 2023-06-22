@@ -2,6 +2,8 @@ package com.example.shopify.feature.navigation_bar.my_account.screens.change_pho
 
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
 import com.example.shopify.helpers.validator.TextFieldStateValidatorImpl
+import com.example.shopify.ui.bottom_bar.my_account.change_phone_number.ChangePhoneNumberViewModel
+import com.example.shopify.ui.bottom_bar.my_account.change_phone_number.view.ChangePhoneNumberEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
