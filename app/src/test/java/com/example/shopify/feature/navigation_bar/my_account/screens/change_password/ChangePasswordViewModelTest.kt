@@ -1,6 +1,8 @@
 package com.example.shopify.feature.navigation_bar.my_account.screens.change_password
 
 import com.example.shopify.feature.navigation_bar.model.repository.shopify.FakeShopifyRepositoryImpl
+import com.example.shopify.ui.bottom_bar.my_account.change_password.ChangePasswordViewModel
+import com.example.shopify.ui.bottom_bar.my_account.change_password.view.ChangePasswordEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -31,7 +33,7 @@ class ChangePasswordViewModelTest {
     fun onEvent_PasswordChanged() = runTest {
         //when
         val actual = "123"
-        viewModel.onEvent(com.example.shopify.feature.navigation_bar.my_account.change_password.ChangePasswordEvent.PasswordChanged(actual))
+        viewModel.onEvent(ChangePasswordEvent.PasswordChanged(actual))
         val expected = viewModel.state.first().password.value
 
         //then
@@ -42,7 +44,7 @@ class ChangePasswordViewModelTest {
     fun onEvent_ConfirmPasswordChanged() = runTest {
         //when
         val actual = "123"
-        viewModel.onEvent(com.example.shopify.feature.navigation_bar.my_account.change_password.ChangePasswordEvent.ConfirmPasswordChanged(actual))
+        viewModel.onEvent(ChangePasswordEvent.ConfirmPasswordChanged(actual))
         val expected = viewModel.state.first().confirmPassword.value
 
         //then
@@ -52,11 +54,11 @@ class ChangePasswordViewModelTest {
     @Test
     fun onEvent_Change() = runTest {
         //give
-        viewModel.onEvent(com.example.shopify.feature.navigation_bar.my_account.change_password.ChangePasswordEvent.PasswordChanged("201120060103"))
-        viewModel.onEvent(com.example.shopify.feature.navigation_bar.my_account.change_password.ChangePasswordEvent.ConfirmPasswordChanged("201120060103"))
+        viewModel.onEvent(ChangePasswordEvent.PasswordChanged("201120060103"))
+        viewModel.onEvent(ChangePasswordEvent.ConfirmPasswordChanged("201120060103"))
 
         //when
-        viewModel.onEvent(com.example.shopify.feature.navigation_bar.my_account.change_password.ChangePasswordEvent.Change)
+        viewModel.onEvent(ChangePasswordEvent.Change)
         val expected = viewModel.state.first().remoteError
 
         //then

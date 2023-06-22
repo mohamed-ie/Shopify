@@ -2,15 +2,7 @@ package com.example.shopify.feature.navigation_bar.model.repository.shopify
 
 import com.example.shopify.data.shopify.repository.ShopifyRepository
 import com.example.shopify.model.Pageable
-import com.example.shopify.feature.navigation_bar.my_account.screens.my_account.model.MinCustomerInfo
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.LineItems
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.model.order.Order
-import com.example.shopify.feature.navigation_bar.my_account.screens.order.view.component.order.OrderItemState
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Discount
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Price
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.Product
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.model.VariantItem
-import com.example.shopify.feature.navigation_bar.productDetails.screens.productDetails.view.Review
+
 import com.example.shopify.helpers.Resource
 import com.example.shopify.model.auth.signin.SignInUserInfo
 import com.example.shopify.model.auth.signin.SignInUserInfoResult
@@ -19,8 +11,17 @@ import com.example.shopify.model.auth.signup.SignUpUserResponseInfo
 import com.example.shopify.model.cart.cart.Cart
 import com.example.shopify.model.cart.cart.CartLine
 import com.example.shopify.model.cart.cart.CartProduct
+import com.example.shopify.model.cart.order.LineItems
+import com.example.shopify.model.cart.order.Order
 import com.example.shopify.model.home.Brand
-import com.example.shopify.ui.home.product.model.BrandProduct
+import com.example.shopify.model.my_account.MinCustomerInfo
+import com.example.shopify.model.product_details.Discount
+import com.example.shopify.model.product_details.Price
+import com.example.shopify.model.product_details.Product
+import com.example.shopify.model.product_details.VariantItem
+import com.example.shopify.ui.bottom_bar.home.product.model.BrandProduct
+import com.example.shopify.ui.order.orders.OrderItemState
+import com.example.shopify.ui.product_details.product_details.view.Review
 import com.example.shopify.utils.Constants
 import com.shopify.buy3.Storefront
 import com.shopify.graphql.support.ID
