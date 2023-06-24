@@ -8,6 +8,7 @@ data class CheckoutState(
     val selectedPaymentMethod: PaymentMethod = PaymentMethod.CreditCard,
     val invoiceUrl: String? = null,
     val isInvoiceDialogVisible: Boolean = false,
-    val remoteError: UIText? = null
+    val remoteError: UIText? = null,
+    val clientSecret: String? = null
 
 )

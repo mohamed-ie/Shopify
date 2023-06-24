@@ -9,6 +9,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -57,7 +59,6 @@ fun CartCouponCard(
         OutlinedCard(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
             shape = MaterialTheme.shapes.medium,
-//            elevation = CardDefaults.elevatedCardElevation(defaultElevation = cartElevation),
             border = BorderStroke(
                 width = .8.dp, color = if (textFieldFocused) MaterialTheme.colorScheme.primary
                 else Color.Transparent
@@ -139,6 +140,15 @@ fun CartCouponCard(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+
+        state.coupons.keys.forEach {
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                text = it
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
     }
 }
 

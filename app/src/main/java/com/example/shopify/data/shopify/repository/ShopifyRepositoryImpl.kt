@@ -395,398 +395,400 @@ class ShopifyRepositoryImpl @Inject constructor(
             }
     }
 
-        private suspend fun getWishList(customerId: String): List<ID> =
-            fireStoreManager.getWishList(customerId).getOrNull() ?: emptyList()
+    private suspend fun getWishList(customerId: String): List<ID> =
+        fireStoreManager.getWishList(customerId).getOrNull() ?: emptyList()
 
 
-        override fun getShopifyProductsByWishListIDs() = flow {
-            getWishList(dataStoreManager.getEmail().first())
-                .also { productList ->
-                    productList.ifEmpty {
-                        emit(Resource.Success(null))
-                    }
-                }.forEach { id ->
-                    emit(getProductDetailsByID(id.toString()).first())
+    override fun getShopifyProductsByWishListIDs() = flow {
+        getWishList(dataStoreManager.getEmail().first())
+            .also { productList ->
+                productList.ifEmpty {
+                    emit(Resource.Success(null))
                 }
-        }
+            }.forEach { id ->
+                emit(getProductDetailsByID(id.toString()).first())
+            }
+    }
 
         private suspend fun isProductWishList(productId: ID): Boolean =
             getWishList(dataStoreManager.getEmail().first()).find { id ->
                 id == productId
             } != null
 
-        private fun Storefront.QueryRootQuery.enqueue() =
-            graphClient.enqueue(this).map { result ->
-                when (result) {
-                    is GraphCallResult.Success ->
-                        Resource.Success(result.response)
+    private fun Storefront.QueryRootQuery.enqueue() =
+        graphClient.enqueue(this).map { result ->
+            when (result) {
+                is GraphCallResult.Success ->
+                    Resource.Success(result.response)
 
-                    is GraphCallResult.Failure ->
-                        Resource.Error(mapper.map(result.error))
-                }
-            }.applyDispatcher()
-
-        private fun Storefront.MutationQuery.enqueue() =
-            graphClient.enqueue(this).map { result ->
-                when (result) {
-                    is GraphCallResult.Success ->
-                        Resource.Success(result.response)
-
-                    is GraphCallResult.Failure ->
-                        Resource.Error(mapper.map(result.error))
-                }
-            }.applyDispatcher()
-
-        private suspend fun Storefront.QueryRootQuery.enqueue1() =
-            graphClient.enqueue1(this).run {
-                when (this) {
-                    is GraphCallResult.Success ->
-                        Resource.Success(response)
-
-                    is GraphCallResult.Failure ->
-                        Resource.Error(mapper.map(error))
-                }
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(result.error))
             }
+        }.applyDispatcher()
 
-        private suspend fun Storefront.MutationQuery.enqueue1() =
-            graphClient.enqueue1(this).run {
-                when (this) {
-                    is GraphCallResult.Success ->
-                        Resource.Success(response)
+    private fun Storefront.MutationQuery.enqueue() =
+        graphClient.enqueue(this).map { result ->
+            when (result) {
+                is GraphCallResult.Success ->
+                    Resource.Success(result.response)
 
-                    is GraphCallResult.Failure ->
-                        Resource.Error(mapper.map(error))
-                }
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(result.error))
             }
+        }.applyDispatcher()
 
-        private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
+    private suspend fun Storefront.QueryRootQuery.enqueue1() =
+        graphClient.enqueue1(this).run {
+            when (this) {
+                is GraphCallResult.Success ->
+                    Resource.Success(response)
 
-        override suspend fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
-            val email = dataStoreManager.getEmail().first()
-            return queryGenerator.checkoutCreate(cart, email).enqueue()
-                .mapResource {
-                    mapper.mapToCheckoutId(it)
-                }
-        }
-
-        override fun getProductsCategory(
-            productType: String,
-            productTag: String
-        ): Flow<Resource<List<BrandProduct>>> {
-            return queryGenerator.generateProductCategoryQuery(productType, productTag).enqueue()
-                .mapResource(mapper::mapToProductsCategoryResponse)
-        }
-
-        override suspend fun getProductsTag(): Resource<List<String>> {
-            return queryGenerator.generateProductTagsQuery().enqueue1()
-                .mapResource(mapper::mapToProductsTagsResponse)
-
-        }
-
-        override suspend fun getProductsType(): Resource<List<String>> {
-            return queryGenerator.generateProductTypesQuery().enqueue1()
-                .mapResource(mapper::mapToProductsTypeResponse)
-        }
-
-        private inner class StoreFrontManager() {
-            private val queryGenerator = QueryGenerator()
-            private val mapper = Mapper()
-            suspend fun getMinCustomerInfo(accessToken: String): Resource<MinCustomerInfo> {
-                return queryGenerator.generateGetMinCustomerInfoQuery(accessToken)
-                    .enqueue1()
-                    .mapResource(mapper::mapToMinCustomerInfo)
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(error))
             }
+        }
 
-            suspend fun updateAddress(
+    private suspend fun Storefront.MutationQuery.enqueue1() =
+        graphClient.enqueue1(this).run {
+            when (this) {
+                is GraphCallResult.Success ->
+                    Resource.Success(response)
+
+                is GraphCallResult.Failure ->
+                    Resource.Error(mapper.map(error))
+            }
+        }
+
+    private fun <T> Flow<T>.applyDispatcher() = this.flowOn(defaultDispatcher)
+
+    override suspend fun getCheckOutId(cart: Cart): Flow<Resource<ID?>> {
+        val email = dataStoreManager.getEmail().first()
+        return queryGenerator.checkoutCreate(cart, email).enqueue()
+            .mapResource {
+                mapper.mapToCheckoutId(it)
+            }
+    }
+
+    override fun getProductsCategory(
+        productType: String,
+        productTag: String
+    ): Flow<Resource<List<BrandProduct>>> {
+        return queryGenerator.generateProductCategoryQuery(productType, productTag).enqueue()
+            .mapResource(mapper::mapToProductsCategoryResponse)
+    }
+
+    override suspend fun getProductsTag(): Resource<List<String>> {
+        return queryGenerator.generateProductTagsQuery().enqueue1()
+            .mapResource(mapper::mapToProductsTagsResponse)
+
+    }
+
+    override suspend fun getProductsType(): Resource<List<String>> {
+        return queryGenerator.generateProductTypesQuery().enqueue1()
+            .mapResource(mapper::mapToProductsTypeResponse)
+    }
+
+    private inner class StoreFrontManager() {
+        private val queryGenerator = QueryGenerator()
+        private val mapper = Mapper()
+        suspend fun getMinCustomerInfo(accessToken: String): Resource<MinCustomerInfo> {
+            return queryGenerator.generateGetMinCustomerInfoQuery(accessToken)
+                .enqueue1()
+                .mapResource(mapper::mapToMinCustomerInfo)
+        }
+
+        suspend fun updateAddress(
+            accessToken: String,
+            addressId: ID,
+            address: Storefront.MailingAddressInput
+        ): Resource<String?> {
+            return queryGenerator.generateUpdateAddressQuery(accessToken, addressId, address)
+                .enqueue1()
+                .mapResource(mapper::mapToAddressError)
+        }
+
+        private inner class Mapper() {
+            fun mapToAddressError(response: GraphResponse<Storefront.Mutation>) =
+                response.run {
+                    data?.customerAddressUpdate?.customerUserErrors?.getOrNull(0)?.message
+                        ?: errors.getOrNull(0)?.message()
+                }
+
+            fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo {
+                return graphResponse.data?.customer?.run {
+                    MinCustomerInfo(name = firstName, email = email)
+                } ?: MinCustomerInfo()
+            }
+        }
+
+
+        private inner class QueryGenerator() {
+            fun generateUpdateAddressQuery(
                 accessToken: String,
                 addressId: ID,
                 address: Storefront.MailingAddressInput
-            ): Resource<String?> {
-                return queryGenerator.generateUpdateAddressQuery(accessToken, addressId, address)
-                    .enqueue1()
-                    .mapResource(mapper::mapToAddressError)
-            }
-
-            private inner class Mapper() {
-                fun mapToAddressError(response: GraphResponse<Storefront.Mutation>) =
-                    response.run {
-                        data?.customerAddressUpdate?.customerUserErrors?.getOrNull(0)?.message
-                            ?: errors.getOrNull(0)?.message()
-                    }
-
-                fun mapToMinCustomerInfo(graphResponse: GraphResponse<Storefront.QueryRoot>): MinCustomerInfo {
-                    return graphResponse.data?.customer?.run {
-                        MinCustomerInfo(name = firstName, email = email)
-                    } ?: MinCustomerInfo()
+            ) = Storefront.mutation { mutation ->
+                mutation.customerAddressUpdate(
+                    accessToken,
+                    addressId,
+                    address
+                ) { customerAddressUpdate ->
+                    customerAddressUpdate.customerUserErrors { it.message() }
                 }
             }
 
 
-            private inner class QueryGenerator() {
-                fun generateUpdateAddressQuery(
-                    accessToken: String,
-                    addressId: ID,
-                    address: Storefront.MailingAddressInput
-                ) = Storefront.mutation { mutation ->
-                    mutation.customerAddressUpdate(
-                        accessToken,
-                        addressId,
-                        address
-                    ) { customerAddressUpdate ->
-                        customerAddressUpdate.customerUserErrors { it.message() }
+            fun generateGetMinCustomerInfoQuery(accessToken: String): Storefront.QueryRootQuery =
+                Storefront.query { query ->
+                    query.customer(accessToken) { customer ->
+                        customer.firstName()
+                            .email()
                     }
                 }
-
-
-                fun generateGetMinCustomerInfoQuery(accessToken: String): Storefront.QueryRootQuery =
-                    Storefront.query { query ->
-                        query.customer(accessToken) { customer ->
-                            customer.firstName()
-                                .email()
-                        }
-                    }
-
-            }
-        }
-
-
-        private inner class AdminManager() {
-
-            // return pair of draftOrderId and totalPrice
-            suspend fun createDraftOrder(
-                customerId: String,
-                variantId: String,
-                quantity: Int,
-                currencyCode: String,
-                rate: Float
-            ): Resource<Pair<String, String>?> {
-                val newLine =
-                    DraftOrderLineItemInput(variantId = variantId.present(), quantity = quantity)
-                val lines = listOf(newLine)
-                val input = DraftOrderInput(
-                    customerId = customerId.present(),
-                    lineItems = lines.present()
-                )
-                val createInput = DraftOrderCreateMutation(input = input)
-
-                return apolloClient.mutation(createInput)
-                    .executeCatching()
-                    .mapResource {
-                        it.draftOrderCreate
-                            ?.draftOrder
-                            ?.run {
-                                val amount = String.format(
-                                    "%.2f",
-                                    this.totalPrice.toString().toFloat() * rate
-                                )
-                                val total = "$currencyCode  $amount"
-                                Pair(id, total)
-                            }
-                    }
-            }
-
-            suspend fun addToDraftOrder(
-                draftOrderId: String,
-                variantId: String,
-                quantity: Int
-            ): Resource<String?> {
-                val lineItems = getDraftOrderLineItems(draftOrderId)
-                    ?: return Resource.Error(UIError.Unexpected)
-
-                lineItems.apply {
-                    val newLine =
-                        DraftOrderLineItemInput(
-                            variantId = variantId.present(),
-                            quantity = quantity
-                        )
-                    if (none { it.variantId.getOrNull() == variantId })
-                        add(newLine)
-                    else return Resource.Success(null)
-                }
-
-                val input = DraftOrderInput(lineItems = lineItems.present())
-                val updateInput = DraftOrderUpdateMutation(draftOrderId, input, Optional.Absent)
-
-                return updateDraftOrder(updateInput)
-                    .mapResource { it?.run { "$currencyCode $totalPrice" } }
-            }
-
-            //return error message if failed
-            suspend fun deleteDraftOrder(draftOrderId: String): Resource<String?> =
-                apolloClient.mutation(DraftOrderDeleteMutation(DraftOrderDeleteInput(draftOrderId)))
-                    .executeCatching()
-                    .mapResource { it.draftOrderDelete?.userErrors?.getOrNull(0)?.message }
-
-
-            /*
-            since draft order must contain at least 1 item
-            delete draft order if one line item exist
-            otherwise update draft order remove line item
-             */
-            suspend fun removeCartLine(draftOrderId: String, variantId: String): Resource<Cart?> {
-                val lineItems = getDraftOrderLineItems(draftOrderId)
-                    ?: return Resource.Error(UIError.Unexpected)
-
-                if (lineItems.size == 1)
-                    return deleteDraftOrder(draftOrderId)
-                        .mapResource { Cart(error = it) }
-                else
-                    lineItems.apply { removeIf { it.variantId.getOrNull() == variantId } }
-
-                val input = DraftOrderInput(lineItems = lineItems.present())
-                val updateInput = DraftOrderUpdateMutation(draftOrderId, input, Optional.Absent)
-
-                return updateDraftOrder(updateInput)
-            }
-
-            private suspend fun updateDraftOrder(input: DraftOrderUpdateMutation): Resource<Cart?> {
-                return apolloClient.mutation(input)
-                    .executeCatching()
-                    .mapSuspendResource {
-                        mapper.mapMutationToCart(
-                            it,
-                            dataStoreManager.getCurrency().first(),
-                            dataStoreManager.getCurrencyAmountPerOnePound().first(),
-                        )
-                    }
-            }
-
-            suspend fun changeDraftOrderLineQuantity(
-                draftOrderId: String,
-                variantId: String,
-                quantity: Int
-            ): Resource<Cart?> {
-                val lineItems = getDraftOrderLineItems(draftOrderId)
-                    ?: return Resource.Error(UIError.Unexpected)
-
-                lineItems.apply {
-                    removeIf { it.variantId.getOrNull() == variantId }
-                    val newItem = DraftOrderLineItemInput(
-                        variantId = variantId.present(),
-                        quantity = quantity
-                    )
-                    add(newItem)
-                }
-
-                val input = DraftOrderInput(lineItems = lineItems.present())
-                val updateInput = DraftOrderUpdateMutation(draftOrderId, input = input)
-
-                return updateDraftOrder(updateInput)
-            }
-
-            suspend fun completeDraftOrder(
-                draftOrderId: String,
-                paymentPending: Boolean
-            ): Resource<String?> {
-                return apolloClient.mutation(
-                    DraftOrderCompleteMutation(
-                        draftOrderId,
-                        paymentPending
-                    )
-                )
-                    .executeCatching()
-                    .mapResource { it.draftOrderComplete?.userErrors?.getOrNull(0)?.message }
-            }
-
-            suspend fun sendInvoice(cartId: String): Resource<Pair<String?, String?>?> {
-                return apolloClient.mutation(DraftOrderInvoiceSendMutation(cartId))
-                    .executeCatching()
-                    .mapResource {
-                        it.draftOrderInvoiceSend?.run {
-                            Pair(
-                                draftOrder?.invoiceUrl.toString(),
-                                userErrors.getOrNull(0)?.message
-                            )
-                        }
-                    }
-            }
-
-            suspend fun updateShippingAddress(
-                draftOrderId: String,
-                address: Storefront.MailingAddress
-            ): Resource<String?> {
-                val addressInput = MailingAddressInput(
-                    address1 = address.address1.present(),
-                    address2 = address.address2.present(),
-                    city = address.city.present(),
-                    company = address.company.present(),
-                    country = address.country.present(),
-                    firstName = address.firstName.present(),
-                    lastName = address.lastName.present(),
-                    phone = address.phone.present(),
-                    zip = address.zip.present(),
-                    province = address.province.present()
-                )
-                val input = DraftOrderInput(shippingAddress = addressInput.present())
-                val updateInput = DraftOrderUpdateMutation(draftOrderId, input)
-                return updateDraftOrder(updateInput)
-                    .mapResource { it?.error }
-            }
-
-            suspend fun applyDiscount(
-                draftOrderId: String,
-                discountValue: Double
-            ): Resource<Cart?> {
-                val appliedDiscountInput =
-                    DraftOrderAppliedDiscountInput(
-                        valueType = DraftOrderAppliedDiscountType.PERCENTAGE,
-                        value = discountValue
-                    )
-                val input = DraftOrderInput(appliedDiscount = appliedDiscountInput.present())
-                val updateInput = DraftOrderUpdateMutation(draftOrderId, input = input)
-
-                return updateDraftOrder(updateInput)
-            }
-
-
-            suspend fun getDraftOrder(cartId: String): Resource<Cart?> {
-                return apolloClient.query(DraftOrderQuery(cartId, Optional.Absent))
-                    .executeCatching()
-                    .mapSuspendResource {
-                        mapper.mapQueryToCart(
-                            it,
-                            dataStoreManager.getCurrency().first(),
-                            dataStoreManager.getCurrencyAmountPerOnePound().first()
-                        )
-                    }
-            }
-
-
-            private suspend fun getDraftOrderLineItems(
-                draftOrderId: String
-            ): MutableList<DraftOrderLineItemInput>? {
-                return apolloClient.query(DraftOrderLineItemsQuery(draftOrderId, Optional.Absent))
-                    .executeCatching()
-                    .getOrNull()
-                    ?.draftOrder
-                    ?.lineItems
-                    ?.nodes
-                    ?.map {
-                        DraftOrderLineItemInput(
-                            quantity = it.quantity,
-                            variantId = it.variant?.id.present()
-                        )
-                    }
-                    ?.toMutableList()
-            }
-
-            private suspend fun <D : Operation.Data> ApolloCall<D>.executeCatching(): Resource<D> =
-                try {
-                    val response = execute()
-                    if (response.hasErrors())
-                        Resource.Error(UIError.Unexpected)
-                    else
-                        Resource.Success(response.dataAssertNoErrors)
-                } catch (e: Exception) {
-                    Resource.Error(UIError.Unexpected)
-                }
-
-
-            @JvmName("present")
-            private fun <T : Any> T?.present(): Optional<T?> = Optional.present(this)
-
-            @JvmName("null_present")
-            private fun <T : Any> T.present(): Optional<T> = Optional.present(this)
 
         }
     }
+
+
+    private inner class AdminManager() {
+
+        // return pair of draftOrderId and totalPrice
+        suspend fun createDraftOrder(
+            customerId: String,
+            variantId: String,
+            quantity: Int,
+            currencyCode: String,
+            rate: Float
+        ): Resource<Pair<String, String>?> {
+            val rate =  if (currencyCode == "EGP") 1f else rate
+
+            val newLine =
+                DraftOrderLineItemInput(variantId = variantId.present(), quantity = quantity)
+            val lines = listOf(newLine)
+            val input = DraftOrderInput(
+                customerId = customerId.present(),
+                lineItems = lines.present()
+            )
+            val createInput = DraftOrderCreateMutation(input = input)
+
+            return apolloClient.mutation(createInput)
+                .executeCatching()
+                .mapResource {
+                    it.draftOrderCreate
+                        ?.draftOrder
+                        ?.run {
+                            val amount = String.format(
+                                "%.2f",
+                                this.totalPrice.toString().toFloat() * rate
+                            )
+                            val total = "$currencyCode  $amount"
+                            Pair(id, total)
+                        }
+                }
+        }
+
+        suspend fun addToDraftOrder(
+            draftOrderId: String,
+            variantId: String,
+            quantity: Int
+        ): Resource<String?> {
+            val lineItems = getDraftOrderLineItems(draftOrderId)
+                ?: return Resource.Error(UIError.Unexpected)
+
+            lineItems.apply {
+                val newLine =
+                    DraftOrderLineItemInput(
+                        variantId = variantId.present(),
+                        quantity = quantity
+                    )
+                if (none { it.variantId.getOrNull() == variantId })
+                    add(newLine)
+                else return Resource.Success(null)
+            }
+
+            val input = DraftOrderInput(lineItems = lineItems.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input, Optional.Absent)
+
+            return updateDraftOrder(updateInput)
+                .mapResource { it?.run { "$currencyCode $totalPrice" } }
+        }
+
+        //return error message if failed
+        suspend fun deleteDraftOrder(draftOrderId: String): Resource<String?> =
+            apolloClient.mutation(DraftOrderDeleteMutation(DraftOrderDeleteInput(draftOrderId)))
+                .executeCatching()
+                .mapResource { it.draftOrderDelete?.userErrors?.getOrNull(0)?.message }
+
+
+        /*
+        since draft order must contain at least 1 item
+        delete draft order if one line item exist
+        otherwise update draft order remove line item
+         */
+        suspend fun removeCartLine(draftOrderId: String, variantId: String): Resource<Cart?> {
+            val lineItems = getDraftOrderLineItems(draftOrderId)
+                ?: return Resource.Error(UIError.Unexpected)
+
+            if (lineItems.size == 1)
+                return deleteDraftOrder(draftOrderId)
+                    .mapResource { Cart(error = it) }
+            else
+                lineItems.apply { removeIf { it.variantId.getOrNull() == variantId } }
+
+            val input = DraftOrderInput(lineItems = lineItems.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input, Optional.Absent)
+
+            return updateDraftOrder(updateInput)
+        }
+
+        private suspend fun updateDraftOrder(input: DraftOrderUpdateMutation): Resource<Cart?> {
+            return apolloClient.mutation(input)
+                .executeCatching()
+                .mapSuspendResource {
+                    mapper.mapMutationToCart(
+                        it,
+                        dataStoreManager.getCurrency().first(),
+                        dataStoreManager.getCurrencyAmountPerOnePound().first(),
+                    )
+                }
+        }
+
+        suspend fun changeDraftOrderLineQuantity(
+            draftOrderId: String,
+            variantId: String,
+            quantity: Int
+        ): Resource<Cart?> {
+            val lineItems = getDraftOrderLineItems(draftOrderId)
+                ?: return Resource.Error(UIError.Unexpected)
+
+            lineItems.apply {
+                removeIf { it.variantId.getOrNull() == variantId }
+                val newItem = DraftOrderLineItemInput(
+                    variantId = variantId.present(),
+                    quantity = quantity
+                )
+                add(newItem)
+            }
+
+            val input = DraftOrderInput(lineItems = lineItems.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input = input)
+
+            return updateDraftOrder(updateInput)
+        }
+
+        suspend fun completeDraftOrder(
+            draftOrderId: String,
+            paymentPending: Boolean
+        ): Resource<String?> {
+            return apolloClient.mutation(
+                DraftOrderCompleteMutation(
+                    draftOrderId,
+                    paymentPending
+                )
+            )
+                .executeCatching()
+                .mapResource { it.draftOrderComplete?.userErrors?.getOrNull(0)?.message }
+        }
+
+        suspend fun sendInvoice(cartId: String): Resource<Pair<String?, String?>?> {
+            return apolloClient.mutation(DraftOrderInvoiceSendMutation(cartId))
+                .executeCatching()
+                .mapResource {
+                    it.draftOrderInvoiceSend?.run {
+                        Pair(
+                            draftOrder?.invoiceUrl.toString(),
+                            userErrors.getOrNull(0)?.message
+                        )
+                    }
+                }
+        }
+
+        suspend fun updateShippingAddress(
+            draftOrderId: String,
+            address: Storefront.MailingAddress
+        ): Resource<String?> {
+            val addressInput = MailingAddressInput(
+                address1 = address.address1.present(),
+                address2 = address.address2.present(),
+                city = address.city.present(),
+                company = address.company.present(),
+                country = address.country.present(),
+                firstName = address.firstName.present(),
+                lastName = address.lastName.present(),
+                phone = address.phone.present(),
+                zip = address.zip.present(),
+                province = address.province.present()
+            )
+            val input = DraftOrderInput(shippingAddress = addressInput.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input)
+            return updateDraftOrder(updateInput)
+                .mapResource { it?.error }
+        }
+
+        suspend fun applyDiscount(
+            draftOrderId: String,
+            discountValue: Double
+        ): Resource<Cart?> {
+            val appliedDiscountInput =
+                DraftOrderAppliedDiscountInput(
+                    valueType = DraftOrderAppliedDiscountType.PERCENTAGE,
+                    value = discountValue
+                )
+            val input = DraftOrderInput(appliedDiscount = appliedDiscountInput.present())
+            val updateInput = DraftOrderUpdateMutation(draftOrderId, input = input)
+
+            return updateDraftOrder(updateInput)
+        }
+
+
+        suspend fun getDraftOrder(cartId: String): Resource<Cart?> {
+            return apolloClient.query(DraftOrderQuery(cartId, Optional.Absent))
+                .executeCatching()
+                .mapSuspendResource {
+                    mapper.mapQueryToCart(
+                        it,
+                        dataStoreManager.getCurrency().first(),
+                        dataStoreManager.getCurrencyAmountPerOnePound().first()
+                    )
+                }
+        }
+
+
+        private suspend fun getDraftOrderLineItems(
+            draftOrderId: String
+        ): MutableList<DraftOrderLineItemInput>? {
+            return apolloClient.query(DraftOrderLineItemsQuery(draftOrderId, Optional.Absent))
+                .executeCatching()
+                .getOrNull()
+                ?.draftOrder
+                ?.lineItems
+                ?.nodes
+                ?.map {
+                    DraftOrderLineItemInput(
+                        quantity = it.quantity,
+                        variantId = it.variant?.id.present()
+                    )
+                }
+                ?.toMutableList()
+        }
+
+        private suspend fun <D : Operation.Data> ApolloCall<D>.executeCatching(): Resource<D> =
+            try {
+                val response = execute()
+                if (response.hasErrors())
+                    Resource.Error(UIError.Unexpected)
+                else
+                    Resource.Success(response.dataAssertNoErrors)
+            } catch (e: Exception) {
+                Resource.Error(UIError.Unexpected)
+            }
+
+
+        @JvmName("present")
+        private fun <T : Any> T?.present(): Optional<T?> = Optional.present(this)
+
+        @JvmName("null_present")
+        private fun <T : Any> T.present(): Optional<T> = Optional.present(this)
+
+    }
+}

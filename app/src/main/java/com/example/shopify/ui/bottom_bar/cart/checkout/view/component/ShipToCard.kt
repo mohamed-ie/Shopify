@@ -22,16 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shopify.R
-import com.example.shopify.ui.theme.ShopifyTheme
+import com.example.shopify.model.address.MyAccountMinAddress
 
 @Composable
 fun ShipToCard(
-    name: String,
-    address: String,
-    phone: String,
+    address: MyAccountMinAddress,
     onChangeClick: () -> Unit
 ) {
 
@@ -54,7 +51,12 @@ fun ShipToCard(
 
             TextButton(onClick = onChangeClick) {
                 Text(
-                    text = stringResource(id = R.string.change),
+                    text = stringResource(
+                        id = if (address.address == null)
+                            R.string.select
+                        else
+                            R.string.change
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -62,9 +64,7 @@ fun ShipToCard(
             }
         }
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
             colors = CardDefaults.cardColors(containerColor = Color.White),
             border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.2f)),
@@ -80,34 +80,25 @@ fun ShipToCard(
                     contentDescription = null,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = address,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = phone,
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    address.address?.let {
+                        Text(
+                            text = it.asString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                    address.phone?.let {
+                        Text(
+                            text = it.asString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    } ?: Text(
+                        text = stringResource(id = R.string.no_address_selected),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
 
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewShipToScreen() {
-    ShopifyTheme {
-        ShipToCard(
-            name="ahmed",
-            address = "galal street - elhassan building - haram - giza - egypt ", "01120060103",
-            onChangeClick = { }
-        )
     }
 }

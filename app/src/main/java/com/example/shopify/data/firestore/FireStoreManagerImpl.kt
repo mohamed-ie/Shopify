@@ -61,8 +61,10 @@ class FireStoreManagerImpl @Inject constructor(
             }
 
 
-
-    override suspend fun setProductReviewByProductId(productId: ID, review: Review):Resource<Unit> =
+    override suspend fun setProductReviewByProductId(
+        productId: ID,
+        review: Review
+    ): Resource<Unit> =
         fireStore.collection(PATH)
             .document(productId.encodeProductId())
             .collection(REVIEW_PATH)
@@ -71,9 +73,8 @@ class FireStoreManagerImpl @Inject constructor(
             .awaitResource {}
 
 
-
     override suspend fun updateCurrency(customerId: String, currency: String) {
-        customerId.ifEmpty { return  }
+        customerId.ifEmpty { return }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .set(Collections.singletonMap(Customer.Fields.CURRENCY, currency))
@@ -108,26 +109,26 @@ class FireStoreManagerImpl @Inject constructor(
     override suspend fun clearDraftOrderId(email: String): Resource<Unit> {
         email.ifEmpty { return Resource.Success(Unit) }
         return fireStore.collection(Customer.PATH)
-                    .document(email)
-                    .update(Customer.Fields.CURRENT_CART_ID, null)
-                    .awaitResource {}
+            .document(email)
+            .update(Customer.Fields.CURRENT_CART_ID, null)
+            .awaitResource {}
 
     }
 
     override suspend fun getCurrentCartId(email: String): Resource<String?> {
         email.ifEmpty { return Resource.Success(null) }
         return fireStore.collection(Customer.PATH)
-                    .document(email)
-                    .get()
-                    .awaitResource{
-                        it.get(Customer.Fields.CURRENT_CART_ID) as String?
-                    }
+            .document(email)
+            .get()
+            .awaitResource {
+                it.get(Customer.Fields.CURRENT_CART_ID) as String?
+            }
 
     }
 
 
     override suspend fun updateWishList(customerId: String, productId: ID) {
-        customerId.ifEmpty { return  }
+        customerId.ifEmpty { return }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .update(
@@ -137,7 +138,7 @@ class FireStoreManagerImpl @Inject constructor(
     }
 
     override suspend fun removeAWishListProduct(customerId: String, productId: ID) {
-        customerId.ifEmpty { return  }
+        customerId.ifEmpty { return }
         fireStore.collection(Customer.PATH)
             .document(customerId)
             .update(
@@ -162,8 +163,8 @@ class FireStoreManagerImpl @Inject constructor(
             .get()
             .awaitResource { documentSnapshot ->
                 (documentSnapshot.get(Customer.Fields.WISH_LIST) as? List<*>)
-                ?.map { it as String }
-                ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
+                    ?.map { it as String }
+                    ?.map(mapper::mapEncodedToDecodedProductId) ?: emptyList()
             }
     }
 
@@ -177,11 +178,10 @@ class FireStoreManagerImpl @Inject constructor(
             }
     }
 
-    private suspend fun <I,O> Task<I>.awaitResource(block: suspend (I)->O): Resource<O> {
+    private suspend fun <I, O> Task<I>.awaitResource(block: suspend (I) -> O): Resource<O> {
         return try {
             Resource.Success(block(await()))
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Resource.Error(UIError.Unexpected)
         }
     }
@@ -189,8 +189,7 @@ class FireStoreManagerImpl @Inject constructor(
     private suspend fun <I> Task<I>.awaitResource(): Resource<I> {
         return try {
             Resource.Success(await())
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Resource.Error(UIError.Unexpected)
         }
     }

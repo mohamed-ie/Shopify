@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.lang.Math.abs
 import javax.inject.Inject
 
 
@@ -90,7 +91,7 @@ class ProductDetailsViewModel @Inject constructor(
                     is Resource.Success -> {
                         _variantState.value = _variantState.value.copy(
                             variants = mapAnyNegativeQuantity(resource.data.variants),
-                            isLowStock = resource.data.totalInventory <= 5,
+                            isLowStock = abs(resource.data.totalInventory) <= 5,
                             isAvailable = resource.data.totalInventory != 0
                         )
                         _productState.value = resource.data.copy(

@@ -181,5 +181,8 @@
     <string name="edit_information">Edit Information</string>
     <string name="the_current_product_is_not_available">The current product is not available</string>
     <string name="please_check_our_other_available_products">Please check our other available products</string>
+    <string name="stripe">Stripe Pay</string>
+    <string name="no_address_selected">No Shipping address selected</string>
+    <string name="select">Select</string>
 
 </resources>

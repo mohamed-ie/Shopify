@@ -59,7 +59,7 @@ fun CartScreenContent(
         RemoteErrorHeader(error = cart.error)
         CartHeader(
             itemsCount = itemsCount,
-            address = cart.address.address.asString(),
+            address = cart.address.address?.asString()?:"",
             navigateToWishlistScreen = {
                 if (state.isLoggedIn)
                     navigateTo(Graph.WISH_LIST)
