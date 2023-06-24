@@ -10,7 +10,7 @@ import com.example.shopify.R
 
 sealed class PaymentMethod(@StringRes val nameResource: Int, val icon: ImageVector) {
     object CreditCard :
-        PaymentMethod(nameResource = R.string.credit_card, icon = Icons.Rounded.CreditCard)
+        PaymentMethod(nameResource = R.string.stripe, icon = Icons.Rounded.CreditCard)
 
     object CashOnDelivery :
         PaymentMethod(nameResource = R.string.cash_on_delivery, icon = Icons.Rounded.Payments)

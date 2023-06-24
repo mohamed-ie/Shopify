@@ -1,9 +1,8 @@
 package com.example.shopify.feature.navigation_bar.model.repository.shopify
 
 import com.example.shopify.data.shopify.repository.ShopifyRepository
-import com.example.shopify.model.Pageable
-
 import com.example.shopify.helpers.Resource
+import com.example.shopify.model.Pageable
 import com.example.shopify.model.auth.signin.SignInUserInfo
 import com.example.shopify.model.auth.signin.SignInUserInfoResult
 import com.example.shopify.model.auth.signup.SignUpUserInfo
@@ -245,6 +244,7 @@ class FakeShopifyRepositoryImpl(
         TODO("Not yet implemented")
     }
 
+
     override suspend fun updateCartShippingAddress(address: Storefront.MailingAddress): Resource<String?> {
         TODO("Not yet implemented")
     }
@@ -425,4 +425,6 @@ class FakeShopifyRepositoryImpl(
     ): Resource<String?> {
         TODO("Not yet implemented")
     }
+
+
 }

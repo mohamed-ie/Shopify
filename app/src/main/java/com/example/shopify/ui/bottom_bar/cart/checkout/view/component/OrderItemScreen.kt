@@ -1,6 +1,5 @@
 package com.example.shopify.ui.bottom_bar.cart.checkout.view.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrokenImage
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,15 +39,16 @@ fun OrderItemScreen(
     cartLine: CartLine,
 ) {
     val product = cartLine.cartProduct
-    Column(
+    Card(
         modifier = Modifier
-            .background(Color.White)
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        shape = MaterialTheme.shapes.small
     ) {
         Row(
             modifier = Modifier
                 .wrapContentHeight()
+                .padding(vertical = 4.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -116,27 +117,3 @@ fun OrderItemScreen(
         }
     }
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewItemScreen() {
-//    ShopifyTheme {
-//        OrderItemScreen(
-//                    CartLine(
-//                        productVariantID = ID(""),
-//                        index = ID(""),
-//                        Storefront.MoneyV2().setAmount("900.00")
-//                            .setCurrencyCode(Storefront.CurrencyCode.EGP),
-//                        quantity = 1,
-//                        availableQuantity = 20,
-//                        cartProduct = CartProduct(
-//                            name = "Snpurdiri 60% Wired Gaming Keyboard, RGB Backlit Ultra-Compact Mini Keyboard, Waterproof Small Compact 61 Keys Keyboard for PC/Mac Gamer, Typist, Travel, Easy to Carry on Business Trip(Black-White)",
-//                            collection = "Electronics",
-//                            thumbnail = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMSOfds9U-FZS1k7vZ01-SA6M7MxN-esvkFAkxePEN5V4EUU1nejc1i9vMm8D274FXBQM",
-//                            vendor = "Amazon"
-//                        )
-//                    )
-//
-//        )
-//    }
-//}

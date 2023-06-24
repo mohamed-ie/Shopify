@@ -17,8 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shopify.R
-import com.example.shopify.ui.common.topbar.NamedTopAppBar
-import com.example.shopify.ui.common.component.RemoteErrorHeader
 import com.example.shopify.ui.address.AddressGraph
 import com.example.shopify.ui.bottom_bar.cart.cart.view.componenet.total_cost.TotalCostCard
 import com.example.shopify.ui.bottom_bar.cart.checkout.view.component.CheckoutFooterScreen
@@ -27,6 +25,8 @@ import com.example.shopify.ui.bottom_bar.cart.checkout.view.component.PaymentMet
 import com.example.shopify.ui.bottom_bar.cart.checkout.view.component.ShipToCard
 import com.example.shopify.ui.bottom_bar.cart.checkout.view.event.CheckoutEvent
 import com.example.shopify.ui.bottom_bar.cart.checkout.view.state.CheckoutState
+import com.example.shopify.ui.common.component.RemoteErrorHeader
+import com.example.shopify.ui.common.topbar.NamedTopAppBar
 import com.example.shopify.ui.theme.ShopifyTheme
 
 @Composable
@@ -45,19 +45,20 @@ fun CheckoutContent(
         LazyColumn(modifier = Modifier.weight(1f)) {
             item {
                 ShipToCard(
-                    name = cart.address.name.asString(),
-                    address = cart.address.address.asString(),
-                    phone = cart.address.phone.asString(),
+                    address = cart.address,
                     onChangeClick = { navigateTo(AddressGraph.Addresses.withArgs("true", "ture")) }
                 )
             }
             item {
+                Spacer(modifier = Modifier.height(8.dp))
                 PaymentMethodScreen(
                     selected = state.selectedPaymentMethod,
                     paymentMethodChanged = { onEvent(CheckoutEvent.PaymentMethodChanged(it)) }
                 )
             }
             item {
+                Spacer(modifier = Modifier.height(8.dp))
+
                 TotalCostCard(
                     itemsCount = cart.lines.size,
                     subTotalsPrice = "${cart.currencyCode} ${cart.subTotalsPrice}",

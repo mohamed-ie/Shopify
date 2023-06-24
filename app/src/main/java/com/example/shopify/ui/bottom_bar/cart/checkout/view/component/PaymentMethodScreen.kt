@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -20,12 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shopify.R
 import com.example.shopify.ui.bottom_bar.cart.checkout.view.state.PaymentMethod
 import com.example.shopify.ui.theme.ShopifyTheme
 
@@ -93,7 +98,14 @@ fun RadioButtonOption(
             modifier = Modifier,
         )
         Spacer(modifier = Modifier.weight(1f))
-        Icon(
+        if (icon == Icons.Rounded.CreditCard)
+            Icon(
+                modifier = Modifier.size(40.dp),
+                painter = painterResource(id = R.drawable.stripe_wordmark___blurple),
+                contentDescription = null
+            )
+        else Icon(
+            modifier = Modifier.padding(horizontal = 8.dp),
             imageVector = icon,
             contentDescription = null
         )

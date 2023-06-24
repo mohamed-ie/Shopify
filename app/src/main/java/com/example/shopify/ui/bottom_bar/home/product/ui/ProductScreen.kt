@@ -26,15 +26,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.shopify.R
-import com.example.shopify.ui.common.screen.ErrorScreen
-import com.example.shopify.ui.common.screen.LoadingScreen
-import com.example.shopify.ui.common.topbar.NamedTopAppBar
-import com.example.shopify.ui.common.component.SearchHeader
-import com.example.shopify.ui.common.state.ScreenState
 import com.example.shopify.helpers.firestore.mapper.encodeProductId
 import com.example.shopify.ui.auth.Auth
 import com.example.shopify.ui.bottom_bar.home.product.model.ProductsState
 import com.example.shopify.ui.bottom_bar.home.product.viewModel.ProductViewModel
+import com.example.shopify.ui.common.component.SearchHeader
+import com.example.shopify.ui.common.screen.ErrorScreen
+import com.example.shopify.ui.common.screen.LoadingScreen
+import com.example.shopify.ui.common.state.ScreenState
+import com.example.shopify.ui.common.topbar.NamedTopAppBar
 import com.example.shopify.ui.product_details.ProductDetailsGraph
 import com.shopify.graphql.support.ID
 
@@ -99,7 +99,7 @@ fun ProductScreenContent(
     navigateToSearch: () -> Unit
 ) {
     Column() {
-        NamedTopAppBar("", navigateToHome)
+        NamedTopAppBar(back= navigateToHome)
         SearchHeader { navigateToSearch() }
         Slider(
             minValue = productsState.minPrice,

@@ -66,7 +66,7 @@ fun ProductDetailsCard(
             contentAlignment = Alignment.Center
         ) {
             ImageCardScrollHorizontally(
-                isAvailable = isAvailable,
+                isAvailable = true,
                 images = thumbnails,
                 isFavourite = isFavourite,
                 addToFavourite = { onFavouriteClick(isFavourite) }
