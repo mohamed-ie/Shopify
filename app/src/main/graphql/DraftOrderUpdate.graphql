@@ -1,0 +1,51 @@
+mutation draftOrderUpdate($id: ID!, $input: DraftOrderInput!,$after: String) {
+    draftOrderUpdate(id: $id, input: $input) {
+        draftOrder {
+            id
+            subtotalPrice
+            totalPrice
+            totalShippingPrice
+            totalTax
+            currencyCode
+            lineItems(first: 200,after: $after){
+                nodes {
+                    id
+                    image{url}
+                    name
+                    vendor
+                    name
+                    quantity
+                    product {
+                        id
+                        productType
+                    }
+                    variant {
+                        id
+                        inventoryQuantity
+                        price
+                        barcode
+                    }
+                }
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+            }
+            appliedDiscount {
+                amountV2 {
+                    amount
+                    currencyCode
+                }
+            }
+
+            shippingAddress {
+                firstName
+                lastName
+                phone
+                formattedArea
+            }
+
+        }
+        userErrors {message}
+    }
+}

@@ -1,0 +1,5 @@
+mutation draftOrderComplete($id: ID!,$paymentPending: Boolean!) {
+    draftOrderComplete(id: $id,paymentPending: $paymentPending) {
+        userErrors {message}
+    }
+}
